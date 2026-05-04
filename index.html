@@ -165,7 +165,6 @@
     const ctx = canvas.getContext('2d');
     let pintando = false;
 
-    // FUNCIÓN CAMBIO DE TEMA
     function toggleTheme() {
         const body = document.documentElement;
         const btn = document.getElementById('themeBtn');
@@ -277,14 +276,14 @@
         if (fotoFile) {
             const fileName = `${Date.now()}_${fotoFile.name}`;
             const { data, error } = await client.storage
-                .from('estudio_imagenes')
+                .from('MEDIA') // Nombre del bucket en mayúsculas según captura
                 .upload(fileName, fotoFile);
             
             if (error) {
                 console.error("Error subiendo foto:", error);
             } else {
                 const { data: urlData } = client.storage
-                    .from('estudio_imagenes')
+                    .from('MEDIA')
                     .getPublicUrl(fileName);
                 fotoUrl = urlData.publicUrl;
             }
