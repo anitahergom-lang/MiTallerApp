@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mi Taller - Diseño de Moda</title>
+    
+    <!-- CONFIGURACIÓN PARA QUE PAREZCA UNA APP INSTALADA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mi Taller">
+    
+    <!-- LOGO DE LA APP -->
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" href="icon.png">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --primario: #9c27b0; --secundario: #ce93d8; --fondo: #f4f4f9; --blanco: #ffffff; }
+        
+        /* Ajuste para que la app ocupe toda la pantalla sin scroll extra en el móvil */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: var(--fondo); 
+            padding: 20px; 
+            color: #333; 
+            margin: 0;
+            padding-top: env(safe-area-inset-top); /* Evita que el diseño choque con el 'notch' del iPhone */
+        }
+        
+        .menu-secciones { text-align: center; margin-bottom: 25px; background: var(--blanco); padding: 15px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
+        .btn-nav { padding: 10px 20px; font-weight: bold; border-radius: 10px; border: 1px solid #ddd; cursor: pointer; background: var(--blanco); text-transform: uppercase; font-size: 13px; transition: 0.3s; }
+        .btn-nav.active { background: #fdf5ff; border-color: var(--primario); color: var(--primario); }
+        .btn-proyectos { background: var(--secundario) !important; color: var(--blanco) !important; border: none !important; display: flex; align-items: center; gap: 5px; }
+
+        .contenedor-seccion { max-width: 900px; margin: auto; }
+        .seccion-diseno { background: var(--blanco); border-radius: 20px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 1px solid #eee; }
+        .header-diseno { text-align: center; color: var(--primario); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 25px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        
+        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .col-full { grid-column: 1 / -1; }
+
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #666; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 15px; background: #fafafa; }
+
+        .canvas-wrapper { position: relative; width: 100%; max-width: 450px; height: 600px; margin: 20px auto; background: #fff; border-radius: 15px; border: 2px solid #eee; overflow: hidden; cursor: crosshair; touch-action: none; }
+        #silueta-estudio { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; z-index: 1; pointer-events: none; }
+        canvas { position: absolute; top: 0; left: 0; z-index: 2; background: transparent; }
+
+        .controles-dibujo { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .btn-principal { background: var(--primario); color: white; padding: 15px 30px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; width: 100%; transition: 0.3s; }
+        
+        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .item-card { background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee; text-align: center; transition: 0.3s; }
+        .item-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 10px; }
+        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
+        .btn-qty { width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--primario); color: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="botones-menu" class="menu-secciones"></div>
+
+    <div class="contenedor-seccion">
+        <div id="seccion-stock">
+            <div id="formulario-registro" class="seccion-diseno" style="margin-bottom: 30px; display: none;">
+                <h3 style="margin-top:0">📦 Nuevo Material</h3>
+                <div class="grid-inputs">
+                    <input type="text" id="m-nombre" placeholder="Nombre (ej: Lana Merino)">
+                    <input type="number" id="m-cantidad" placeholder="Cantidad" value="1">
+                    <select id="m-categoria"></select>
+                    <input type="file" id="m-foto" accept="image/*">
+                </div>
+                <button class="btn-principal" onclick="subirMaterial()">AÑADIR AL TALLER</button>
+            </div>
+            <div id="lista-stock" class="grid-estudio"></div>
+        </div>
+
+        <div id="seccion-proyectos" style="display:none;">
+            <div class="seccion-diseno">
+                <h2 class="header-diseno">✨ Nuevo Diseño</h2>
+                <div class="grid-inputs">
+                    <div class="col-full">
+                        <label>Nombre del Proyecto</label>
+                        <input type="text" id="p-nombre" placeholder="Ej: Jersey de Invierno">
+                    </div>
+                    <div>
+                        <label>Notas de Confección</label>
+                        <textarea id="p-notas" rows="4" placeholder="Agujas, tipo de punto..."></textarea>
+                    </div>
+                    <div>
+                        <label>Patrón o Guía (PDF)</label>
+                        <input type="file" id="p-pdf" accept=".pdf">
+                    </div>
+                </div>
+
+                <div class="canvas-wrapper">
+                    <img id="silueta-estudio" src="Silueta 3 cuerpos.jpg">
+                    <canvas id="lienzo" width="450" height="600"></canvas>
+                </div>
+
+                <div class="controles-dibujo">
+                    <button onclick="limpiarLienzo()" style="background:#eee; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">Limpiar Boceto</button>
+                    <input type="color" id="pincel-color" value="#9c27b0" style="width:50px; height:40px;">
+                </div>
+
+                <button class="btn-principal" onclick="guardarProyectoCompleto()">GUARDAR PROYECTO FINAL</button>
+            </div>
+            
+            <h3 style="text-align:center; margin-top:40px;">📂 Mis Diseños Guardados</h3>
+            <div id="historial-proyectos" class="grid-estudio"></div>
+        </div>
+    </div>
+
+<script>
+    const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
+    const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
+    const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    let stockLocal = [];
+    let secciones = [];
+    const canvas = document.getElementById('lienzo');
+    const ctx = canvas.getContext('2d');
+    let pintando = false;
+
+    async function init() {
+        const { data } = await client.from('Secciones').select('nombre');
+        secciones = data.map(s => s.nombre);
+        renderMenu();
+        renderSelect();
+        await cargarStock();
+        setupDibujo();
+        cambiarVista('INICIO');
+    }
+
+    function renderMenu() {
+        const m = document.getElementById('botones-menu');
+        let html = `<button class="btn-nav" data-ref="INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>`;
+        
+        secciones.forEach(s => {
+            let emoji = '🧶'; 
+            const nombre = s.toLowerCase();
+            if (nombre.includes('tela')) emoji = '👗';
+            else if (nombre.includes('hilo')) emoji = '🧵';
+            else if (nombre.includes('accesorios')) emoji = '🎀';
+            else if (nombre.includes('otros')) emoji = '🧸';
+            html += `<button class="btn-nav" data-ref="${s}" onclick="cambiarVista('${s}')">${emoji} ${s}</button>`;
+        });
+        
+        html += `<button class="btn-nav btn-proyectos" data-ref="PROYECTOS" onclick="cambiarVista('PROYECTOS')">📂 PROYECTOS</button>`;
+        m.innerHTML = html;
+    }
+
+    function renderSelect() {
+        document.getElementById('m-categoria').innerHTML = secciones.map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+
+    function cambiarVista(v) {
+        document.querySelectorAll('.btn-nav').forEach(b => {
+            b.classList.toggle('active', b.getAttribute('data-ref') === v);
+        });
+        const isPro = v === 'PROYECTOS';
+        const isInicio = v === 'INICIO';
+        document.getElementById('seccion-stock').style.display = isPro ? 'none' : 'block';
+        document.getElementById('seccion-proyectos').style.display = isPro ? 'block' : 'none';
+        document.getElementById('formulario-registro').style.display = isInicio ? 'block' : 'none';
+        
+        if(!isPro) {
+            let filtrados = isInicio ? stockLocal : stockLocal.filter(i => (i.categoria || "").toLowerCase().includes(v.toLowerCase()));
+            renderStock(filtrados);
+        } else {
+            cargarHistorial();
+        }
+    }
+
+    async function cargarStock() {
+        const { data } = await client.from('estudio_data').select('*');
+        stockLocal = data || [];
+    }
+
+    function renderStock(items) {
+        const div = document.getElementById('lista-stock');
+        div.innerHTML = items.map(m => `
+            <div class="item-card">
+                <img src="${m.contenido || 'https://via.placeholder.com/150'}">
+                <strong>${m.tipo_material}</strong>
+                <p style="font-size:12px; color:#666">${m.categoria}</p>
+                <div class="controles-stock">
+                    <button class="btn-qty" onclick="actualizarCant(${m.id},-1)">-</button>
+                    <span>${m.cantidad || 0}</span>
+                    <button class="btn-qty" onclick="actualizarCant(${m.id},1)">+</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function actualizarCant(id, d) {
+        const i = stockLocal.find(x => x.id === id);
+        const nc = Math.max(0, (i.cantidad || 0) + d);
+        await client.from('estudio_data').update({ cantidad: nc }).eq('id', id);
+        i.cantidad = nc;
+        cambiarVista(document.querySelector('.btn-nav.active').getAttribute('data-ref'));
+    }
+
+    function setupDibujo() {
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        const colorPicker = document.getElementById('pincel-color');
+        const getPos = (e) => {
+            const r = canvas.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            return { x: clientX - r.left, y: clientY - r.top };
+        };
+        const start = (e) => { pintando = true; ctx.strokeStyle = colorPicker.value; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); };
+        const move = (e) => { if(!pintando) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); };
+        const stop = () => { pintando = false; };
+        canvas.onmousedown = start; canvas.onmousemove = move; window.onmouseup = stop;
+        canvas.ontouchstart = (e) => { start(e); e.preventDefault(); };
+        canvas.ontouchmove = (e) => { move(e); e.preventDefault(); };
+    }
+
+    function limpiarLienzo() { ctx.clearRect(0,0,450,600); }
+
+    async function guardarProyectoCompleto() {
+        const nom = document.getElementById('p-nombre').value;
+        if(!nom) return alert("Por favor, ponle un nombre al diseño");
+        const imgDibujo = canvas.toDataURL();
+        const { error } = await client.from('Proyectos').insert([{
+            nombre: nom,
+            diseno_canvas: imgDibujo,
+            patron_punto: document.getElementById('p-notas').value
+        }]);
+        if(!error) { alert("¡Proyecto guardado!"); limpiarLienzo(); cargarHistorial(); }
+    }
+
+    async function cargarHistorial() {
+        const { data } = await client.from('Proyectos').select('*').order('created_at', { ascending: false });
+        document.getElementById('historial-proyectos').innerHTML = data.map(p => `
+            <div class="item-card">
+                <div style="position:relative; height:250px; background:#fff; border-radius:10px; overflow:hidden; border:1px solid #f0f0f0">
+                    <img src="Silueta 3 cuerpos.jpg" style="position:absolute; width:100%; height:100%; object-fit:contain; opacity:0.3">
+                    <img src="${p.diseno_canvas}" style="position:absolute; width:100%; height:100%; object-fit:contain; z-index:2">
+                </div>
+                <strong style="display:block; margin-top:10px;">${p.nombre}</strong>
+            </div>
+        `).join('');
+    }
+
+    init();
+</script>
+</body>
+</html>
