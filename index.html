@@ -181,7 +181,6 @@
     }
 
     async function init() {
-        // Cargar tema guardado
         if (localStorage.getItem('tema') === 'oscuro') {
             document.documentElement.setAttribute('data-theme', 'dark');
             document.getElementById('themeBtn').innerText = '🌙';
@@ -263,6 +262,50 @@
         await client.from('estudio_data').update({ cantidad: nc }).eq('id', id);
         i.cantidad = nc;
         cambiarVista(document.querySelector('.btn-nav.active').getAttribute('data-ref'));
+    }
+
+    async function subirMaterial() {
+        const nombre = document.getElementById('m-nombre').value;
+        const cantidad = document.getElementById('m-cantidad').value;
+        const categoria = document.getElementById('m-categoria').value;
+        const fotoFile = document.getElementById('m-foto').files[0];
+
+        if (!nombre) return alert("Por favor, pon un nombre al material");
+
+        let fotoUrl = "";
+
+        if (fotoFile) {
+            const fileName = `${Date.now()}_${fotoFile.name}`;
+            const { data, error } = await client.storage
+                .from('estudio_imagenes')
+                .upload(fileName, fotoFile);
+            
+            if (error) {
+                console.error("Error subiendo foto:", error);
+            } else {
+                const { data: urlData } = client.storage
+                    .from('estudio_imagenes')
+                    .getPublicUrl(fileName);
+                fotoUrl = urlData.publicUrl;
+            }
+        }
+
+        const { error } = await client.from('estudio_data').insert([{
+            tipo_material: nombre,
+            cantidad: parseInt(cantidad),
+            categoria: categoria,
+            contenido: fotoUrl
+        }]);
+
+        if (error) {
+            alert("Error al guardar: " + error.message);
+        } else {
+            alert("¡Material añadido!");
+            document.getElementById('m-nombre').value = "";
+            document.getElementById('m-cantidad').value = "1";
+            await cargarStock();
+            cambiarVista('INICIO');
+        }
     }
 
     function setupDibujo() {
