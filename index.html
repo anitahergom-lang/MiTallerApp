@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Mi Estudio Creativo</title>
     <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* MANTENEMOS TUS COLORES PERO COMO VARIABLES PARA EL MODO OSCURO */
         :root { 
             --primario: #6200ee;
             --fondo: #f5f5f5;
@@ -14,6 +16,7 @@
             --borde: #dddddd;
         }
 
+        /* CONFIGURACIÓN MODO OSCURO */
         [data-theme="dark"] {
             --primario: #bb86fc;
             --fondo: #121212;
@@ -25,27 +28,14 @@
         body { 
             background: var(--fondo); 
             color: var(--texto);
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             margin: 0;
             padding: 20px;
             padding-top: env(safe-area-inset-top);
+            transition: background 0.3s, color 0.3s;
         }
 
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .logo {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            object-fit: cover;
-        }
-
+        /* ESTILO DEL BOTÓN SOL/LUNA */
         .theme-toggle {
             position: fixed;
             top: 15px;
@@ -57,72 +47,100 @@
             border-radius: 50%;
             width: 45px;
             height: 45px;
-            font-size: 22px;
+            font-size: 20px;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
+        /* TUS ESTILOS DE SIEMPRE USANDO LAS VARIABLES NUESTRAS */
+        .header-diseno {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--borde);
+        }
+
+        .logo-app {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
         .seccion-diseno {
             background: var(--tarjeta);
-            border-radius: 15px;
+            border-radius: 20px;
             padding: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             border: 1px solid var(--borde);
-            text-align: center;
+        }
+
+        .silueta-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            position: relative;
         }
 
         .silueta-img {
-            max-width: 100%;
+            width: 100%;
             height: auto;
-            border-radius: 10px;
+            display: block;
         }
 
-        .menu-grid {
+        .menu-secciones {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
+            background: var(--tarjeta);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid var(--borde);
         }
 
-        .boton-menu {
-            background: var(--tarjeta);
+        .btn-seccion {
+            background: var(--fondo);
             border: 1px solid var(--borde);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
+            padding: 15px;
+            border-radius: 12px;
             font-weight: bold;
             color: var(--texto);
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
+    <!-- EL NUEVO BOTÓN -->
     <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">☀️</button>
 
-    <div class="header">
-        <img src="icon.png" alt="Logo" class="logo">
-        <h1>Mi Estudio</h1>
+    <div class="header-diseno">
+        <img src="icon.png" alt="Logo" class="logo-app">
+        <h2 style="margin:0">Mi Estudio</h2>
     </div>
 
     <div class="seccion-diseno">
-        <h3>Boceto Actual</h3>
-        <img src="Silueta 3 cuerpos.jpg" alt="Silueta" class="silueta-img">
+        <div class="silueta-container">
+            <img src="Silueta 3 cuerpos.jpg" alt="Silueta" class="silueta-img">
+        </div>
     </div>
 
-    <div class="menu-grid">
-        <div class="boton-menu">LANAS</div>
-        <div class="boton-menu">TELAS</div>
-        <div class="boton-menu">BOTONES</div>
-        <div class="boton-menu">PROYECTOS</div>
+    <div class="menu-secciones" id="contenedorMenu">
+        <div class="btn-seccion">LANAS</div>
+        <div class="btn-seccion">PROYECTOS</div>
     </div>
 
     <script>
+        // LÓGICA DEL MODO OSCURO
         function toggleTheme() {
             const body = document.documentElement;
             const btn = document.getElementById('themeBtn');
-            
             if (body.getAttribute('data-theme') === 'dark') {
                 body.removeAttribute('data-theme');
                 btn.innerText = '☀️';
@@ -134,11 +152,14 @@
             }
         }
 
-        // Cargar preferencia al iniciar
+        // Recuperar el tema al cargar la página
         if (localStorage.getItem('tema') === 'oscuro') {
             document.documentElement.setAttribute('data-theme', 'dark');
             document.getElementById('themeBtn').innerText = '🌙';
         }
+
+        // AQUÍ IRÍA TU CONFIGURACIÓN DE SUPABASE Y DEMÁS FUNCIONES
+        // (No las incluyo para no inventar tus credenciales, pero pégalas aquí debajo)
     </script>
 </body>
 </html>
