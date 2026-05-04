@@ -16,7 +16,38 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --primario: #9c27b0; --secundario: #ce93d8; --fondo: #f4f4f9; --blanco: #ffffff; }
+       :root { 
+            --primario: #bb86fc; /* Un morado más suave que resalta en oscuro */
+            --secundario: #03dac6; 
+            --fondo: #121212; /* El negro profundo de las apps modernas */
+            --blanco: #1e1e1e; /* Gris oscuro para las tarjetas/bloques */
+            --texto: #e1e1e1; 
+            --borde: #333333;
+        }
+
+        body { 
+            background: var(--fondo); 
+            color: var(--texto);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding: 20px; 
+            margin: 0;
+            padding-top: env(safe-area-inset-top);
+        }
+
+        /* Ajustamos las tarjetas para que no sean blancas */
+        .seccion-diseno, .item-card, .menu-secciones { 
+            background: var(--blanco) !important; 
+            color: var(--texto);
+            border: 1px solid var(--borde) !important;
+        }
+
+        input, select, textarea {
+            background: #2c2c2c !important;
+            color: white !important;
+            border: 1px solid var(--borde) !important;
+        }
+        
+        .header-diseno { color: var(--primario); border-bottom-color: var(--borde); }
         
         /* Ajuste para que la app ocupe toda la pantalla sin scroll extra en el móvil */
         body { 
