@@ -22,10 +22,10 @@
         .btn-filtro { white-space: nowrap; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--br); background: var(--b); color: var(--txt); font-size: 12px; cursor: pointer; font-weight: 600; }
         .btn-filtro.active { background: var(--p); color: white; border-color: var(--p); }
 
-        /* TARJETAS */
+        /* TARJETAS MEJORADAS */
         .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
         .item-card { background: var(--b); border-radius: 20px; border: 1px solid var(--br); overflow: hidden; position: relative; display: flex; flex-direction: column; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .foto-material { width: 100%; height: 130px; object-fit: cover; border-bottom: 1px solid var(--br); background: #eee; }
+        .foto-material { width: 100%; height: 130px; object-fit: cover; border-bottom: 1px solid var(--br); }
         
         .info-material { padding: 12px; flex-grow: 1; }
         .info-tag { font-size: 9px; color: var(--s); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -37,7 +37,7 @@
         .btn-edit-float { position: absolute; top: 8px; right: 8px; background: white; color: var(--s); border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 5; }
         .btn-delete-float { position: absolute; top: 8px; left: 8px; background: rgba(255, 68, 68, 0.9); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; font-size: 12px; }
 
-        /* FORMULARIO */
+        /* FORMULARIO Y BOTONES ROSAS */
         .card-form { background: var(--b); padding: 22px; border-radius: 25px; border: 1px solid var(--br); max-width: 500px; margin: 0 auto; margin-bottom: 20px; }
         label { display: block; font-size: 11px; color: var(--s); font-weight: 700; margin: 12px 0 5px 4px; text-transform: uppercase; }
         input, select, textarea { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--br); box-sizing: border-box; font-size: 14px; background: var(--f); color: var(--txt); }
@@ -47,7 +47,7 @@
         .btn-rosa-claro { background: var(--pc) !important; color: var(--s) !important; box-shadow: none !important; }
 
         .controles-stock { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--f); }
-        .btn-qty { background: var(--pc); border: 1px solid var(--p); width: 32px; height: 32px; border-radius: 10px; color: var(--s); font-weight: bold; cursor: pointer; }
+        .btn-qty { background: var(--pc); border: 1px solid var(--p); width: 32px; height: 32px; border-radius: 10px; color: var(--s); font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
         #dark-mode-toggle { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; cursor: pointer; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
     </style>
@@ -70,7 +70,7 @@
         <input type="hidden" id="m-id">
         
         <label>Nombre del Material</label>
-        <input type="text" id="m-nombre" placeholder="Ej: Mega Ball Peacocks">
+        <input type="text" id="m-nombre" placeholder="Ej: Lana Merino Azul">
         
         <div style="display:flex; gap:10px;">
             <div style="flex:1;">
@@ -90,16 +90,16 @@
         </div>
 
         <label>Composición</label>
-        <input type="text" id="m-composicion" placeholder="Ej: 100% Algodón">
+        <input type="text" id="m-composicion" placeholder="Ej: 100% Algodón, Lana Virgen...">
         
         <label>Tienda</label>
-        <input type="text" id="m-tienda" placeholder="Ej: Hobbii">
+        <input type="text" id="m-tienda" placeholder="Ej: Mercería del Barrio">
         
         <label>Grosor / WPI</label>
-        <input type="text" id="m-grosor" placeholder="Ej: Aran, 8 ply">
+        <input type="text" id="m-grosor" placeholder="Ej: Fingering, 3mm...">
         
         <label>Notas Adicionales</label>
-        <textarea id="m-notas" placeholder="Lote, aguja recomendada..."></textarea>
+        <textarea id="m-notas" placeholder="Lote, lavado, etc..."></textarea>
         
         <label>Foto</label>
         <input type="file" id="m-archivo" accept="image/*">
@@ -140,7 +140,7 @@
             const el = document.getElementById('vista-' + vista);
             if(el) el.style.display = (v === vista) ? 'block' : 'none';
         });
-        if(v === 'STOCK') cargarDatos();
+        if(v === 'STOCK') filtrar('Todo');
     }
 
     async function cargarDatos() {
@@ -152,13 +152,7 @@
     }
 
     function renderizarStock(lista) {
-        document.getElementById('lista-stock').innerHTML = lista.map(m => {
-            // Aseguramos que si el dato es nulo o vacío, se vea algo coherente
-            const comp = m.composicion && m.composicion !== "" ? m.composicion : "No definida";
-            const gros = m.grosor && m.grosor !== "" ? m.grosor : "No definido";
-            const tien = m.tienda && m.tienda !== "" ? m.tienda : "No especificada";
-
-            return `
+        document.getElementById('lista-stock').innerHTML = lista.map(m => `
             <div class="item-card">
                 <button class="btn-delete-float" onclick="eliminarStock(${m.id})">✖</button>
                 <button class="btn-edit-float" onclick="cargarEdicion(${m.id})">✏️</button>
@@ -168,9 +162,9 @@
                     <span class="info-tag">${m.categoria}</span>
                     <h4 class="info-titulo">${m.tipo_material}</h4>
                     
-                    <div class="info-linea"><span>🧵</span> <span><b>Comp:</b> ${comp}</span></div>
-                    <div class="info-linea"><span>📏</span> <span><b>Grosor:</b> ${gros}</span></div>
-                    <div class="info-linea"><span>🛒</span> <span><b>Tienda:</b> ${tien}</span></div>
+                    <div class="info-linea"><span>🧵</span> <span><b>Comp:</b> ${m.composicion || 'N/A'}</span></div>
+                    <div class="info-linea"><span>📏</span> <span><b>Grosor:</b> ${m.grosor || 'N/A'}</span></div>
+                    <div class="info-linea"><span>🛒</span> <span><b>Tienda:</b> ${m.tienda || 'Desconocida'}</span></div>
                     
                     ${m.notas ? `<div class="info-notas">${m.notas}</div>` : ''}
 
@@ -183,8 +177,8 @@
                         </div>
                     </div>
                 </div>
-            </div>`;
-        }).join('');
+            </div>
+        `).join('');
     }
 
     function cargarEdicion(id) {
@@ -205,7 +199,6 @@
         document.getElementById('btn-cancelar-stock').style.display = "block";
 
         cambiarVista('INICIO');
-        window.scrollTo(0,0);
     }
 
     function limpiarFormularioStock() {
@@ -225,11 +218,9 @@
     async function guardarNuevo(tipo) {
         if(tipo !== 'stock') return;
         const nombre = document.getElementById('m-nombre').value;
-        if(!nombre) return alert("¡Ponle nombre al material! 🎀");
+        if(!nombre) return alert("¡Ponle nombre! 🎀");
 
         const id = document.getElementById('m-id').value;
-        
-        // Objeto de datos asegurando que los nombres coincidan con Supabase
         const datos = {
             tipo_material: nombre,
             categoria: document.getElementById('m-categoria').value,
@@ -243,30 +234,22 @@
         const file = document.getElementById('m-archivo').files[0];
         if(file) {
             const fileName = `${Date.now()}_${file.name}`;
-            const { data: uploadData, error: uploadError } = await client.storage.from('fotos_estudio').upload(fileName, file);
-            if(!uploadError) {
-                const { data: urlData } = client.storage.from('fotos_estudio').getPublicUrl(fileName);
-                datos.contenido = urlData.publicUrl;
-            }
+            await client.storage.from('fotos_estudio').upload(fileName, file);
+            const { data } = client.storage.from('fotos_estudio').getPublicUrl(fileName);
+            datos.contenido = data.publicUrl;
         }
 
-        let errorResponse;
         if(id) {
-            const { error } = await client.from('estudio_data').update(datos).eq('id', id);
-            errorResponse = error;
+            await client.from('estudio_data').update(datos).eq('id', id);
+            alert("¡Actualizado! ✨");
         } else {
-            const { error } = await client.from('estudio_data').insert([datos]);
-            errorResponse = error;
+            await client.from('estudio_data').insert([datos]);
+            alert("¡Guardado! 💖");
         }
 
-        if(errorResponse) {
-            alert("Error al guardar: " + errorResponse.message);
-        } else {
-            alert("¡Todo guardado correctamente! ✨");
-            limpiarFormularioStock();
-            await cargarDatos();
-            cambiarVista('STOCK');
-        }
+        limpiarFormularioStock();
+        cargarDatos();
+        cambiarVista('STOCK');
     }
 
     async function eliminarStock(id) {
@@ -292,9 +275,7 @@
 
     function toggleDarkMode() {
         const b = document.body;
-        const current = b.getAttribute('data-theme');
-        b.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-        document.getElementById('dark-mode-toggle').innerText = current === 'dark' ? '🌙' : '☀️';
+        b.setAttribute('data-theme', b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     }
 
     window.onload = cargarDatos;
