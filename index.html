@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mi Taller Rosa v2.1</title>
+    <title>Mi Taller Rosa</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --t: #4a4a4a; --br: #f1e1e5; }
@@ -20,39 +20,32 @@
         .label-f { font-size: 11px; font-weight: bold; color: var(--s); margin-left: 5px; text-transform: uppercase; display: block; margin-bottom: 4px; }
 
         .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .item-card { background: var(--b); border-radius: 20px; border: 1px solid var(--br); overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .item-card { background: var(--b); border-radius: 20px; border: 1px solid var(--br); overflow: hidden; display: flex; flex-direction: column; }
         .foto-material { width: 100%; height: 140px; object-fit: cover; background: #fff0f3; display: flex; align-items: center; justify-content: center; font-size: 40px; }
         .info-material { padding: 12px; flex-grow: 1; }
-        .info-material h4 { margin: 0; color: var(--s); font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .info-material p { margin: 3px 0; font-size: 11px; color: #777; line-height: 1.2; }
+        .info-material h4 { margin: 0; color: var(--s); font-size: 15px; }
         
         .badge-cantidad { background: var(--pc); color: var(--s); padding: 4px 8px; border-radius: 10px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 5px; }
-
-        .btn-principal { background: var(--p); color: white; padding: 16px; border: none; border-radius: 18px; width: 100%; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-principal:active { transform: scale(0.98); }
-        
+        .btn-principal { background: var(--p); color: white; padding: 16px; border: none; border-radius: 18px; width: 100%; font-weight: bold; cursor: pointer; }
         .btn-edit { background: #f0f0f0; color: #666; margin-top: 10px; width: 100%; padding: 8px; border-radius: 10px; border: none; font-size: 11px; font-weight: bold; cursor: pointer; }
-        
-        /* Indicador de edición */
-        #modo-edicion { display: none; background: #fff3cd; color: #856404; padding: 10px; border-radius: 10px; margin-bottom: 15px; font-size: 12px; text-align: center; border: 1px solid #ffeeba; }
     </style>
 </head>
 <body>
 
     <div class="menu-secciones">
-        <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">✨ Registro</button>
-        <button class="btn-nav" id="nav-MATERIALES" onclick="cambiarVista('MATERIALES')">🧶 Mi Stock</button>
-        <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 Ideas</button>
+        <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 Inicio</button>
+        <button class="btn-nav" id="nav-MATERIALES" onclick="cambiarVista('MATERIALES')">📦 Stock</button>
+        <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 Proyectos</button>
     </div>
 
+    <!-- SECCIÓN INICIO -->
     <div id="seccion-inicio" class="card-registro">
-        <div id="modo-edicion">✍️ Estás editando un material existente</div>
-        <h3 id="titulo-form" style="text-align:center; color:var(--s); margin-top:0;">🧶 Nueva Lana</h3>
+        <div id="modo-edicion" style="display:none; background: #fff3cd; padding: 10px; border-radius: 10px; margin-bottom: 15px; font-size: 12px; text-align: center;">✍️ Editando material</div>
+        <h3 id="titulo-form" style="text-align:center; color:var(--s); margin-top:0;">✨ Nuevo Material</h3>
         
-        <input type="hidden" id="m-id"> <!-- ID oculto para saber qué editamos -->
-        
-        <label class="label-f">Nombre del producto</label>
-        <input type="text" id="m-nombre" placeholder="Nombre...">
+        <input type="hidden" id="m-id">
+        <label class="label-f">Nombre del material</label>
+        <input type="text" id="m-nombre" placeholder="Ej: Algodón XL">
         
         <div class="grid-inputs">
             <div>
@@ -65,33 +58,37 @@
             </div>
             <div>
                 <label class="label-f">Composición</label>
-                <input type="text" id="m-composicion" placeholder="Lana, Algodón...">
+                <input type="text" id="m-composicion">
             </div>
             <div>
                 <label class="label-f">Grosor</label>
-                <input type="text" id="m-grosor" placeholder="Fingering, DK...">
+                <input type="text" id="m-grosor">
             </div>
         </div>
 
-        <label class="label-f">Tienda</label>
-        <input type="text" id="m-tienda" placeholder="URL o nombre tienda">
-
+        <label class="label-f">Tienda / Origen</label>
+        <input type="text" id="m-tienda">
         <label class="label-f">URL Foto (Opcional)</label>
-        <input type="text" id="m-foto" placeholder="https://...">
-
+        <input type="text" id="m-foto">
         <label class="label-f">Notas</label>
         <textarea id="m-notas" rows="2"></textarea>
 
-        <button class="btn-principal" id="btn-guardar" onclick="guardarMaterial()">GUARDAR EN STOCK</button>
-        <button class="btn-edit" id="btn-cancelar" style="display:none; background:#ffebef; color:#d63384;" onclick="cancelarEdicion()">CANCELAR EDICIÓN</button>
+        <button class="btn-principal" id="btn-guardar" onclick="guardarMaterial()">AÑADIR AL TALLER</button>
+        <button id="btn-cancelar" style="display:none; margin-top:10px; width:100%; border:none; background:none; color:grey; cursor:pointer;" onclick="cancelarEdicion()">Cancelar cambios</button>
     </div>
 
+    <!-- SECCIÓN STOCK -->
     <div id="seccion-materiales" style="display:none;">
         <div id="lista-stock" class="grid-estudio"></div>
     </div>
 
-    <div id="seccion-proyectos" style="display:none; text-align: center;">
-        <p>🎨 Sección en mantenimiento</p>
+    <!-- SECCIÓN PROYECTOS -->
+    <div id="seccion-proyectos" style="display:none;">
+        <div class="card-registro">
+            <h3 style="text-align:center; color:var(--s); margin-top:0;">🎨 Mis Proyectos</h3>
+            <p style="text-align:center; font-size:12px; color:grey;">Aquí recuperaremos tus bocetos y patrones.</p>
+            <!-- Aquí irá el bloque de dibujo cuando lo ajustemos -->
+        </div>
     </div>
 
 <script>
@@ -123,30 +120,21 @@
             notas: document.getElementById('m-notas').value
         };
 
-        if(!material.tipo_material) return alert("Pon un nombre");
+        if(!material.tipo_material) return alert("Falta el nombre");
 
-        let resultado;
-        if(id) {
-            // Actualizar existente
-            resultado = await client.from('estudio_data').update(material).eq('id', id);
-        } else {
-            // Insertar nuevo
-            resultado = await client.from('estudio_data').insert([material]);
-        }
+        let res = id ? await client.from('estudio_data').update(material).eq('id', id) : await client.from('estudio_data').insert([material]);
 
-        if (resultado.error) {
-            alert("Error: " + resultado.error.message);
-        } else {
-            alert(id ? "¡Actualizado!" : "¡Añadido!");
+        if (res.error) alert("Error: " + res.error.message);
+        else {
+            alert(id ? "Actualizado" : "Guardado");
             cancelarEdicion();
             if(!id) limpiarForm();
         }
     }
 
     function prepararEdicion(id) {
-        const m = lanasCargadas.find(item => item.id == id);
+        const m = lanasCargadas.find(i => i.id == id);
         if(!m) return;
-
         document.getElementById('m-id').value = m.id;
         document.getElementById('m-nombre').value = m.tipo_material;
         document.getElementById('m-categoria').value = m.categoria;
@@ -157,19 +145,17 @@
         document.getElementById('m-foto').value = m.contenido || "";
         document.getElementById('m-notas').value = m.notas || "";
 
-        document.getElementById('titulo-form').innerText = "✍️ Editar Lana";
-        document.getElementById('btn-guardar').innerText = "ACTUALIZAR CAMBIOS";
+        document.getElementById('titulo-form').innerText = "✍️ Modificar Material";
+        document.getElementById('btn-guardar').innerText = "GUARDAR CAMBIOS";
         document.getElementById('modo-edicion').style.display = "block";
         document.getElementById('btn-cancelar').style.display = "block";
-        
         cambiarVista('INICIO');
-        window.scrollTo(0,0);
     }
 
     function cancelarEdicion() {
         document.getElementById('m-id').value = "";
-        document.getElementById('titulo-form').innerText = "🧶 Nueva Lana";
-        document.getElementById('btn-guardar').innerText = "GUARDAR EN STOCK";
+        document.getElementById('titulo-form').innerText = "✨ Nuevo Material";
+        document.getElementById('btn-guardar').innerText = "AÑADIR AL TALLER";
         document.getElementById('modo-edicion').style.display = "none";
         document.getElementById('btn-cancelar').style.display = "none";
         limpiarForm();
@@ -181,7 +167,7 @@
     }
 
     async function cargarStock() {
-        const { data, error } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
+        const { data } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
         if(data) {
             lanasCargadas = data;
             document.getElementById('lista-stock').innerHTML = data.map(m => `
@@ -200,9 +186,7 @@
 
     async function cargarInicial() {
         const { data } = await client.from('Secciones').select('nombre');
-        if(data) {
-            document.getElementById('m-categoria').innerHTML = data.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
-        }
+        if(data) document.getElementById('m-categoria').innerHTML = data.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
     }
 
     window.onload = cargarInicial;
