@@ -112,7 +112,6 @@
     function renderMenu() {
         let html = `<button class="btn-nav" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>`;
         secciones.forEach(s => {
-            // ASIGNACIÓN DINÁMICA DE EMOJIS
             let emoji = '🧶'; 
             const nombre = s.toLowerCase();
             if (nombre.includes('tela')) emoji = '👗';
@@ -200,11 +199,16 @@
 
         let fotoUrl = "";
         if (fotoFile) {
-            const fileName = `${Date.now()}_${fotoFile.name}`;
-            const { error: upErr } = await client.storage.from('MEDIA').upload(fileName, fotoFile);
+            // Ajustado a "media" en minúsculas y limpieza de nombre de archivo
+            const fileName = `${Date.now()}_${fotoFile.name.replace(/\s+/g, '_')}`;
+            const { error: upErr } = await client.storage.from('media').upload(fileName, fotoFile);
+            
             if (!upErr) {
-                const { data } = client.storage.from('MEDIA').getPublicUrl(fileName);
-                fotoUrl = data.publicUrl;
+                const { data } = client.storage.from('media').getPublicUrl(fileName);
+                if (data) fotoUrl = data.publicUrl;
+            } else {
+                console.error("Error al subir:", upErr);
+                return alert("Error al subir la imagen. Revisa las políticas de Supabase.");
             }
         }
 
