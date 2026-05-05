@@ -14,10 +14,9 @@
         .btn-nav { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 40px; font-size: 11px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-nav.active { background: var(--pc); color: var(--s); border: 1px solid var(--p); }
 
-        /* Filtros de Subsecciones (Estilo Burbuja como en la foto) */
+        /* Filtros de Subsecciones */
         .contenedor-filtros { display: flex; gap: 10px; overflow-x: auto; padding: 5px 0 15px 0; scrollbar-width: none; }
         .contenedor-filtros::-webkit-scrollbar { display: none; }
-        
         .btn-filtro { flex: 0 0 auto; padding: 8px 18px; border-radius: 25px; border: 1px solid var(--br); background: var(--b); color: var(--blue); font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.3s; }
         .btn-filtro.active { background: var(--p); color: white; border-color: var(--p); }
 
@@ -26,52 +25,81 @@
         .item-card { background: var(--b); border-radius: 20px; border: 1px solid var(--br); overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
         .foto-material { width: 100%; height: 130px; object-fit: cover; background: #fff0f3; display: flex; align-items: center; justify-content: center; font-size: 40px; }
         .info-material { padding: 12px; text-align: center; }
-        .info-material h4 { margin: 0 0 8px 0; color: #444; font-size: 14px; font-weight: bold; }
+        .info-material h4 { margin: 0 0 4px 0; color: #444; font-size: 14px; font-weight: bold; }
+        .info-material p { margin: 0 0 8px 0; font-size: 11px; color: #888; }
         
-        /* Controles Stock (Estilo Foto) */
+        /* Controles Stock */
         .controles-stock { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 5px; }
         .btn-stock { background: var(--pc); border: none; color: var(--s); width: 28px; height: 28px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
         .cant-numero { font-weight: bold; color: #333; font-size: 16px; }
 
         /* Formulario Registro */
         .card-registro { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 600px; margin: auto; }
-        .btn-principal { background: var(--p); color: white; padding: 16px; border: none; border-radius: 18px; width: 100%; font-weight: bold; margin-top: 10px; }
+        .label-f { font-size: 11px; font-weight: bold; color: var(--s); margin-left: 5px; text-transform: uppercase; display: block; margin-bottom: 4px; }
         .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--br); border-radius: 12px; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--br); border-radius: 12px; box-sizing: border-box; font-size: 14px; }
+        
+        .btn-principal { background: var(--p); color: white; padding: 16px; border: none; border-radius: 18px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-edit { background: #f0f0f0; color: #666; margin-top: 10px; width: 100%; padding: 8px; border-radius: 10px; border: none; font-size: 11px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <!-- Navegación Superior -->
     <div class="menu-secciones">
         <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
         <button class="btn-nav" id="nav-MATERIALES" onclick="cambiarVista('MATERIALES')">📦 MATERIALES</button>
         <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
     </div>
 
-    <!-- SECCIÓN INICIO (FORMULARIO) -->
+    <!-- SECCIÓN INICIO (FORMULARIO COMPLETO RE-ESTABLECIDO) -->
     <div id="seccion-inicio" class="card-registro">
+        <div id="modo-edicion" style="display:none; background: #fff3cd; padding: 10px; border-radius: 10px; margin-bottom: 15px; font-size: 12px; text-align: center;">✍️ Editando material</div>
         <h3 id="titulo-form" style="text-align:center; color:var(--s); margin-top:0;">✨ Nuevo Material</h3>
+        
         <input type="hidden" id="m-id">
-        <input type="text" id="m-nombre" placeholder="Nombre del material (ej: Mega Ball Lila)">
+        <label class="label-f">Nombre del material</label>
+        <input type="text" id="m-nombre" placeholder="Ej: Mega Ball Lila">
+        
         <div class="grid-inputs">
-            <select id="m-categoria">
-                <option value="Lana">🧶 Lana</option>
-                <option value="Telas">👗 Telas</option>
-                <option value="Hilos">🧵 Hilos</option>
-                <option value="Accesorios">🎀 Accesorios</option>
-                <option value="Otros">🧸 Otros</option>
-            </select>
-            <input type="number" id="m-cantidad" value="1">
+            <div>
+                <label class="label-f">Categoría</label>
+                <select id="m-categoria">
+                    <option value="Lana">🧶 Lana</option>
+                    <option value="Telas">👗 Telas</option>
+                    <option value="Hilos">🧵 Hilos</option>
+                    <option value="Accesorios">🎀 Accesorios</option>
+                    <option value="Otros">🧸 Otros</option>
+                </select>
+            </div>
+            <div>
+                <label class="label-f">Cantidad</label>
+                <input type="number" id="m-cantidad" value="1">
+            </div>
+            <div>
+                <label class="label-f">Composición</label>
+                <input type="text" id="m-composicion">
+            </div>
+            <div>
+                <label class="label-f">Grosor</label>
+                <input type="text" id="m-grosor">
+            </div>
         </div>
-        <input type="text" id="m-composicion" placeholder="Composición">
+
+        <label class="label-f">Tienda / Origen</label>
+        <input type="text" id="m-tienda">
+
+        <label class="label-f">Foto (Opcional)</label>
         <input type="file" id="m-foto-archivo" accept="image/*">
-        <button class="btn-principal" onclick="ejecutarGuardado()">AÑADIR AL TALLER</button>
+
+        <label class="label-f">Notas</label>
+        <textarea id="m-notas" rows="2"></textarea>
+
+        <button class="btn-principal" id="btn-guardar" onclick="ejecutarGuardado()">AÑADIR AL TALLER</button>
+        <button id="btn-cancelar" style="display:none; margin-top:10px; width:100%; border:none; background:none; color:grey; cursor:pointer;" onclick="cancelarEdicion()">Cancelar cambios</button>
     </div>
 
     <!-- SECCIÓN STOCK -->
     <div id="seccion-materiales" style="display:none;">
-        <!-- Menú de Filtros Burbuja -->
         <div class="contenedor-filtros">
             <button class="btn-filtro active" onclick="filtrarPor('Todo', this)">✨ Todo</button>
             <button class="btn-filtro" onclick="filtrarPor('Lana', this)">🧶 Lana</button>
@@ -80,13 +108,12 @@
             <button class="btn-filtro" onclick="filtrarPor('Otros', this)">🧸 Otros</button>
             <button class="btn-filtro" onclick="filtrarPor('Accesorios', this)">🎀 Accesorios</button>
         </div>
-
         <div id="lista-stock" class="grid-estudio"></div>
     </div>
 
     <!-- SECCIÓN PROYECTOS -->
     <div id="seccion-proyectos" style="display:none;">
-        <div class="card-registro"><p style="text-align:center;">🎨 Sección de Proyectos en construcción...</p></div>
+        <div class="card-registro"><p style="text-align:center; color:grey;">🎨 Mis Proyectos (Próximamente)</p></div>
     </div>
 
 <script>
@@ -123,17 +150,18 @@
 
     function renderizarStock() {
         const filtrados = filtroActual === 'Todo' ? lanasCargadas : lanasCargadas.filter(m => m.categoria === filtroActual);
-        
         document.getElementById('lista-stock').innerHTML = filtrados.map(m => `
             <div class="item-card">
                 <div class="foto-material">${m.contenido ? `<img src="${m.contenido}" style="width:100%;height:100%;object-fit:cover;">` : '🧶'}</div>
                 <div class="info-material">
                     <h4>${m.tipo_material}</h4>
+                    <p>${m.composicion || ''} ${m.grosor ? '· '+m.grosor : ''}</p>
                     <div class="controles-stock">
                         <button class="btn-stock" onclick="ajustarStock(${m.id}, -1)">-</button>
                         <span class="cant-numero" id="cant-${m.id}">${m.cantidad}</span>
                         <button class="btn-stock" onclick="ajustarStock(${m.id}, 1)">+</button>
                     </div>
+                    <button class="btn-edit" onclick="prepararEdicion(${m.id})">✏️ EDITAR</button>
                 </div>
             </div>
         `).join('');
@@ -147,32 +175,70 @@
         await client.from('estudio_data').update({ cantidad: m.cantidad }).eq('id', id);
     }
 
-    async function subirFoto(archivo) {
-        if (!archivo) return null;
-        const nombre = `${Date.now()}.${archivo.name.split('.').pop()}`;
-        const { data, error } = await client.storage.from('fotos-lanas').upload(nombre, archivo);
-        if (error) return null;
-        const { data: url } = client.storage.from('fotos-lanas').getPublicUrl(nombre);
-        return url.publicUrl;
+    function prepararEdicion(id) {
+        const m = lanasCargadas.find(i => i.id == id);
+        if(!m) return;
+        document.getElementById('m-id').value = m.id;
+        document.getElementById('m-nombre').value = m.tipo_material;
+        document.getElementById('m-categoria').value = m.categoria;
+        document.getElementById('m-cantidad').value = m.cantidad;
+        document.getElementById('m-composicion').value = m.composicion || "";
+        document.getElementById('m-grosor').value = m.grosor || "";
+        document.getElementById('m-tienda').value = m.tienda || "";
+        document.getElementById('m-notas').value = m.notas || "";
+
+        document.getElementById('titulo-form').innerText = "✍️ Modificar Material";
+        document.getElementById('btn-guardar').innerText = "GUARDAR CAMBIOS";
+        document.getElementById('modo-edicion').style.display = "block";
+        document.getElementById('btn-cancelar').style.display = "block";
+        cambiarVista('INICIO');
+    }
+
+    function cancelarEdicion() {
+        document.getElementById('m-id').value = "";
+        document.getElementById('titulo-form').innerText = "✨ Nuevo Material";
+        document.getElementById('btn-guardar').innerText = "AÑADIR AL TALLER";
+        document.getElementById('modo-edicion').style.display = "none";
+        document.getElementById('btn-cancelar').style.display = "none";
+        limpiarForm();
+    }
+
+    function limpiarForm() {
+        document.querySelectorAll('input, textarea').forEach(el => el.id !== 'm-id' ? el.value = "" : null);
+        document.getElementById('m-cantidad').value = "1";
     }
 
     async function ejecutarGuardado() {
+        const id = document.getElementById('m-id').value;
         const archivo = document.getElementById('m-foto-archivo').files[0];
-        const urlFoto = archivo ? await subirFoto(archivo) : null;
+        let urlFoto = null;
+
+        if (archivo) {
+            const nombre = `${Date.now()}.${archivo.name.split('.').pop()}`;
+            const { data } = await client.storage.from('fotos-lanas').upload(nombre, archivo);
+            if (data) {
+                const { data: pub } = client.storage.from('fotos-lanas').getPublicUrl(nombre);
+                urlFoto = pub.publicUrl;
+            }
+        }
 
         const material = {
             tipo_material: document.getElementById('m-nombre').value,
             categoria: document.getElementById('m-categoria').value,
             cantidad: parseInt(document.getElementById('m-cantidad').value),
             composicion: document.getElementById('m-composicion').value,
-            contenido: urlFoto
+            grosor: document.getElementById('m-grosor').value,
+            tienda: document.getElementById('m-tienda').value,
+            notas: document.getElementById('m-notas').value
         };
+        if (urlFoto) material.contenido = urlFoto;
 
-        const { error } = await client.from('estudio_data').insert([material]);
-        if (error) alert("Error: " + error.message);
+        const res = id ? await client.from('estudio_data').update(material).eq('id', id) : await client.from('estudio_data').insert([material]);
+        
+        if (res.error) alert("Error");
         else {
-            alert("¡Material guardado!");
-            document.querySelectorAll('input').forEach(i => i.value = "");
+            alert(id ? "Actualizado" : "Añadido");
+            cancelarEdicion();
             cambiarVista('MATERIALES');
         }
     }
