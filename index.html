@@ -147,6 +147,10 @@
             <button class="btn-tool" onclick="limpiarCanvas('canvas-punto')">🗑️ Borrar</button>
         </div>
 
+        <!-- NUEVO CAMPO AÑADIDO: FOTO DE REFERENCIA DEL PUNTO -->
+        <label>SUBIR FOTO DE REFERENCIA DEL PUNTO</label>
+        <input type="file" id="p-foto-referencia-punto" accept="image/*" style="margin-bottom:15px;">
+
         <label>DISEÑO SOBRE CUERPOS (BASE)</label>
         <div class="canvas-container">
             <canvas id="canvas-cuerpos" class="canvas-base"></canvas>
@@ -282,9 +286,9 @@
                 tipo_material: document.getElementById('m-nombre').value,
                 categoria: document.getElementById('m-categoria').value,
                 cantidad: parseInt(document.getElementById('m-cantidad').value),
-                tienda: document.getElementById('m-tienda').value, // Nuevo campo
-                grosor: document.getElementById('m-grosor').value, // Nuevo campo
-                notas: document.getElementById('m-notas').value,   // Nuevo campo
+                tienda: document.getElementById('m-tienda').value,
+                grosor: document.getElementById('m-grosor').value,
+                notas: document.getElementById('m-notas').value,
                 contenido: fotoUrl
             }]);
         } else {
