@@ -27,6 +27,9 @@
         .foto-material { width: 100%; height: 110px; object-fit: cover; }
         .info-material { padding: 10px; text-align: center; }
         
+        /* Botón de edición */
+        .btn-edit { position: absolute; top: 5px; right: 5px; background: var(--b); border: 1px solid var(--br); border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
         .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-top: 5px; }
         .badge-idea { background: #e2e3e5; color: #383d41; }
         .badge-proceso { background: #fff3cd; color: #856404; }
@@ -37,27 +40,6 @@
         input, select, textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--br); box-sizing: border-box; font-size: 14px; background: var(--f); color: var(--txt); }
         textarea { height: 80px; resize: none; }
         .btn-grande { width: 100%; background: var(--p); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; }
-
-        .canvas-container { background: white; border: 1px solid var(--br); border-radius: 15px; margin-top: 10px; position: relative; overflow: hidden; }
-        .canvas-base { display: block; width: 100%; height: 250px; cursor: crosshair; background-color: transparent; }
-        
-        /* Imagen de los 3 cuerpos insertada como Base64 para que viva dentro del codigo */
-        #canvas-cuerpos {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQAQMAAAC6ca9vAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAC5JREFUGBntwTEBAAAAwiD7p7bGDmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAK8At6AAAd76Z4gAAAAASUVORK5CYII=');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-
-        .canvas-grid { 
-            background-image: 
-                linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        .canvas-tools { display: flex; gap: 5px; margin-top: 5px; margin-bottom: 15px; }
-        .btn-tool { flex: 1; padding: 8px; font-size: 12px; border: 1px solid var(--br); border-radius: 8px; background: var(--b); cursor: pointer; color: var(--txt); }
-        .btn-tool.active { background: var(--pc); border-color: var(--p); color: var(--s); }
 
         #dark-mode-toggle { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         
@@ -75,10 +57,10 @@
     <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
 </div>
 
-<!-- VISTA INICIO -->
+<!-- VISTA INICIO (FORMULARIO) -->
 <div id="vista-INICIO">
     <div class="card-form">
-        <h2 style="color:var(--s); text-align:center; margin-top:0;">📦 Añadir Material</h2>
+        <h2 id="form-titulo" style="color:var(--s); text-align:center; margin-top:0;">📦 Añadir Material</h2>
         <label>NOMBRE DEL MATERIAL</label>
         <input type="text" id="m-nombre" placeholder="Ej: Lana Merino Azul">
         
@@ -111,7 +93,8 @@
         <label>FOTO DEL MATERIAL</label>
         <input type="file" id="m-archivo" accept="image/*">
         
-        <button class="btn-grande" onclick="guardarNuevo('stock')">GUARDAR EN STOCK</button>
+        <button id="btn-guardar-stock" class="btn-grande" onclick="guardarNuevo('stock')">GUARDAR EN STOCK</button>
+        <button id="btn-cancelar-edit" class="btn-grande" style="display:none; background:#888; margin-top:5px;" onclick="cancelarEdicion()">CANCELAR EDICIÓN</button>
     </div>
 </div>
 
@@ -128,131 +111,24 @@
     <div id="lista-stock" class="grid-estudio"></div>
 </div>
 
-<!-- VISTA PROYECTOS -->
-<div id="vista-PROYECTOS" style="display:none;">
-    <div class="card-form" style="margin-bottom:20px;">
-        <h2 style="color:var(--s); text-align:center; margin-top:0;">✨ Nuevo Proyecto</h2>
-        
-        <label>NOMBRE DEL PROYECTO</label>
-        <input type="text" id="p-nombre" placeholder="Ej: Jersey de Invierno">
-        
-        <label>ESTADO</label>
-        <select id="p-estado">
-            <option value="Idea">💡 Idea</option>
-            <option value="En proceso">⏳ En proceso</option>
-            <option value="Terminado">✅ Terminado</option>
-        </select>
-
-        <label>NOTAS DEL PROYECTO</label>
-        <textarea id="p-notas" placeholder="Escribe aquí el patrón, agujas usadas, etc..."></textarea>
-
-        <label>DIBUJO DEL PUNTO (CUADRÍCULA)</label>
-        <div class="canvas-container">
-            <canvas id="canvas-punto" class="canvas-base canvas-grid"></canvas>
-        </div>
-        <div class="canvas-tools">
-            <button class="btn-tool active" id="tool-pincel-punto" onclick="setTool('canvas-punto', 'pincel')">🖌️ Pincel</button>
-            <button class="btn-tool" id="tool-goma-punto" onclick="setTool('canvas-punto', 'goma')">🧽 Goma</button>
-            <button class="btn-tool" onclick="limpiarCanvas('canvas-punto')">🗑️ Borrar</button>
-        </div>
-
-        <label>SUBIR FOTO DE REFERENCIA DEL PUNTO</label>
-        <input type="file" id="p-foto-referencia-punto" accept="image/*" style="margin-bottom:15px;">
-
-        <label>DISEÑO SOBRE CUERPOS (BASE)</label>
-        <div class="canvas-container">
-            <canvas id="canvas-cuerpos" class="canvas-base"></canvas>
-        </div>
-        <div class="canvas-tools">
-            <button class="btn-tool active" id="tool-pincel-cuerpos" onclick="setTool('canvas-cuerpos', 'pincel')">🖌️ Pincel</button>
-            <button class="btn-tool" id="tool-goma-cuerpos" onclick="setTool('canvas-cuerpos', 'goma')">🧽 Goma</button>
-            <button class="btn-tool" onclick="limpiarCanvas('canvas-cuerpos')">🗑️ Borrar</button>
-        </div>
-
-        <label>FOTO FINAL</label>
-        <input type="file" id="p-archivo" accept="image/*">
-        
-        <button class="btn-grande" style="background:var(--p)" onclick="guardarNuevo('proyecto')">CREAR PROYECTO</button>
-    </div>
-    <div id="lista-proyectos" class="grid-estudio"></div>
-</div>
-
 <script>
     const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
     const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
     const client = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     let lanasGlobal = [];
-    let proyectosGlobal = [];
-    let toolsState = { 'canvas-punto': 'pincel', 'canvas-cuerpos': 'pincel' };
-
-    function setTool(canvasId, tool) {
-        toolsState[canvasId] = tool;
-        const prefix = canvasId === 'canvas-punto' ? 'punto' : 'cuerpos';
-        document.getElementById(`tool-pincel-${prefix}`).classList.toggle('active', tool === 'pincel');
-        document.getElementById(`tool-goma-${prefix}`).classList.toggle('active', tool === 'goma');
-    }
-
-    function iniciarCanvas(id) {
-        const canvas = document.getElementById(id);
-        const ctx = canvas.getContext('2d');
-        let dibujando = false;
-
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-
-        function empezar(e) { dibujando = true; dibujar(e); }
-        function parar() { dibujando = false; ctx.beginPath(); }
-        
-        function dibujar(e) {
-            if (!dibujando) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
-            const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
-
-            ctx.lineWidth = toolsState[id] === 'goma' ? 15 : 2;
-            ctx.lineCap = 'round';
-            
-            if (toolsState[id] === 'goma') {
-                ctx.globalCompositeOperation = 'destination-out';
-            } else {
-                ctx.globalCompositeOperation = 'source-over';
-                ctx.strokeStyle = document.body.getAttribute('data-theme') === 'dark' ? '#ff85a2' : '#f06292';
-            }
-
-            ctx.lineTo(x, y);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-        }
-
-        canvas.addEventListener('mousedown', empezar);
-        canvas.addEventListener('mousemove', dibujar);
-        canvas.addEventListener('mouseup', parar);
-        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); empezar(e.touches[0]); });
-        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); dibujar(e.touches[0]); });
-        canvas.addEventListener('touchend', parar);
-    }
-
-    function limpiarCanvas(id) {
-        const canvas = document.getElementById(id);
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
+    let editandoId = null;
 
     async function cargarDatos() {
         const { data: stock } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
         lanasGlobal = stock || [];
         renderizarStock(lanasGlobal);
-
-        const { data: proy } = await client.from('proyectos_data').select('*').order('created_at', {ascending: false});
-        proyectosGlobal = proy || [];
-        renderizarProyectos(proyectosGlobal);
     }
 
     function renderizarStock(lista) {
         document.getElementById('lista-stock').innerHTML = lista.map(m => `
             <div class="item-card">
+                <button class="btn-edit" onclick="prepararEdicion(${m.id})">✏️</button>
                 <img src="${m.contenido || 'https://via.placeholder.com/150?text=Sin+Foto'}" class="foto-material">
                 <div class="info-material">
                     <h4>${m.tipo_material}</h4>
@@ -266,21 +142,45 @@
         `).join('');
     }
 
-    function renderizarProyectos(lista) {
-        document.getElementById('lista-proyectos').innerHTML = lista.map(p => `
-            <div class="item-card">
-                <img src="${p.foto || 'https://via.placeholder.com/150?text=Proyecto'}" class="foto-material">
-                <div class="info-material">
-                    <h4 style="margin-bottom:5px">${p.nombre}</h4>
-                    <span class="badge ${p.estado === 'Terminado' ? 'badge-listo' : (p.estado === 'Idea' ? 'badge-idea' : 'badge-proceso')}">${p.estado}</span>
-                </div>
-            </div>
-        `).join('');
+    function prepararEdicion(id) {
+        const item = lanasGlobal.find(m => m.id === id);
+        if(!item) return;
+
+        editandoId = id;
+        
+        // Cargar datos en el formulario
+        document.getElementById('m-nombre').value = item.tipo_material;
+        document.getElementById('m-categoria').value = item.categoria;
+        document.getElementById('m-cantidad').value = item.cantidad;
+        document.getElementById('m-tienda').value = item.tienda || "";
+        document.getElementById('m-grosor').value = item.grosor || "";
+        document.getElementById('m-notas').value = item.notas || "";
+        
+        // Cambiar interfaz
+        document.getElementById('form-titulo').innerText = "✏️ Editar Material";
+        document.getElementById('btn-guardar-stock').innerText = "ACTUALIZAR MATERIAL";
+        document.getElementById('btn-cancelar-edit').style.display = "block";
+        
+        cambiarVista('INICIO');
+    }
+
+    function cancelarEdicion() {
+        editandoId = null;
+        document.getElementById('form-titulo').innerText = "📦 Añadir Material";
+        document.getElementById('btn-guardar-stock').innerText = "GUARDAR EN STOCK";
+        document.getElementById('btn-cancelar-edit').style.display = "none";
+        document.getElementById('m-nombre').value = "";
+        document.getElementById('m-cantidad').value = 1;
+        document.getElementById('m-tienda').value = "";
+        document.getElementById('m-grosor').value = "";
+        document.getElementById('m-notas').value = "";
     }
 
     async function guardarNuevo(tipo) {
-        const file = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo').files[0];
-        let fotoUrl = "";
+        if(tipo !== 'stock') return;
+
+        const file = document.getElementById('m-archivo').files[0];
+        let fotoUrl = editandoId ? lanasGlobal.find(m => m.id === editandoId).contenido : "";
 
         if(file) {
             const fileName = `${Date.now()}_${file.name}`;
@@ -289,25 +189,25 @@
             fotoUrl = urlData.publicUrl;
         }
 
-        if(tipo === 'stock') {
-            await client.from('estudio_data').insert([{
-                tipo_material: document.getElementById('m-nombre').value,
-                categoria: document.getElementById('m-categoria').value,
-                cantidad: parseInt(document.getElementById('m-cantidad').value),
-                tienda: document.getElementById('m-tienda').value,
-                grosor: document.getElementById('m-grosor').value,
-                notas: document.getElementById('m-notas').value,
-                contenido: fotoUrl
-            }]);
+        const datos = {
+            tipo_material: document.getElementById('m-nombre').value,
+            categoria: document.getElementById('m-categoria').value,
+            cantidad: parseInt(document.getElementById('m-cantidad').value),
+            tienda: document.getElementById('m-tienda').value,
+            grosor: document.getElementById('m-grosor').value,
+            notas: document.getElementById('m-notas').value,
+            contenido: fotoUrl
+        };
+
+        if(editandoId) {
+            await client.from('estudio_data').update(datos).eq('id', editandoId);
+            alert("¡Material actualizado! ✨");
         } else {
-            await client.from('proyectos_data').insert([{
-                nombre: document.getElementById('p-nombre').value,
-                estado: document.getElementById('p-estado').value,
-                notas: document.getElementById('p-notas').value,
-                foto: fotoUrl
-            }]);
+            await client.from('estudio_data').insert([datos]);
+            alert("¡Guardado correctamente! 💖");
         }
-        alert("¡Guardado correctamente! 💖");
+        
+        cancelarEdicion();
         location.reload();
     }
 
@@ -323,13 +223,6 @@
         document.getElementById('vista-INICIO').style.display = v === 'INICIO' ? 'block' : 'none';
         document.getElementById('vista-STOCK').style.display = v === 'STOCK' ? 'block' : 'none';
         document.getElementById('vista-PROYECTOS').style.display = v === 'PROYECTOS' ? 'block' : 'none';
-        
-        if(v === 'PROYECTOS') {
-            setTimeout(() => {
-                iniciarCanvas('canvas-punto');
-                iniciarCanvas('canvas-cuerpos');
-            }, 100);
-        }
     }
 
     function filtrar(cat) {
