@@ -9,50 +9,43 @@
         :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --br: #f1e1e5; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--f); margin: 0; padding: 15px; padding-bottom: 80px; }
         
-        /* Menú Superior */
         .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 50px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 15px; }
         .btn-nav { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 40px; font-size: 10px; text-transform: uppercase; }
         .btn-nav.active { background: var(--pc); color: var(--s); border: 1px solid var(--p); }
 
-        /* BARRA DE SUBSECCIONES (Nueva) */
+        /* NUEVA BARRA DE SUBSECCIONES */
         .filtros-container { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0 15px 0; scrollbar-width: none; }
-        .filtros-container::-webkit-scrollbar { display: none; }
         .btn-filtro { white-space: nowrap; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--br); background: white; color: #666; font-size: 12px; cursor: pointer; }
         .btn-filtro.active { background: var(--p); color: white; border-color: var(--p); }
 
-        /* GRID PEQUEÑO (Como antes) */
-        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; display: flex; flex-direction: column; }
+        /* GRID DE TARJETAS MEDIANAS */
+        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
+        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; }
         
-        /* Botones Lápiz y X */
+        /* BOTONES FLOTANTES (Lápiz y X) */
         .acciones-flotantes { position: absolute; top: 6px; right: 6px; display: flex; gap: 4px; z-index: 10; }
-        .btn-mini { background: rgba(255,255,255,0.9); border: 1px solid var(--br); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+        .btn-mini { background: rgba(255,255,255,0.95); border: 1px solid var(--br); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-        .foto-material { width: 100%; height: 100px; object-fit: cover; background: #fff0f3; }
-        .info-material { padding: 10px; text-align: center; flex-grow: 1; }
-        .info-material h4 { margin: 0 0 8px 0; color: #444; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .foto-material { width: 100%; height: 110px; object-fit: cover; background: #fff0f3; }
+        .info-material { padding: 10px; text-align: center; }
+        .info-material h4 { margin: 0 0 8px 0; color: #444; font-size: 13px; font-weight: 600; }
 
-        /* Botones + / - Ajustados a tarjeta pequeña */
+        /* BOTONES + / - INTEGRADOS */
         .controles-stock { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 5px; }
-        .btn-qty { background: var(--pc); color: var(--s); border: none; width: 28px; height: 26px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .btn-qty { background: var(--pc); color: var(--s); border: none; width: 30px; height: 28px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
         .qty-num { font-weight: bold; font-size: 14px; color: #333; min-width: 15px; }
-
-        /* Formulario y Dibujo (Sin cambios) */
-        .card-registro { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 450px; margin: 0 auto; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 12px; margin-bottom: 10px; }
-        .contenedor-dibujo { background: #fff; border: 1px dashed var(--p); border-radius: 12px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
     <div class="menu-secciones">
         <button class="btn-nav" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
-        <button class="btn-nav active" id="nav-MATERIALES" onclick="cambiarVista('MATERIALES')">📦 MATERIALES</button>
+        <button class="btn-nav active" id="nav-STOCK" onclick="cambiarVista('STOCK')">📦 STOCK</button>
         <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
     </div>
 
-    <!-- SECCIÓN MATERIALES CON SUBSECCIONES -->
-    <div id="seccion-materiales">
+    <!-- SECCIÓN CON NOMBRE NUEVO PARA FORZAR CARGA -->
+    <div id="seccion-stock-v2">
         <div class="filtros-container">
             <button class="btn-filtro active" onclick="filtrar('Todo')">✨ Todo</button>
             <button class="btn-filtro" onclick="filtrar('Lana')">🧶 Lana</button>
@@ -63,27 +56,20 @@
         <div id="lista-stock" class="grid-estudio"></div>
     </div>
 
-    <!-- SECCIÓN INICIO Y PROYECTOS (SE MANTIENEN IGUAL) -->
-    <div id="seccion-inicio" style="display:none;">
-        <div class="card-registro">
-            <h3 id="titulo-form" style="color:var(--s); text-align:center;">✨ Nuevo Material</h3>
-            <input type="hidden" id="m-id">
-            <input type="text" id="m-nombre" placeholder="Nombre">
-            <select id="m-categoria">
-                <option value="Lana">Lana</option>
-                <option value="Telas">Telas</option>
-                <option value="Hilos">Hilos</option>
-                <option value="Otros">Otros</option>
-            </select>
-            <input type="number" id="m-cantidad" value="1">
-            <button style="background:var(--p); color:white; border:none; padding:15px; border-radius:15px; width:100%; font-weight:bold;" onclick="ejecutarGuardado()">GUARDAR</button>
+    <div id="seccion-inicio" style="display:none; padding:20px;">
+        <div style="background:white; padding:25px; border-radius:30px; border:1px solid var(--br); max-width:450px; margin:0 auto;">
+            <h2 style="color:var(--s); text-align:center;">✨ Nuevo Material</h2>
+            <input type="text" id="m-nombre" placeholder="Nombre (ej. Mega Ball)" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #eee; border-radius:12px;">
+            <button onclick="guardar()" style="width:100%; background:var(--p); color:white; border:none; padding:15px; border-radius:15px; font-weight:bold;">AÑADIR</button>
         </div>
     </div>
 
-    <div id="seccion-proyectos" style="display:none;">
-        <div class="card-registro">
-            <h3 style="color:var(--s); text-align:center;">🎨 Proyectos en construcción</h3>
-            <div class="contenedor-dibujo"><canvas id="canvas-cuerpo" style="width:100%; height:250px;"></canvas></div>
+    <div id="seccion-proyectos" style="display:none; padding:20px;">
+        <div style="background:white; padding:20px; border-radius:25px; border:1px solid var(--br); text-align:center;">
+            <h2 style="color:var(--s);">🎨 Zona de Diseño</h2>
+            <div style="border:1px dashed var(--p); height:300px; border-radius:15px; background-color: #fcf8f9;">
+                <canvas id="canvas-cuerpo" style="width:100%; height:100%;"></canvas>
+            </div>
         </div>
     </div>
 
@@ -97,13 +83,15 @@
     function cambiarVista(v) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
         document.getElementById('nav-' + v).classList.add('active');
+        
+        document.getElementById('seccion-stock-v2').style.display = (v === 'STOCK') ? 'block' : 'none';
         document.getElementById('seccion-inicio').style.display = (v === 'INICIO') ? 'block' : 'none';
-        document.getElementById('seccion-materiales').style.display = (v === 'MATERIALES') ? 'block' : 'none';
         document.getElementById('seccion-proyectos').style.display = (v === 'PROYECTOS') ? 'block' : 'none';
-        if(v === 'MATERIALES') cargarStock();
+        
+        if(v === 'STOCK') cargarDatos();
     }
 
-    async function cargarStock() {
+    async function cargarDatos() {
         const { data } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
         lanasGlobal = data || [];
         renderizar(lanasGlobal);
@@ -114,57 +102,36 @@
         contenedor.innerHTML = lista.map(m => `
             <div class="item-card">
                 <div class="acciones-flotantes">
-                    <button class="btn-mini" onclick="editarMaterial(${m.id})">✏️</button>
-                    <button class="btn-mini" onclick="borrarMaterial(${m.id})">❌</button>
+                    <button class="btn-mini" onclick="alert('editar')">✏️</button>
+                    <button class="btn-mini" onclick="borrar(${m.id})">❌</button>
                 </div>
                 <img src="${m.contenido || ''}" class="foto-material">
                 <div class="info-material">
                     <h4>${m.tipo_material}</h4>
                     <div class="controles-stock">
-                        <button class="btn-qty" onclick="actualizarStock(${m.id}, -1)">-</button>
+                        <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
                         <span class="qty-num">${m.cantidad}</span>
-                        <button class="btn-qty" onclick="actualizarStock(${m.id}, 1)">+</button>
+                        <button class="btn-qty" onclick="cambiarStock(${m.id}, 1)">+</button>
                     </div>
                 </div>
             </div>
         `).join('');
     }
 
-    async function actualizarStock(id, cambio) {
+    async function cambiarStock(id, cambio) {
         const item = lanasGlobal.find(m => m.id === id);
-        const n = Math.max(0, item.cantidad + cambio);
-        await client.from('estudio_data').update({ cantidad: n }).eq('id', id);
-        cargarStock();
-    }
-
-    async function borrarMaterial(id) {
-        if(confirm("¿Borrar?")) { await client.from('estudio_data').delete().eq('id', id); cargarStock(); }
+        const nuevaCant = Math.max(0, item.cantidad + cambio);
+        await client.from('estudio_data').update({ cantidad: nuevaCant }).eq('id', id);
+        cargarDatos();
     }
 
     function filtrar(cat) {
         document.querySelectorAll('.btn-filtro').forEach(b => b.classList.toggle('active', b.innerText.includes(cat)));
-        const f = (cat === 'Todo') ? lanasGlobal : lanasGlobal.filter(m => m.categoria === cat);
-        renderizar(f);
+        const filtrados = (cat === 'Todo') ? lanasGlobal : lanasGlobal.filter(m => m.categoria === cat);
+        renderizar(filtrados);
     }
 
-    function editarMaterial(id) {
-        const m = lanasGlobal.find(i => i.id === id);
-        document.getElementById('m-id').value = m.id;
-        document.getElementById('m-nombre').value = m.tipo_material;
-        document.getElementById('m-categoria').value = m.categoria || 'Lana';
-        document.getElementById('m-cantidad').value = m.cantidad;
-        cambiarVista('INICIO');
-    }
-
-    async function ejecutarGuardado() {
-        const id = document.getElementById('m-id').value;
-        const d = { tipo_material: document.getElementById('m-nombre').value, categoria: document.getElementById('m-categoria').value, cantidad: document.getElementById('m-cantidad').value };
-        if(id) await client.from('estudio_data').update(d).eq('id', id);
-        else await client.from('estudio_data').insert([d]);
-        cambiarVista('MATERIALES');
-    }
-
-    window.onload = cargarStock;
+    window.onload = cargarDatos;
 </script>
 </body>
 </html>
