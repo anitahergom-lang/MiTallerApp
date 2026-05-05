@@ -212,22 +212,26 @@
     function editarMaterial(id) {
         const m = stockLocal.find(x => x.id === id);
         if (!m) return;
+        
         editandoId = id;
         cambiarVista('INICIO');
         document.getElementById('formulario-registro').style.display = 'block';
         document.getElementById('form-titulo').innerText = "✏️ Editando Material";
         document.getElementById('btn-guardar').innerText = "GUARDAR CAMBIOS";
         document.getElementById('btn-cancelar').style.display = "block";
+        
         document.getElementById('m-nombre').value = m.tipo_material;
         document.getElementById('m-cantidad').value = m.cantidad;
         document.getElementById('m-categoria').value = m.categoria;
+        
         mostrarCamposExtra(m.categoria);
-        if(m.categoria.toLowerCase().includes('lana') && m.notas) {
-            const partes = m.notas.split(' | ');
+        
+        if(m.categoria.toLowerCase().includes('lana')) {
+            const partes = m.notas ? m.notas.split(' | ') : [];
             document.getElementById('m-composicion').value = partes[0] || '';
             document.getElementById('m-grosor').value = partes[1] || '';
             document.getElementById('m-tienda').value = partes[2] || '';
-            if(partes[3]) document.getElementById('m-estado-uso').value = partes[3];
+            document.getElementById('m-estado-uso').value = partes[3] || '🏠 En espera';
         }
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
