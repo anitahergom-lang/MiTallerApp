@@ -6,42 +6,31 @@
     <title>Mi Taller Rosa</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { 
-            --primario: #ff85a2; 
-            --primario-claro: #fce4ec; 
-            --secundario: #f06292; 
-            --fondo: #fcf8f9; 
-            --blanco: #ffffff; 
-            --texto: #4a4a4a; 
-            --borde: #f1e1e5; 
-        }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--fondo); color: var(--texto); margin: 0; padding: 20px; }
+        :root { --primario: #ff85a2; --primario-claro: #fce4ec; --secundario: #f06292; --fondo: #fcf8f9; --blanco: #ffffff; --texto: #4a4a4a; --borde: #f1e1e5; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--fondo); color: var(--texto); margin: 0; padding: 15px; }
         
-        /* Menú de navegación */
         .menu-secciones { display: flex; gap: 8px; background: var(--blanco); padding: 8px; border-radius: 20px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--borde); margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .btn-nav { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 15px; font-size: 11px; text-transform: uppercase; }
+        .btn-nav { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 15px; font-size: 10px; text-transform: uppercase; }
         .btn-nav.active { background: var(--primario-claro); color: var(--secundario); border-bottom: 3px solid var(--secundario); }
 
-        /* Filtros de categorías */
-        .filtros-materiales { display: flex; gap: 10px; overflow-x: auto; padding: 5px 10px 20px 10px; margin-bottom: 10px; scrollbar-width: none; }
-        .btn-filtro { padding: 8px 16px; border-radius: 25px; border: 1px solid var(--borde); background: var(--blanco); white-space: nowrap; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; color: var(--texto); }
+        .filtros-materiales { display: flex; gap: 10px; overflow-x: auto; padding: 5px 5px 15px 5px; margin-bottom: 10px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .btn-filtro { padding: 10px 18px; border-radius: 25px; border: 1px solid var(--borde); background: var(--blanco); white-space: nowrap; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; color: var(--texto); box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
         .btn-filtro.active { background: var(--secundario); color: white; border-color: var(--secundario); }
 
-        /* Grid de materiales */
-        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-        .item-card { background: var(--blanco); padding: 15px; border-radius: 20px; border: 1px solid var(--borde); text-align: center; position: relative; transition: 0.3s; }
-        .item-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 15px; margin-bottom: 10px; }
+        .grid-estudio { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .item-card { background: var(--blanco); padding: 12px; border-radius: 20px; border: 1px solid var(--borde); text-align: center; position: relative; }
+        .item-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 15px; margin-bottom: 8px; }
         
-        .nombre-producto { font-weight: bold; font-size: 14px; margin-bottom: 10px; display: block; color: var(--texto); }
-        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 5px; }
-        .btn-qty { width: 32px; height: 32px; border-radius: 8px; border: none; background: var(--primario-claro); color: var(--secundario); font-weight: bold; cursor: pointer; font-size: 18px; }
+        .nombre-producto { font-weight: bold; font-size: 13px; margin-bottom: 8px; display: block; height: 32px; overflow: hidden; }
+        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-qty { width: 35px; height: 35px; border-radius: 10px; border: none; background: var(--primario-claro); color: var(--secundario); font-weight: bold; cursor: pointer; font-size: 18px; }
         
-        .btn-editar { position: absolute; top: 5px; left: 5px; background: #FFC107; border: none; border-radius: 50%; width: 26px; height: 26px; color: white; cursor: pointer; z-index: 5; }
-        .btn-eliminar { position: absolute; top: 5px; right: 5px; background: #ff5252; border: none; border-radius: 50%; width: 26px; height: 26px; color: white; cursor: pointer; z-index: 5; }
+        .btn-editar { position: absolute; top: -5px; left: -5px; background: #FFC107; border: 2px solid white; border-radius: 50%; width: 28px; height: 28px; color: white; cursor: pointer; z-index: 5; font-size: 12px; }
+        .btn-eliminar { position: absolute; top: -5px; right: -5px; background: #ff5252; border: 2px solid white; border-radius: 50%; width: 28px; height: 28px; color: white; cursor: pointer; z-index: 5; font-size: 12px; }
         
-        /* Formulario */
-        input, select { width: 100%; padding: 14px; margin-bottom: 10px; border: 1px solid var(--borde); border-radius: 12px; box-sizing: border-box; font-size: 14px; }
-        .btn-principal { background: var(--primario); color: white; padding: 16px; border: none; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 10px rgba(255,133,162,0.3); }
+        .card-registro { background: var(--blanco); padding: 20px; border-radius: 25px; border: 1px solid var(--borde); max-width: 450px; margin: auto; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--borde); border-radius: 12px; box-sizing: border-box; font-size: 14px; }
+        .btn-principal { background: var(--primario); color: white; padding: 15px; border: none; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -54,15 +43,13 @@
 
     <div id="contenedor-filtros" class="filtros-materiales" style="display:none;"></div>
 
-    <div id="seccion-registro" style="max-width: 500px; margin: auto;">
-        <div style="background: var(--blanco); padding: 25px; border-radius: 25px; border: 1px solid var(--borde);">
-            <h3 id="titulo-form" style="margin-top:0; color:var(--secundario)">✨ Registro de Material</h3>
-            <input type="text" id="m-nombre" placeholder="Nombre del material (ej: Lana Azul)">
-            <select id="m-categoria"></select>
-            <input type="number" id="m-cantidad" placeholder="Cantidad" value="1">
-            <input type="file" id="m-foto" accept="image/*">
-            <button id="btn-guardar" class="btn-principal" onclick="guardar()">AÑADIR AL TALLER</button>
-        </div>
+    <div id="seccion-registro" class="card-registro">
+        <h3 id="titulo-form" style="margin-top:0; color:var(--secundario); text-align:center;">✨ Nuevo Material</h3>
+        <input type="text" id="m-nombre" placeholder="Nombre (ej: Lana Azul)">
+        <select id="m-categoria"></select>
+        <input type="number" id="m-cantidad" placeholder="Cantidad" value="1">
+        <input type="file" id="m-foto" accept="image/*">
+        <button id="btn-guardar" class="btn-principal" onclick="guardar()">AÑADIR AL TALLER</button>
     </div>
 
     <div id="seccion-listado" style="display:none;">
@@ -78,18 +65,15 @@
     let categoriasBase = [];
     let editandoId = null;
 
-    // FUNCIÓN BLINDADA PARA EMOJIS
-    function obtenerEmoji(nombreCat) {
-        if (!nombreCat) return "🌸";
-        const n = nombreCat.toLowerCase();
-        
-        if (n.includes("lana")) return "🧶";
-        if (n.includes("tela")) return "👗";
-        if (n.includes("hilo")) return "🧵";
-        if (n.includes("accesorio")) return "🎀";
-        if (n.includes("otro")) return "🧸";
-        
-        return "🌸"; 
+    // Lógica forzada de Emojis
+    function darEmoji(txt) {
+        const t = txt.toLowerCase();
+        if (t.includes("lana")) return "🧶";
+        if (t.includes("tela")) return "👗";
+        if (t.includes("hilo")) return "🧵";
+        if (t.includes("accesorio")) return "🎀";
+        if (t.includes("otro")) return "🧸";
+        return "✨"; 
     }
 
     async function iniciar() {
@@ -97,7 +81,7 @@
         categoriasBase = catData ? catData.map(c => c.nombre.trim()) : [];
         
         const sel = document.getElementById('m-categoria');
-        sel.innerHTML = categoriasBase.map(c => `<option value="${c}">${obtenerEmoji(c)} ${c}</option>`).join('');
+        sel.innerHTML = categoriasBase.map(c => `<option value="${c}">${darEmoji(c)} ${c}</option>`).join('');
 
         await cargarDatos();
         renderFiltros();
@@ -119,7 +103,7 @@
                 <span class="nombre-producto">${m.tipo_material}</span>
                 <div class="controles-stock">
                     <button class="btn-qty" onclick="actualizarCant(${m.id}, -1)">-</button>
-                    <span style="font-weight:bold; min-width:20px;">${m.cantidad || 0}</span>
+                    <span style="font-weight:bold;">${m.cantidad || 0}</span>
                     <button class="btn-qty" onclick="actualizarCant(${m.id}, 1)">+</button>
                 </div>
             </div>
@@ -130,7 +114,7 @@
         const contenedor = document.getElementById('contenedor-filtros');
         let html = `<button class="btn-filtro active" onclick="filtrar('TODO', this)">✨ Todo</button>`;
         categoriasBase.forEach(cat => {
-            html += `<button class="btn-filtro" onclick="filtrar('${cat}', this)">${obtenerEmoji(cat)} ${cat}</button>`;
+            html += `<button class="btn-filtro" onclick="filtrar('${cat}', this)"><span>${darEmoji(cat)}</span> ${cat}</button>`;
         });
         contenedor.innerHTML = html;
     }
@@ -141,8 +125,7 @@
         if (busqueda === 'TODO') {
             renderStock(stockGlobal);
         } else {
-            const filtrados = stockGlobal.filter(p => p.categoria === busqueda);
-            renderStock(filtrados);
+            renderStock(stockGlobal.filter(p => p.categoria === busqueda));
         }
     }
 
@@ -167,12 +150,7 @@
         const nombre = document.getElementById('m-nombre').value;
         const cat = document.getElementById('m-categoria').value;
         const cant = document.getElementById('m-cantidad').value;
-        const btn = document.getElementById('btn-guardar');
-
-        if (!nombre) return alert("Escribe el nombre del material");
-
-        btn.disabled = true;
-        btn.innerText = "GUARDANDO...";
+        if (!nombre) return alert("Escribe un nombre");
 
         const payload = { tipo_material: nombre, categoria: cat, cantidad: parseInt(cant) || 0 };
         const foto = document.getElementById('m-foto').files[0];
@@ -183,12 +161,8 @@
             payload.contenido = client.storage.from('media').getPublicUrl(name).data.publicUrl;
         }
 
-        if (editandoId) {
-            await client.from('estudio_data').update(payload).eq('id', editandoId);
-            editandoId = null;
-        } else {
-            await client.from('estudio_data').insert([payload]);
-        }
+        if (editandoId) await client.from('estudio_data').update(payload).eq('id', editandoId);
+        else await client.from('estudio_data').insert([payload]);
         
         location.reload();
     }
@@ -197,7 +171,6 @@
         const m = stockGlobal.find(x => x.id === id);
         editandoId = id;
         cambiarVista('INICIO');
-        document.getElementById('titulo-form').innerText = "✏️ Editar Material";
         document.getElementById('m-nombre').value = m.tipo_material;
         document.getElementById('m-categoria').value = m.categoria;
         document.getElementById('m-cantidad').value = m.cantidad;
@@ -205,7 +178,7 @@
     }
 
     async function eliminar(id) {
-        if(confirm("¿Quieres eliminar este material?")) {
+        if(confirm("¿Eliminar?")) {
             await client.from('estudio_data').delete().eq('id', id);
             cargarDatos();
         }
