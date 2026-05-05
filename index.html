@@ -3,24 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Taller Rosa v2.0</title>
+    <title>Taller Rosa - Verificación</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --t: #4a4a4a; --br: #f1e1e5; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--f); color: var(--t); margin: 0; padding: 15px; }
-        .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 20px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 20px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 20px; }
         .btn-nav { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 15px; font-size: 10px; text-transform: uppercase; }
         .btn-nav.active { background: var(--pc); color: var(--s); border-bottom: 3px solid var(--s); }
-        .filtros-materiales { display: flex; gap: 10px; overflow-x: auto; padding: 10px; margin-bottom: 10px; scrollbar-width: none; }
-        .btn-filtro { padding: 10px 18px; border-radius: 25px; border: 1px solid var(--br); background: var(--b); white-space: nowrap; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; color: var(--t); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .filtros-materiales { display: flex; gap: 10px; overflow-x: auto; padding: 10px; margin-bottom: 10px; }
+        .btn-filtro { padding: 10px 18px; border-radius: 25px; border: 1px solid var(--br); background: var(--b); white-space: nowrap; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; }
         .btn-filtro.active { background: var(--s); color: white; border-color: var(--s); }
         .grid-estudio { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         .item-card { background: var(--b); padding: 12px; border-radius: 20px; border: 1px solid var(--br); text-align: center; position: relative; }
         .item-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 15px; margin-bottom: 8px; }
-        .nombre-producto { font-weight: bold; font-size: 13px; margin-bottom: 8px; display: block; height: 32px; overflow: hidden; line-height: 1.2; }
-        .btn-qty { width: 35px; height: 35px; border-radius: 10px; border: none; background: var(--pc); color: var(--s); font-weight: bold; cursor: pointer; font-size: 18px; }
-        .btn-editar { position: absolute; top: -5px; left: -5px; background: #FFC107; border: 2px solid white; border-radius: 50%; width: 28px; height: 28px; color: white; cursor: pointer; z-index: 5; }
-        .btn-eliminar { position: absolute; top: -5px; right: -5px; background: #ff5252; border: 2px solid white; border-radius: 50%; width: 28px; height: 28px; color: white; cursor: pointer; z-index: 5; }
+        .nombre-producto { font-weight: bold; font-size: 13px; margin-bottom: 8px; display: block; height: 32px; overflow: hidden; }
+        .btn-qty { width: 35px; height: 35px; border-radius: 10px; border: none; background: var(--pc); color: var(--s); font-weight: bold; cursor: pointer; }
         .card-registro { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 450px; margin: auto; }
         input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--br); border-radius: 12px; font-size: 14px; box-sizing: border-box; }
         .btn-principal { background: var(--p); color: white; padding: 15px; border: none; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; }
@@ -34,8 +32,7 @@
         <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 Proyectos</button>
     </div>
 
-    <!-- Contenedor de filtros con IDs únicos para forzar recarga -->
-    <div id="wrapper-filtros" class="filtros-materiales" style="display:none;"></div>
+    <div id="contenedor-filtros" class="filtros-materiales" style="display:none;"></div>
 
     <div id="seccion-registro" class="card-registro">
         <h3 id="titulo-form" style="margin-top:0; color:var(--s); text-align:center;">✨ Nuevo Material</h3>
@@ -43,7 +40,7 @@
         <select id="m-categoria"></select>
         <input type="number" id="m-cantidad" value="1">
         <input type="file" id="m-foto" accept="image/*">
-        <button id="btn-guardar" class="btn-principal" onclick="guardarNuevo()">AÑADIR</button>
+        <button id="btn-guardar" class="btn-principal" onclick="guardar()">AÑADIR</button>
     </div>
 
     <div id="seccion-listado" style="display:none;">
@@ -51,136 +48,111 @@
     </div>
 
 <script>
-    // Configuración con "cache buster" manual
-    const VERSION = "2.0.1"; 
-    console.log("Cargando versión: " + VERSION);
-
     const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
     const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
-    const _db = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const client = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    let stockData = [];
-    let categoriasLista = [];
-    let idEdit = null;
+    let stockGlobal = [];
+    let categoriasBase = [];
 
-    // EL EMOJI-FIX DEFINITIVO (Usando comparaciones directas y seguras)
-    function getEmoji(txt) {
-        if (!txt) return "🌸";
-        const val = txt.toLowerCase().trim();
+    // LÓGICA DE FUERZA BRUTA
+    function obtenerEmoji(texto) {
+        if (!texto) return "🌸";
+        // Limpiamos el texto al extremo: minúsculas, sin espacios, sin acentos
+        const t = texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
         
-        if (val.includes("lana")) return "🧶";
-        if (val.includes("tela")) return "👗";
-        if (val.includes("hilo")) return "🧵";
-        if (val.includes("accesorio")) return "🎀";
-        if (val.includes("otro")) return "🧸";
+        console.log("Procesando categoría:", t); // Para que revises en la consola del navegador
+
+        if (t.includes("lana")) return "🧶";
+        if (t.includes("tela")) return "👗";
+        if (t.includes("hilo")) return "🧵";
+        if (t.includes("accesorio")) return "🎀";
+        if (t.includes("otro")) return "🧸";
         
-        return "🌸";
+        return "🌸"; 
     }
 
-    async function appInit() {
-        const { data: cData } = await _db.from('Secciones').select('nombre');
-        categoriasLista = cData ? cData.map(c => c.nombre.trim()) : [];
-        
-        const sel = document.getElementById('m-categoria');
-        sel.innerHTML = categoriasLista.map(c => `<option value="${c}">${getEmoji(c)} ${c}</option>`).join('');
+    async function iniciar() {
+        try {
+            const { data: catData } = await client.from('Secciones').select('nombre');
+            categoriasBase = catData ? catData.map(c => c.nombre.trim()) : [];
+            
+            // Llenar el SELECT del formulario
+            const sel = document.getElementById('m-categoria');
+            sel.innerHTML = categoriasBase.map(c => `<option value="${c}">${obtenerEmoji(c)} ${c}</option>`).join('');
 
-        await fetchStock();
-        drawFiltros();
+            await cargarDatos();
+            renderFiltros();
+        } catch (e) {
+            console.error("Error al iniciar:", e);
+        }
     }
 
-    async function fetchStock() {
-        const { data } = await _db.from('estudio_data').select('*').order('created_at', { ascending: false });
-        stockData = data || [];
-        drawStock(stockData);
+    async function cargarDatos() {
+        const { data } = await client.from('estudio_data').select('*').order('created_at', { ascending: false });
+        stockGlobal = data || [];
+        renderStock(stockGlobal);
     }
 
-    function drawStock(items) {
-        const box = document.getElementById('lista-stock');
-        box.innerHTML = items.map(m => `
+    function renderStock(lista) {
+        const contenedor = document.getElementById('lista-stock');
+        contenedor.innerHTML = lista.map(m => `
             <div class="item-card">
-                <button class="btn-editar" onclick="editMode(${m.id})">✏️</button>
-                <button class="btn-eliminar" onclick="deleteItem(${m.id})">×</button>
                 <img src="${m.contenido || 'https://via.placeholder.com/150/fce4ec/888?text=Sin+Foto'}">
                 <span class="nombre-producto">${m.tipo_material}</span>
                 <div class="controles-stock">
-                    <button class="btn-qty" onclick="updateQty(${m.id}, -1)">-</button>
-                    <span style="font-weight:bold; margin: 0 5px;">${m.cantidad || 0}</span>
-                    <button class="btn-qty" onclick="updateQty(${m.id}, 1)">+</button>
+                    <button class="btn-qty" onclick="actualizarCant(${m.id}, -1)">-</button>
+                    <span style="font-weight:bold;">${m.cantidad || 0}</span>
+                    <button class="btn-qty" onclick="actualizarCant(${m.id}, 1)">+</button>
                 </div>
             </div>
         `).join('');
     }
 
-    function drawFiltros() {
-        const wrap = document.getElementById('wrapper-filtros');
-        let h = `<button class="btn-filtro active" onclick="applyFilter('TODO', this)">✨ Todo</button>`;
-        categoriasLista.forEach(cat => {
-            h += `<button class="btn-filtro" onclick="applyFilter('${cat}', this)">${getEmoji(cat)} ${cat}</button>`;
+    function renderFiltros() {
+        const contenedor = document.getElementById('contenedor-filtros');
+        let html = `<button class="btn-filtro active" onclick="filtrar('TODO', this)">✨ Todo</button>`;
+        categoriasBase.forEach(cat => {
+            html += `<button class="btn-filtro" onclick="filtrar('${cat}', this)">${obtenerEmoji(cat)} ${cat}</button>`;
         });
-        wrap.innerHTML = h;
+        contenedor.innerHTML = html;
     }
 
-    function applyFilter(cat, btn) {
+    function filtrar(busqueda, boton) {
         document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        drawStock(cat === 'TODO' ? stockData : stockData.filter(s => s.categoria === cat));
+        boton.classList.add('active');
+        renderStock(busqueda === 'TODO' ? stockGlobal : stockGlobal.filter(p => p.categoria === busqueda));
     }
 
-    function cambiarVista(v) {
+    function cambiarVista(vista) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
-        document.getElementById('nav-' + v).classList.add('active');
-        document.getElementById('seccion-registro').style.display = (v === 'INICIO' ? 'block' : 'none');
-        document.getElementById('seccion-listado').style.display = (v === 'MATERIALES' ? 'block' : 'none');
-        document.getElementById('wrapper-filtros').style.display = (v === 'MATERIALES' ? 'flex' : 'none');
-        if(v === 'MATERIALES') fetchStock();
+        document.getElementById('nav-' + vista).classList.add('active');
+        document.getElementById('seccion-registro').style.display = (vista === 'INICIO' ? 'block' : 'none');
+        document.getElementById('seccion-listado').style.display = (vista === 'MATERIALES' ? 'block' : 'none');
+        document.getElementById('contenedor-filtros').style.display = (vista === 'MATERIALES' ? 'flex' : 'none');
     }
 
-    async function updateQty(id, n) {
-        const it = stockData.find(x => x.id === id);
-        const nv = Math.max(0, (it.cantidad || 0) + n);
-        it.cantidad = nv;
-        drawStock(stockData);
-        await _db.from('estudio_data').update({ cantidad: nv }).eq('id', id);
+    async function actualizarCant(id, cambio) {
+        const item = stockGlobal.find(x => x.id === id);
+        const nuevaCant = Math.max(0, (item.cantidad || 0) + cambio);
+        item.cantidad = nuevaCant;
+        renderStock(stockGlobal);
+        await client.from('estudio_data').update({ cantidad: nuevaCant }).eq('id', id);
     }
 
-    async function guardarNuevo() {
-        const nom = document.getElementById('m-nombre').value;
+    async function guardar() {
+        const nombre = document.getElementById('m-nombre').value;
         const cat = document.getElementById('m-categoria').value;
-        const can = document.getElementById('m-cantidad').value;
-        if (!nom) return alert("Falta el nombre");
+        const cant = document.getElementById('m-cantidad').value;
+        if (!nombre) return alert("Escribe un nombre");
+
+        const payload = { tipo_material: nombre, categoria: cat, cantidad: parseInt(cant) || 0 };
+        const { error } = await client.from('estudio_data').insert([payload]);
         
-        const obj = { tipo_material: nom, categoria: cat, cantidad: parseInt(can) || 0 };
-        const f = document.getElementById('m-foto').files[0];
-        if (f) {
-            const path = `img_${Date.now()}`;
-            await _db.storage.from('media').upload(path, f);
-            obj.contenido = _db.storage.from('media').getPublicUrl(path).data.publicUrl;
-        }
-
-        if (idEdit) await _db.from('estudio_data').update(obj).eq('id', idEdit);
-        else await _db.from('estudio_data').insert([obj]);
-        
-        location.reload();
+        if(!error) location.reload();
     }
 
-    function editMode(id) {
-        const m = stockData.find(x => x.id === id);
-        idEdit = id;
-        cambiarVista('INICIO');
-        document.getElementById('m-nombre').value = m.tipo_material;
-        document.getElementById('m-categoria').value = m.categoria;
-        document.getElementById('m-cantidad').value = m.cantidad;
-        document.getElementById('btn-guardar').innerText = "GUARDAR CAMBIOS";
-    }
-
-    async function deleteItem(id) {
-        if(confirm("¿Borrar?")) {
-            await _db.from('estudio_data').delete().eq('id', id);
-            fetchStock();
-        }
-    }
-
-    appInit();
+    iniciar();
 </script>
 </body>
 </html>
