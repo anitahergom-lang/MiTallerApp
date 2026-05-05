@@ -2,37 +2,46 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Mi Taller Rosa</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --t: #4a4a4a; --br: #f1e1e5; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--f); color: var(--t); margin: 0; padding: 20px; }
+        :root { 
+            --primario: #ff85a2; 
+            --primario-claro: #fce4ec; 
+            --secundario: #f06292; 
+            --fondo: #fcf8f9; 
+            --blanco: #ffffff; 
+            --texto: #4a4a4a; 
+            --borde: #f1e1e5; 
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--fondo); color: var(--texto); margin: 0; padding: 20px; }
         
-        /* Navegación */
-        .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 20px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 20px; }
+        /* Menú de navegación */
+        .menu-secciones { display: flex; gap: 8px; background: var(--blanco); padding: 8px; border-radius: 20px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--borde); margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .btn-nav { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 15px; font-size: 11px; text-transform: uppercase; }
-        .btn-nav.active { background: var(--pc); color: var(--s); border-bottom: 3px solid var(--s); }
+        .btn-nav.active { background: var(--primario-claro); color: var(--secundario); border-bottom: 3px solid var(--secundario); }
 
-        /* Filtros */
-        .filtros-materiales { display: flex; gap: 10px; overflow-x: auto; padding: 10px; margin-bottom: 10px; }
-        .btn-filtro { padding: 8px 16px; border-radius: 25px; border: 1px solid var(--br); background: var(--b); white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .btn-filtro.active { background: var(--s); color: white; border-color: var(--s); }
+        /* Filtros de categorías */
+        .filtros-materiales { display: flex; gap: 10px; overflow-x: auto; padding: 5px 10px 20px 10px; margin-bottom: 10px; scrollbar-width: none; }
+        .btn-filtro { padding: 8px 16px; border-radius: 25px; border: 1px solid var(--borde); background: var(--blanco); white-space: nowrap; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; color: var(--texto); }
+        .btn-filtro.active { background: var(--secundario); color: white; border-color: var(--secundario); }
 
-        /* Stock Cards */
+        /* Grid de materiales */
         .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-        .item-card { background: var(--b); padding: 15px; border-radius: 20px; border: 1px solid var(--br); text-align: center; position: relative; }
-        .item-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 15px; margin-bottom: 10px; }
-        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-qty { width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--pc); color: var(--s); font-weight: bold; cursor: pointer; }
+        .item-card { background: var(--blanco); padding: 15px; border-radius: 20px; border: 1px solid var(--borde); text-align: center; position: relative; transition: 0.3s; }
+        .item-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 15px; margin-bottom: 10px; }
         
-        .btn-editar { position: absolute; top: 5px; left: 5px; background: #FFC107; border: none; border-radius: 50%; width: 24px; height: 24px; color: white; cursor: pointer; }
-        .btn-eliminar { position: absolute; top: 5px; right: 5px; background: #ff5252; border: none; border-radius: 50%; width: 24px; height: 24px; color: white; cursor: pointer; }
-
+        .nombre-producto { font-weight: bold; font-size: 14px; margin-bottom: 10px; display: block; color: var(--texto); }
+        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 5px; }
+        .btn-qty { width: 32px; height: 32px; border-radius: 8px; border: none; background: var(--primario-claro); color: var(--secundario); font-weight: bold; cursor: pointer; font-size: 18px; }
+        
+        .btn-editar { position: absolute; top: 5px; left: 5px; background: #FFC107; border: none; border-radius: 50%; width: 26px; height: 26px; color: white; cursor: pointer; z-index: 5; }
+        .btn-eliminar { position: absolute; top: 5px; right: 5px; background: #ff5252; border: none; border-radius: 50%; width: 26px; height: 26px; color: white; cursor: pointer; z-index: 5; }
+        
         /* Formulario */
-        .card-form { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 400px; margin: auto; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--br); border-radius: 10px; box-sizing: border-box; }
-        .btn-p { background: var(--p); color: white; padding: 14px; border: none; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; }
+        input, select { width: 100%; padding: 14px; margin-bottom: 10px; border: 1px solid var(--borde); border-radius: 12px; box-sizing: border-box; font-size: 14px; }
+        .btn-principal { background: var(--primario); color: white; padding: 16px; border: none; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 10px rgba(255,133,162,0.3); }
     </style>
 </head>
 <body>
@@ -45,13 +54,15 @@
 
     <div id="contenedor-filtros" class="filtros-materiales" style="display:none;"></div>
 
-    <div id="seccion-registro" class="card-form">
-        <h3 id="titulo-form" style="color:var(--s); margin-top:0;">✨ Nuevo Material</h3>
-        <input type="text" id="m-nombre" placeholder="¿Qué es?">
-        <select id="m-categoria"></select>
-        <input type="number" id="m-cantidad" value="1">
-        <input type="file" id="m-foto" accept="image/*">
-        <button id="btn-save" class="btn-p" onclick="guardar()">AÑADIR</button>
+    <div id="seccion-registro" style="max-width: 500px; margin: auto;">
+        <div style="background: var(--blanco); padding: 25px; border-radius: 25px; border: 1px solid var(--borde);">
+            <h3 id="titulo-form" style="margin-top:0; color:var(--secundario)">✨ Registro de Material</h3>
+            <input type="text" id="m-nombre" placeholder="Nombre del material (ej: Lana Azul)">
+            <select id="m-categoria"></select>
+            <input type="number" id="m-cantidad" placeholder="Cantidad" value="1">
+            <input type="file" id="m-foto" accept="image/*">
+            <button id="btn-guardar" class="btn-principal" onclick="guardar()">AÑADIR AL TALLER</button>
+        </div>
     </div>
 
     <div id="seccion-listado" style="display:none;">
@@ -63,116 +74,140 @@
     const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
     const client = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    let stock = [];
-    let categorias = [];
-    let editID = null;
+    let stockGlobal = [];
+    let categoriasBase = [];
+    let editandoId = null;
 
-    // Emojis (Llaves exactas)
-    const emojis = { "Lana": "🧶", "Telas": "👗", "Hilos": "🧵", "Accesorios": "🎀", "Otros": "🧸" };
+    // FUNCIÓN BLINDADA PARA EMOJIS
+    function obtenerEmoji(nombreCat) {
+        if (!nombreCat) return "🌸";
+        const n = nombreCat.toLowerCase();
+        
+        if (n.includes("lana")) return "🧶";
+        if (n.includes("tela")) return "👗";
+        if (n.includes("hilo")) return "🧵";
+        if (n.includes("accesorio")) return "🎀";
+        if (n.includes("otro")) return "🧸";
+        
+        return "🌸"; 
+    }
 
     async function iniciar() {
         const { data: catData } = await client.from('Secciones').select('nombre');
-        categorias = catData ? catData.map(c => c.nombre.trim()) : [];
+        categoriasBase = catData ? catData.map(c => c.nombre.trim()) : [];
         
         const sel = document.getElementById('m-categoria');
-        sel.innerHTML = categorias.map(c => `<option value="${c}">${emojis[c] || '🌸'} ${c}</option>`).join('');
+        sel.innerHTML = categoriasBase.map(c => `<option value="${c}">${obtenerEmoji(c)} ${c}</option>`).join('');
 
-        await cargar();
+        await cargarDatos();
         renderFiltros();
     }
 
-    async function cargar() {
+    async function cargarDatos() {
         const { data } = await client.from('estudio_data').select('*').order('created_at', { ascending: false });
-        stock = data || [];
-        renderStock(stock);
+        stockGlobal = data || [];
+        renderStock(stockGlobal);
     }
 
     function renderStock(lista) {
-        const cont = document.getElementById('lista-stock');
-        cont.innerHTML = lista.map(m => `
+        const contenedor = document.getElementById('lista-stock');
+        contenedor.innerHTML = lista.map(m => `
             <div class="item-card">
-                <button class="btn-editar" onclick="preEdicion(${m.id})">✏️</button>
-                <button class="btn-eliminar" onclick="borrar(${m.id})">×</button>
-                <img src="${m.contenido || 'https://via.placeholder.com/150'}">
-                <div style="font-weight:bold; margin-bottom:8px;">${m.tipo_material}</div>
+                <button class="btn-editar" onclick="prepararEdicion(${m.id})">✏️</button>
+                <button class="btn-eliminar" onclick="eliminar(${m.id})">×</button>
+                <img src="${m.contenido || 'https://via.placeholder.com/150/fce4ec/888?text=Sin+Foto'}">
+                <span class="nombre-producto">${m.tipo_material}</span>
                 <div class="controles-stock">
-                    <button class="btn-qty" onclick="cambiarCant(${m.id}, -1)">-</button>
-                    <span>${m.cantidad || 0}</span>
-                    <button class="btn-qty" onclick="cambiarCant(${m.id}, 1)">+</button>
+                    <button class="btn-qty" onclick="actualizarCant(${m.id}, -1)">-</button>
+                    <span style="font-weight:bold; min-width:20px;">${m.cantidad || 0}</span>
+                    <button class="btn-qty" onclick="actualizarCant(${m.id}, 1)">+</button>
                 </div>
             </div>
         `).join('');
     }
 
     function renderFiltros() {
-        const cont = document.getElementById('contenedor-filtros');
+        const contenedor = document.getElementById('contenedor-filtros');
         let html = `<button class="btn-filtro active" onclick="filtrar('TODO', this)">✨ Todo</button>`;
-        categorias.forEach(c => {
-            html += `<button class="btn-filtro" onclick="filtrar('${c}', this)">${emojis[c] || '🌸'} ${c}</button>`;
+        categoriasBase.forEach(cat => {
+            html += `<button class="btn-filtro" onclick="filtrar('${cat}', this)">${obtenerEmoji(cat)} ${cat}</button>`;
         });
-        cont.innerHTML = html;
+        contenedor.innerHTML = html;
     }
 
-    function filtrar(cat, btn) {
+    function filtrar(busqueda, boton) {
         document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderStock(cat === 'TODO' ? stock : stock.filter(s => s.categoria === cat));
+        boton.classList.add('active');
+        if (busqueda === 'TODO') {
+            renderStock(stockGlobal);
+        } else {
+            const filtrados = stockGlobal.filter(p => p.categoria === busqueda);
+            renderStock(filtrados);
+        }
     }
 
-    function cambiarVista(v) {
+    function cambiarVista(vista) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
-        document.getElementById('nav-'+v).classList.add('active');
-        document.getElementById('seccion-registro').style.display = (v === 'INICIO' ? 'block' : 'none');
-        document.getElementById('seccion-listado').style.display = (v === 'MATERIALES' ? 'block' : 'none');
-        document.getElementById('contenedor-filtros').style.display = (v === 'MATERIALES' ? 'flex' : 'none');
-        if(v === 'MATERIALES') cargar();
+        document.getElementById('nav-' + vista).classList.add('active');
+        document.getElementById('seccion-registro').style.display = (vista === 'INICIO' ? 'block' : 'none');
+        document.getElementById('seccion-listado').style.display = (vista === 'MATERIALES' ? 'block' : 'none');
+        document.getElementById('contenedor-filtros').style.display = (vista === 'MATERIALES' ? 'flex' : 'none');
+        if(vista === 'MATERIALES') cargarDatos();
     }
 
-    async function cambiarCant(id, n) {
-        const m = stock.find(x => x.id === id);
-        const nc = Math.max(0, (m.cantidad || 0) + n);
-        await client.from('estudio_data').update({ cantidad: nc }).eq('id', id);
-        cargar();
+    async function actualizarCant(id, cambio) {
+        const item = stockGlobal.find(x => x.id === id);
+        const nuevaCant = Math.max(0, (item.cantidad || 0) + cambio);
+        item.cantidad = nuevaCant;
+        renderStock(stockGlobal);
+        await client.from('estudio_data').update({ cantidad: nuevaCant }).eq('id', id);
     }
 
     async function guardar() {
-        const nom = document.getElementById('m-nombre').value;
+        const nombre = document.getElementById('m-nombre').value;
         const cat = document.getElementById('m-categoria').value;
-        const can = document.getElementById('m-cantidad').value;
-        const file = document.getElementById('m-foto').files[0];
+        const cant = document.getElementById('m-cantidad').value;
+        const btn = document.getElementById('btn-guardar');
 
-        if(!nom) return alert("Pon un nombre");
+        if (!nombre) return alert("Escribe el nombre del material");
 
-        let url = null;
-        if(file) {
-            const path = `f_${Date.now()}`;
-            await client.storage.from('media').upload(path, file);
-            url = client.storage.from('media').getPublicUrl(path).data.publicUrl;
+        btn.disabled = true;
+        btn.innerText = "GUARDANDO...";
+
+        const payload = { tipo_material: nombre, categoria: cat, cantidad: parseInt(cant) || 0 };
+        const foto = document.getElementById('m-foto').files[0];
+        
+        if (foto) {
+            const name = `img_${Date.now()}`;
+            await client.storage.from('media').upload(name, foto);
+            payload.contenido = client.storage.from('media').getPublicUrl(name).data.publicUrl;
         }
 
-        const obj = { tipo_material: nom, categoria: cat, cantidad: parseInt(can) };
-        if(url) obj.contenido = url;
-
-        if(editID) await client.from('estudio_data').update(obj).eq('id', editID);
-        else await client.from('estudio_data').insert([obj]);
-
+        if (editandoId) {
+            await client.from('estudio_data').update(payload).eq('id', editandoId);
+            editandoId = null;
+        } else {
+            await client.from('estudio_data').insert([payload]);
+        }
+        
         location.reload();
     }
 
-    function preEdicion(id) {
-        const m = stock.find(x => x.id === id);
-        editID = id;
+    function prepararEdicion(id) {
+        const m = stockGlobal.find(x => x.id === id);
+        editandoId = id;
         cambiarVista('INICIO');
+        document.getElementById('titulo-form').innerText = "✏️ Editar Material";
         document.getElementById('m-nombre').value = m.tipo_material;
         document.getElementById('m-categoria').value = m.categoria;
         document.getElementById('m-cantidad').value = m.cantidad;
-        document.getElementById('titulo-form').innerText = "✏️ Editar";
+        document.getElementById('btn-guardar').innerText = "GUARDAR CAMBIOS";
     }
 
-    async function borrar(id) {
-        if(confirm("¿Borrar?")) {
+    async function eliminar(id) {
+        if(confirm("¿Quieres eliminar este material?")) {
             await client.from('estudio_data').delete().eq('id', id);
-            cargar();
+            cargarDatos();
         }
     }
 
