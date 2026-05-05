@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Taller Rosa - Verificación</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --t: #4a4a4a; --br: #f1e1e5; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--f); color: var(--t); margin: 0; padding: 15px; }
+        .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 20px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 20px; }
+        .btn-nav { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 15px; font-size: 10px; text-transform: uppercase; }
+        .btn-nav.active { background: var(--pc); color: var(--s); border-bottom: 3px solid var(--s); }
+        .filtros-materiales { display: flex; gap: 10px; overflow-x: auto; padding: 10px; margin-bottom: 10px; }
+        .btn-filtro { padding: 10px 18px; border-radius: 25px; border: 1px solid var(--br); background: var(--b); white-space: nowrap; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .btn-filtro.active { background: var(--s); color: white; border-color: var(--s); }
+        .grid-estudio { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .item-card { background: var(--b); padding: 12px; border-radius: 20px; border: 1px solid var(--br); text-align: center; position: relative; }
+        .item-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 15px; margin-bottom: 8px; }
+        .nombre-producto { font-weight: bold; font-size: 13px; margin-bottom: 8px; display: block; height: 32px; overflow: hidden; }
+        .btn-qty { width: 35px; height: 35px; border-radius: 10px; border: none; background: var(--pc); color: var(--s); font-weight: bold; cursor: pointer; }
+        .card-registro { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 450px; margin: auto; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--br); border-radius: 12px; font-size: 14px; box-sizing: border-box; }
+        .btn-principal { background: var(--p); color: white; padding: 15px; border: none; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="menu-secciones">
+        <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 Inicio</button>
+        <button class="btn-nav" id="nav-MATERIALES" onclick="cambiarVista('MATERIALES')">📦 Materiales</button>
+        <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 Proyectos</button>
+    </div>
+
+    <div id="contenedor-filtros" class="filtros-materiales" style="display:none;"></div>
+
+    <div id="seccion-registro" class="card-registro">
+        <h3 id="titulo-form" style="margin-top:0; color:var(--s); text-align:center;">✨ Nuevo Material</h3>
+        <input type="text" id="m-nombre" placeholder="Nombre (ej: Lana Azul)">
+        <select id="m-categoria"></select>
+        <input type="number" id="m-cantidad" value="1">
+        <input type="file" id="m-foto" accept="image/*">
+        <button id="btn-guardar" class="btn-principal" onclick="guardar()">AÑADIR</button>
+    </div>
+
+    <div id="seccion-listado" style="display:none;">
+        <div id="lista-stock" class="grid-estudio"></div>
+    </div>
+
+<script>
+    const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
+    const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
+    const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    let stockGlobal = [];
+    let categoriasBase = [];
+
+    // LÓGICA DE FUERZA BRUTA
+    function obtenerEmoji(texto) {
+        if (!texto) return "🌸";
+        // Limpiamos el texto al extremo: minúsculas, sin espacios, sin acentos
+        const t = texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        
+        console.log("Procesando categoría:", t); // Para que revises en la consola del navegador
+
+        if (t.includes("lana")) return "🧶";
+        if (t.includes("tela")) return "👗";
+        if (t.includes("hilo")) return "🧵";
+        if (t.includes("accesorio")) return "🎀";
+        if (t.includes("otro")) return "🧸";
+        
+        return "🌸"; 
+    }
+
+    async function iniciar() {
+        try {
+            const { data: catData } = await client.from('Secciones').select('nombre');
+            categoriasBase = catData ? catData.map(c => c.nombre.trim()) : [];
+            
+            // Llenar el SELECT del formulario
+            const sel = document.getElementById('m-categoria');
+            sel.innerHTML = categoriasBase.map(c => `<option value="${c}">${obtenerEmoji(c)} ${c}</option>`).join('');
+
+            await cargarDatos();
+            renderFiltros();
+        } catch (e) {
+            console.error("Error al iniciar:", e);
+        }
+    }
+
+    async function cargarDatos() {
+        const { data } = await client.from('estudio_data').select('*').order('created_at', { ascending: false });
+        stockGlobal = data || [];
+        renderStock(stockGlobal);
+    }
+
+    function renderStock(lista) {
+        const contenedor = document.getElementById('lista-stock');
+        contenedor.innerHTML = lista.map(m => `
+            <div class="item-card">
+                <img src="${m.contenido || 'https://via.placeholder.com/150/fce4ec/888?text=Sin+Foto'}">
+                <span class="nombre-producto">${m.tipo_material}</span>
+                <div class="controles-stock">
+                    <button class="btn-qty" onclick="actualizarCant(${m.id}, -1)">-</button>
+                    <span style="font-weight:bold;">${m.cantidad || 0}</span>
+                    <button class="btn-qty" onclick="actualizarCant(${m.id}, 1)">+</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderFiltros() {
+        const contenedor = document.getElementById('contenedor-filtros');
+        let html = `<button class="btn-filtro active" onclick="filtrar('TODO', this)">✨ Todo</button>`;
+        categoriasBase.forEach(cat => {
+            html += `<button class="btn-filtro" onclick="filtrar('${cat}', this)">${obtenerEmoji(cat)} ${cat}</button>`;
+        });
+        contenedor.innerHTML = html;
+    }
+
+    function filtrar(busqueda, boton) {
+        document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
+        boton.classList.add('active');
+        renderStock(busqueda === 'TODO' ? stockGlobal : stockGlobal.filter(p => p.categoria === busqueda));
+    }
+
+    function cambiarVista(vista) {
+        document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
+        document.getElementById('nav-' + vista).classList.add('active');
+        document.getElementById('seccion-registro').style.display = (vista === 'INICIO' ? 'block' : 'none');
+        document.getElementById('seccion-listado').style.display = (vista === 'MATERIALES' ? 'block' : 'none');
+        document.getElementById('contenedor-filtros').style.display = (vista === 'MATERIALES' ? 'flex' : 'none');
+    }
+
+    async function actualizarCant(id, cambio) {
+        const item = stockGlobal.find(x => x.id === id);
+        const nuevaCant = Math.max(0, (item.cantidad || 0) + cambio);
+        item.cantidad = nuevaCant;
+        renderStock(stockGlobal);
+        await client.from('estudio_data').update({ cantidad: nuevaCant }).eq('id', id);
+    }
+
+    async function guardar() {
+        const nombre = document.getElementById('m-nombre').value;
+        const cat = document.getElementById('m-categoria').value;
+        const cant = document.getElementById('m-cantidad').value;
+        if (!nombre) return alert("Escribe un nombre");
+
+        const payload = { tipo_material: nombre, categoria: cat, cantidad: parseInt(cant) || 0 };
+        const { error } = await client.from('estudio_data').insert([payload]);
+        
+        if(!error) location.reload();
+    }
+
+    iniciar();
+</script>
+</body>
+</html>
