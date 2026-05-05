@@ -1,234 +1,471 @@
 <!DOCTYPE html>
+
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
     <title>Mi Taller Rosa</title>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
+
         :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --t: #4a4a4a; --br: #f1e1e5; }
+
         body { font-family: 'Segoe UI', sans-serif; background: var(--f); color: var(--t); margin: 0; padding: 15px; padding-bottom: 80px; }
+
         
+
+        /* Menú Principal */
+
         .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 20px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
         .btn-nav { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 15px; font-size: 10px; text-transform: uppercase; }
+
         .btn-nav.active { background: var(--pc); color: var(--s); border-bottom: 3px solid var(--s); }
 
+
+
+        /* Tarjetas y Formulario */
+
         .card-registro { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 600px; margin: auto; margin-bottom: 20px; }
+
         .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
         input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--br); border-radius: 12px; font-size: 14px; box-sizing: border-box; background: #fff; }
+
         
+
         .label-f { font-size: 11px; font-weight: bold; color: var(--s); margin-left: 5px; text-transform: uppercase; display: block; margin-bottom: 4px; }
 
+
+
+        /* Listado Stock */
+
         .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+
         .item-card { background: var(--b); border-radius: 20px; border: 1px solid var(--br); overflow: hidden; display: flex; flex-direction: column; }
+
         .foto-material { width: 100%; height: 140px; object-fit: cover; background: #fff0f3; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+
         .info-material { padding: 12px; flex-grow: 1; }
+
         .info-material h4 { margin: 0; color: var(--s); font-size: 15px; }
+
         
+
         .badge-cantidad { background: var(--pc); color: var(--s); padding: 4px 8px; border-radius: 10px; font-weight: bold; font-size: 11px; display: inline-block; margin-top: 5px; }
+
         .btn-principal { background: var(--p); color: white; padding: 16px; border: none; border-radius: 18px; width: 100%; font-weight: bold; cursor: pointer; }
+
         .btn-edit { background: #f0f0f0; color: #666; margin-top: 10px; width: 100%; padding: 8px; border-radius: 10px; border: none; font-size: 11px; font-weight: bold; cursor: pointer; }
+
     </style>
+
 </head>
+
 <body>
 
+
+
     <div class="menu-secciones">
+
         <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 Inicio</button>
+
         <button class="btn-nav" id="nav-MATERIALES" onclick="cambiarVista('MATERIALES')">📦 Stock</button>
+
         <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 Proyectos</button>
+
     </div>
+
+
+
+    <!-- SECCIÓN INICIO -->
 
     <div id="seccion-inicio" class="card-registro">
+
         <div id="modo-edicion" style="display:none; background: #fff3cd; padding: 10px; border-radius: 10px; margin-bottom: 15px; font-size: 12px; text-align: center;">✍️ Editando material</div>
+
         <h3 id="titulo-form" style="text-align:center; color:var(--s); margin-top:0;">✨ Nuevo Material</h3>
+
         
+
         <input type="hidden" id="m-id">
+
         <label class="label-f">Nombre del material</label>
+
         <input type="text" id="m-nombre" placeholder="Ej: Algodón XL">
+
         
+
         <div class="grid-inputs">
+
             <div>
+
                 <label class="label-f">Categoría</label>
+
                 <select id="m-categoria"></select>
+
             </div>
+
             <div>
+
                 <label class="label-f">Cantidad</label>
+
                 <input type="number" id="m-cantidad" value="1">
+
             </div>
+
             <div>
+
                 <label class="label-f">Composición</label>
+
                 <input type="text" id="m-composicion">
+
             </div>
+
             <div>
+
                 <label class="label-f">Grosor</label>
+
                 <input type="text" id="m-grosor">
+
             </div>
+
         </div>
+
+
 
         <label class="label-f">Tienda / Origen</label>
+
         <input type="text" id="m-tienda">
 
+
+
         <label class="label-f">Foto (Opcional)</label>
+
         <input type="file" id="m-foto-archivo" accept="image/*">
 
+
+
         <label class="label-f">Notas</label>
+
         <textarea id="m-notas" rows="2"></textarea>
 
+
+
         <button class="btn-principal" id="btn-guardar" onclick="ejecutarGuardado()">AÑADIR AL TALLER</button>
+
         <button id="btn-cancelar" style="display:none; margin-top:10px; width:100%; border:none; background:none; color:grey; cursor:pointer;" onclick="cancelarEdicion()">Cancelar cambios</button>
+
     </div>
+
+
+
+    <!-- SECCIÓN STOCK -->
 
     <div id="seccion-materiales" style="display:none;">
+
         <div id="lista-stock" class="grid-estudio"></div>
+
     </div>
+
+
+
+    <!-- SECCIÓN PROYECTOS -->
 
     <div id="seccion-proyectos" style="display:none;">
+
         <div class="card-registro">
+
             <h3 style="text-align:center; color:var(--s); margin-top:0;">🎨 Mis Proyectos</h3>
+
             <p style="text-align:center; font-size:12px; color:grey;">Sección protegida.</p>
+
         </div>
+
     </div>
 
+
+
 <script>
+
     const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
+
     const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
+
     const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+
 
     let lanasCargadas = [];
 
+
+
     function cambiarVista(v) {
+
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
+
         document.getElementById('nav-' + v).classList.add('active');
+
         document.getElementById('seccion-inicio').style.display = v === 'INICIO' ? 'block' : 'none';
+
         document.getElementById('seccion-materiales').style.display = v === 'MATERIALES' ? 'block' : 'none';
+
         document.getElementById('seccion-proyectos').style.display = v === 'PROYECTOS' ? 'block' : 'none';
+
         if(v === 'MATERIALES') cargarStock();
+
     }
+
+
 
     async function subirFoto(archivo) {
+
         if (!archivo) return null;
-        try {
-            const extension = archivo.name.split('.').pop();
-            const nombreArchivo = `${Date.now()}.${extension}`;
-            const { data, error } = await client.storage.from('fotos-lanas').upload(nombreArchivo, archivo);
-            if (error) throw error;
-            const { data: publicUrl } = client.storage.from('fotos-lanas').getPublicUrl(nombreArchivo);
-            return publicUrl.publicUrl;
-        } catch (e) { return null; }
+
+        const extension = archivo.name.split('.').pop();
+
+        const nombreArchivo = `${Date.now()}.${extension}`;
+
+        
+
+        const { data, error } = await client.storage
+
+            .from('fotos-lanas')
+
+            .upload(nombreArchivo, archivo);
+
+
+
+        if (error) return null;
+
+
+
+        const { data: publicUrl } = client.storage
+
+            .from('fotos-lanas')
+
+            .getPublicUrl(nombreArchivo);
+
+
+
+        return publicUrl.publicUrl;
+
     }
+
+
 
     async function ejecutarGuardado() {
+
         const btn = document.getElementById('btn-guardar');
+
         btn.disabled = true;
-        btn.innerText = "GUARDANDO...";
+
+        btn.innerText = "SUBIENDO...";
+
+
+
         const archivo = document.getElementById('m-foto-archivo').files[0];
-        let urlFoto = await subirFoto(archivo);
+
+        let urlFoto = null;
+
+
+
+        if (archivo) {
+
+            urlFoto = await subirFoto(archivo);
+
+        }
+
+
+
         await guardarMaterial(urlFoto);
+
+        
+
         btn.disabled = false;
+
         btn.innerText = document.getElementById('m-id').value ? "GUARDAR CAMBIOS" : "AÑADIR AL TALLER";
+
     }
+
+
 
     async function guardarMaterial(urlFoto) {
+
         const id = document.getElementById('m-id').value;
+
         const material = {
+
             tipo_material: document.getElementById('m-nombre').value,
+
             categoria: document.getElementById('m-categoria').value,
+
             cantidad: parseInt(document.getElementById('m-cantidad').value),
+
             composicion: document.getElementById('m-composicion').value,
+
             grosor: document.getElementById('m-grosor').value,
+
             tienda: document.getElementById('m-tienda').value,
+
             notas: document.getElementById('m-notas').value
+
         };
+
+
+
+        // Solo actualizamos la foto si se ha subido una nueva
+
         if (urlFoto) material.contenido = urlFoto;
-        if(!material.tipo_material) return alert("Escribe un nombre");
+
+
+
+        if(!material.tipo_material) return alert("Falta el nombre");
+
+
 
         let res = id ? await client.from('estudio_data').update(material).eq('id', id) : await client.from('estudio_data').insert([material]);
+
+
+
         if (res.error) alert("Error: " + res.error.message);
+
         else {
-            alert("¡Hecho!");
+
+            alert(id ? "Actualizado" : "Guardado");
+
             cancelarEdicion();
+
+            limpiarForm();
+
         }
+
     }
 
-    async function cargarStock() {
-        const { data } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
-        if(data) {
-            lanasCargadas = data;
-            const emojisCat = { "Telas": "👗", "Otros": "🧸", "Hilos": "🧵", "Lanas": "🧶", "Accesorios": "🎀" };
-            
-            // Agrupar
-            const grupos = {};
-            data.forEach(item => {
-                let c = item.categoria || "Otros";
-                if (!grupos[c]) grupos[c] = [];
-                grupos[c].push(item);
-            });
 
-            let htmlFinal = "";
-            const orden = ["Lanas", "Hilos", "Telas", "Accesorios", "Otros"];
-            
-            // Construir HTML
-            orden.forEach(cat => {
-                if (grupos[cat] && grupos[cat].length > 0) {
-                    htmlFinal += `<div style="grid-column: 1/-1; margin-top:20px; border-bottom:2px solid var(--pc); padding-bottom:5px;">
-                        <h3 style="color:var(--s); margin:0;">${cat} ${emojisCat[cat] || "✨"}</h3>
-                    </div>`;
-                    grupos[cat].forEach(m => {
-                        htmlFinal += `
-                        <div class="item-card">
-                            <div class="foto-material">${m.contenido ? `<img src="${m.contenido}" style="width:100%;height:100%;object-fit:cover;">` : '🧶'}</div>
-                            <div class="info-material">
-                                <h4>${m.tipo_material}</h4>
-                                <p style="font-size:12px; margin:5px 0;">${m.composicion || ''}</p>
-                                <div class="badge-cantidad">${m.cantidad} uds</div>
-                                <button class="btn-edit" onclick="prepararEdicion(${m.id})">✏️ EDITAR</button>
-                            </div>
-                        </div>`;
-                    });
-                }
-            });
-            document.getElementById('lista-stock').innerHTML = htmlFinal || "<p style='text-align:center; grid-column:1/-1;'>Aún no hay nada en el taller.</p>";
-        }
-    }
 
     function prepararEdicion(id) {
+
         const m = lanasCargadas.find(i => i.id == id);
+
         if(!m) return;
+
         document.getElementById('m-id').value = m.id;
+
         document.getElementById('m-nombre').value = m.tipo_material;
+
         document.getElementById('m-categoria').value = m.categoria;
+
         document.getElementById('m-cantidad').value = m.cantidad;
+
         document.getElementById('m-composicion').value = m.composicion || "";
+
         document.getElementById('m-grosor').value = m.grosor || "";
+
         document.getElementById('m-tienda').value = m.tienda || "";
+
         document.getElementById('m-notas').value = m.notas || "";
-        document.getElementById('titulo-form').innerText = "✍️ Editar";
+
+
+
+        document.getElementById('titulo-form').innerText = "✍️ Modificar Material";
+
         document.getElementById('btn-guardar').innerText = "GUARDAR CAMBIOS";
+
         document.getElementById('modo-edicion').style.display = "block";
+
         document.getElementById('btn-cancelar').style.display = "block";
+
         cambiarVista('INICIO');
+
     }
+
+
 
     function cancelarEdicion() {
+
         document.getElementById('m-id').value = "";
+
         document.getElementById('titulo-form').innerText = "✨ Nuevo Material";
+
         document.getElementById('btn-guardar').innerText = "AÑADIR AL TALLER";
+
         document.getElementById('modo-edicion').style.display = "none";
+
         document.getElementById('btn-cancelar').style.display = "none";
+
         limpiarForm();
+
     }
+
+
 
     function limpiarForm() {
-        document.querySelectorAll('input:not([type="hidden"]), textarea').forEach(el => el.value = "");
+
+        document.querySelectorAll('input, textarea').forEach(el => el.id !== 'm-id' ? el.value = "" : null);
+
         document.getElementById('m-cantidad').value = "1";
+
     }
+
+
+
+    async function cargarStock() {
+
+        const { data } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
+
+        if(data) {
+
+            lanasCargadas = data;
+
+            document.getElementById('lista-stock').innerHTML = data.map(m => `
+
+                <div class="item-card">
+
+                    <div class="foto-material">${m.contenido ? `<img src="${m.contenido}" style="width:100%;height:100%;object-fit:cover;">` : '🧶'}</div>
+
+                    <div class="info-material">
+
+                        <h4>${m.tipo_material}</h4>
+
+                        <p>${m.composicion || ''} ${m.grosor ? '· '+m.grosor : ''}</p>
+
+                        <div class="badge-cantidad">${m.cantidad} uds</div>
+
+                        <button class="btn-edit" onclick="prepararEdicion(${m.id})">✏️ MODIFICAR</button>
+
+                    </div>
+
+                </div>
+
+            `).join('');
+
+        }
+
+    }
+
+
 
     async function cargarInicial() {
+
         const { data } = await client.from('Secciones').select('nombre');
+
         if(data) document.getElementById('m-categoria').innerHTML = data.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
+
     }
 
+
+
     window.onload = cargarInicial;
+
 </script>
+
 </body>
+
 </html>
