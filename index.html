@@ -27,7 +27,6 @@
         .foto-material { width: 100%; height: 110px; object-fit: cover; }
         .info-material { padding: 10px; text-align: center; }
         
-        /* BOTONES FLOTANTES */
         .btn-edit-float { 
             position: absolute; top: 10px; right: 10px; 
             background: rgba(0, 0, 0, 0.7); color: white; border: none; 
@@ -76,10 +75,13 @@
 
 <button id="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
 
+<!-- MENU ACTUALIZADO -->
 <div class="menu-secciones">
     <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
     <button class="btn-nav" id="nav-STOCK" onclick="cambiarVista('STOCK')">📦 STOCK</button>
     <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
+    <!-- Nuevo botón añadido -->
+    <button class="btn-nav" id="nav-PDFS" onclick="cambiarVista('PDFS')">📂 PDFs</button>
 </div>
 
 <!-- VISTA INICIO -->
@@ -87,10 +89,8 @@
     <div class="card-form">
         <h2 id="titulo-formulario" style="color:var(--s); text-align:center; margin-top:0;">📦 Añadir Material</h2>
         <input type="hidden" id="m-id">
-        
         <label>NOMBRE DEL MATERIAL</label>
         <input type="text" id="m-nombre" placeholder="Ej: Lana Merino Azul">
-        
         <div style="display:flex; gap:10px;">
             <div style="flex:1;">
                 <label>CATEGORÍA</label>
@@ -107,19 +107,14 @@
                 <input type="number" id="m-cantidad" value="1">
             </div>
         </div>
-
         <label>TIENDA DONDE SE COMPRÓ</label>
         <input type="text" id="m-tienda" placeholder="Ej: Mercería del Barrio">
-
         <label>GROSOR / WPI</label>
         <input type="text" id="m-grosor" placeholder="Ej: Fingering, 3mm...">
-
         <label>NOTAS ADICIONALES</label>
         <textarea id="m-notas" placeholder="Nº de lote, composición, etc..."></textarea>
-        
         <label>FOTO DEL MATERIAL</label>
         <input type="file" id="m-archivo" accept="image/*">
-        
         <button id="btn-accion-stock" class="btn-grande" onclick="guardarNuevo('stock')">GUARDAR EN STOCK</button>
         <button id="btn-cancelar-edit" class="btn-grande" style="display:none; background:#888" onclick="limpiarFormulario()">CANCELAR EDICIÓN</button>
     </div>
@@ -179,6 +174,14 @@
     <div id="lista-proyectos" class="grid-estudio"></div>
 </div>
 
+<!-- NUEVA VISTA PDFS (VACÍA DE MOMENTO) -->
+<div id="vista-PDFS" style="display:none;">
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">📂 Mi Biblioteca de PDFs</h2>
+        <p style="text-align:center; color:var(--txt);">Aquí verás tus patrones subidos. ¡Paso a paso! 🎀</p>
+    </div>
+</div>
+
 <script>
     const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
     const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
@@ -197,6 +200,7 @@
 
     function iniciarCanvas(id) {
         const canvas = document.getElementById(id);
+        if(!canvas) return;
         const ctx = canvas.getContext('2d');
         let dibujando = false;
         canvas.width = canvas.offsetWidth;
@@ -230,12 +234,16 @@
     }
 
     async function cargarDatos() {
-        const { data: stock } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
-        lanasGlobal = stock || [];
-        renderizarStock(lanasGlobal);
-        const { data: proy } = await client.from('proyectos_data').select('*').order('created_at', {ascending: false});
-        proyectosGlobal = proy || [];
-        renderizarProyectos(proyectosGlobal);
+        try {
+            const { data: stock } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
+            lanasGlobal = stock || [];
+            renderizarStock(lanasGlobal);
+            const { data: proy } = await client.from('proyectos_data').select('*').order('created_at', {ascending: false});
+            proyectosGlobal = proy || [];
+            renderizarProyectos(proyectosGlobal);
+        } catch (error) {
+            console.error("Error cargando datos:", error);
+        }
     }
 
     function renderizarStock(lista) {
@@ -256,7 +264,6 @@
         `).join('');
     }
 
-    // FUNCIÓN PARA ELIMINAR
     async function eliminarStock(id) {
         if(confirm("¿Estás segura de que quieres eliminar este material? 🎀")) {
             await client.from('estudio_data').delete().eq('id', id);
@@ -335,7 +342,9 @@
             }]);
         }
         alert("¡Operación realizada con éxito! 💖");
-        location.reload();
+        limpiarFormulario();
+        cargarDatos();
+        cambiarVista('STOCK');
     }
 
     async function cambiarStock(id, n) {
@@ -346,10 +355,14 @@
 
     function cambiarVista(v) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
-        document.getElementById('nav-' + v).classList.add('active');
+        const navBtn = document.getElementById('nav-' + v);
+        if(navBtn) navBtn.classList.add('active');
+        
         document.getElementById('vista-INICIO').style.display = v === 'INICIO' ? 'block' : 'none';
         document.getElementById('vista-STOCK').style.display = v === 'STOCK' ? 'block' : 'none';
         document.getElementById('vista-PROYECTOS').style.display = v === 'PROYECTOS' ? 'block' : 'none';
+        document.getElementById('vista-PDFS').style.display = v === 'PDFS' ? 'block' : 'none'; // Vista PDFs
+        
         if(v === 'PROYECTOS') {
             setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
         }
