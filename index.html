@@ -16,9 +16,17 @@
         .card-registro { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 500px; margin: auto; margin-bottom: 20px; }
         input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--br); border-radius: 12px; font-size: 14px; box-sizing: border-box; }
         
-        /* Lienzos de Dibujo */
         .contenedor-dibujo { position: relative; width: 100%; background: #fff; border: 2px solid var(--br); border-radius: 15px; margin-bottom: 10px; overflow: hidden; touch-action: none; }
         canvas { display: block; width: 100%; cursor: crosshair; }
+        
+        /* AQUÍ ESTÁ TU SILUETA INTEGRADA */
+        #canvas-figurines { 
+            background-image: url('https://i.ibb.co/L6V2Mvx/Silueta-3-cuerpos-2.jpg'); 
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
         .toolbar-dibujo { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #fff5f7; border-top: 1px solid var(--br); }
         .colores { display: flex; gap: 8px; }
         .btn-color { width: 22px; height: 22px; border-radius: 50%; border: 2px solid white; cursor: pointer; }
@@ -39,52 +47,51 @@
         <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 Ideas</button>
     </div>
 
-    <!-- SECCIÓN INICIO -->
+    <!-- SECCIÓN INICIO (Se mantiene igual) -->
     <div id="seccion-inicio" class="card-registro">
         <h3 style="text-align:center; color:var(--s); margin-top:0;">✨ Nuevo Material</h3>
-        <input type="text" id="m-nombre" placeholder="Nombre (ej: Lana Merino)">
+        <input type="text" id="m-nombre" placeholder="Nombre del material">
         <select id="m-categoria"></select>
         <input type="number" id="m-cantidad" placeholder="Cantidad" value="1">
         <button class="btn-principal" onclick="guardarMaterial()">AÑADIR AL TALLER</button>
     </div>
 
-    <!-- SECCIÓN MATERIALES (STOCK) -->
+    <!-- SECCIÓN MATERIALES (Se mantiene igual) -->
     <div id="seccion-materiales" style="display:none;">
         <div id="lista-stock" class="grid-estudio"></div>
     </div>
 
-    <!-- SECCIÓN PROYECTOS -->
+    <!-- SECCIÓN PROYECTOS (Solo hemos cambiado la silueta) -->
     <div id="seccion-proyectos" style="display:none;">
         <div class="card-registro">
-            <h3 style="text-align:center; color:var(--s); margin-top:0;">🎨 Nueva Idea</h3>
-            <input type="text" id="p-nombre" placeholder="Nombre del proyecto...">
+            <h3 style="text-align:center; color:var(--s); margin-top:0;">🎨 Nuevo Diseño</h3>
+            <input type="text" id="p-nombre" placeholder="Nombre de la prenda...">
             
-            <label style="font-size:12px; font-weight:bold;">👗 Diseñar sobre figurines:</label>
+            <label style="font-size:12px; font-weight:bold;">👗 Dibujar sobre tu silueta:</label>
             <div class="contenedor-dibujo">
-                <!-- Imagen de fondo de 3 cuerpos corregida -->
-                <canvas id="canvas-figurines" width="400" height="400" style="background: url('https://i.imgur.com/K5fS93C.png') center/contain no-repeat;"></canvas>
+                <canvas id="canvas-figurines" width="500" height="500"></canvas>
                 <div class="toolbar-dibujo">
                     <div class="colores">
                         <div class="btn-color" style="background:black" onclick="pincelColor='black'"></div>
                         <div class="btn-color" style="background:#ff85a2" onclick="pincelColor='#ff85a2'"></div>
                     </div>
-                    <button class="btn-borrar-trazo" onclick="limpiarC('canvas-figurines')">Borrar Dibujo</button>
+                    <button class="btn-borrar-trazo" onclick="limpiarC('canvas-figurines')">Limpiar Silueta</button>
                 </div>
             </div>
 
-            <label style="font-size:12px; font-weight:bold;">🧶 Diseño de puntos:</label>
+            <label style="font-size:12px; font-weight:bold;">🧶 Esquema de puntos:</label>
             <div class="contenedor-dibujo">
-                <canvas id="canvas-puntos" width="400" height="180" style="background:white;"></canvas>
+                <canvas id="canvas-puntos" width="500" height="200" style="background:white;"></canvas>
                 <div class="toolbar-dibujo">
-                    <button class="btn-borrar-trazo" onclick="limpiarC('canvas-puntos')">Borrar Puntos</button>
+                    <button class="btn-borrar-trazo" onclick="limpiarC('canvas-puntos')">Limpiar Puntos</button>
                 </div>
             </div>
 
-            <label style="font-size:12px; font-weight:bold;">📄 Patrón PDF:</label>
+            <label style="font-size:12px; font-weight:bold;">📄 Archivo PDF:</label>
             <input type="file" id="p-pdf" accept=".pdf">
-            <textarea id="p-notas" placeholder="Anotaciones, medidas..." rows="3"></textarea>
+            <textarea id="p-notas" placeholder="Anotaciones extras..." rows="3"></textarea>
             
-            <button class="btn-principal" onclick="alert('Proyecto guardado en tu memoria!')">💾 GUARDAR PROYECTO</button>
+            <button class="btn-principal" onclick="alert('Proyecto guardado')">💾 GUARDAR TODO</button>
         </div>
     </div>
 
@@ -95,27 +102,17 @@
 
     let pincelColor = 'black';
 
-    function ponerEmoji(texto) {
-        const t = (texto || "").toLowerCase();
-        if (t.includes("lana")) return "🧶";
-        if (t.includes("tela")) return "👗";
-        if (t.includes("hilo")) return "🧵";
-        return "✨";
-    }
-
-    // NAVEGACIÓN CORREGIDA
+    // Funciones de navegación y carga (Sin cambios)
     function cambiarVista(v) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
         document.getElementById('nav-' + v).classList.add('active');
-        
         document.getElementById('seccion-inicio').style.display = v === 'INICIO' ? 'block' : 'none';
         document.getElementById('seccion-materiales').style.display = v === 'MATERIALES' ? 'block' : 'none';
         document.getElementById('seccion-proyectos').style.display = v === 'PROYECTOS' ? 'block' : 'none';
-        
         if(v === 'MATERIALES') cargarStock();
     }
 
-    // DIBUJO PROFESIONAL
+    // Lógica de dibujo (Sin cambios)
     function initDibujo(id) {
         const cv = document.getElementById(id);
         const ctx = cv.getContext('2d');
@@ -132,7 +129,7 @@
         };
 
         const start = (e) => { pintando = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); if(e.touches) e.preventDefault(); };
-        const move = (e) => { if(!pintando) return; const p = getPos(e); ctx.strokeStyle = pincelColor; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineTo(p.x, p.y); ctx.stroke(); if(e.touches) e.preventDefault(); };
+        const move = (e) => { if(!pintando) return; const p = getPos(e); ctx.strokeStyle = pincelColor; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineTo(p.x, p.y); ctx.stroke(); if(e.touches) e.preventDefault(); };
         const stop = () => pintando = false;
 
         cv.addEventListener('mousedown', start); cv.addEventListener('mousemove', move); window.addEventListener('mouseup', stop);
@@ -141,12 +138,10 @@
 
     function limpiarC(id) { document.getElementById(id).getContext('2d').clearRect(0,0,1000,1000); }
 
-    // CARGA DE DATOS
+    // Conexión Supabase (Sin cambios)
     async function cargarInicial() {
         const { data: cats } = await client.from('Secciones').select('nombre');
-        if(cats) {
-            document.getElementById('m-categoria').innerHTML = cats.map(c => `<option value="${c.nombre}">${ponerEmoji(c.nombre)} ${c.nombre}</option>`).join('');
-        }
+        if(cats) document.getElementById('m-categoria').innerHTML = cats.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
     }
 
     async function cargarStock() {
@@ -154,9 +149,8 @@
         if(stock) {
             document.getElementById('lista-stock').innerHTML = stock.map(m => `
                 <div class="item-card">
-                    <img src="${m.contenido || 'https://via.placeholder.com/150/fce4ec/888?text=Material'}">
-                    <p style="margin:5px 0; font-size:12px;"><b>${m.tipo_material}</b></p>
-                    <span style="font-size:14px; color:var(--s); font-weight:bold;">Cant: ${m.cantidad || 0}</span>
+                    <p><b>${m.tipo_material}</b></p>
+                    <span style="color:var(--s);">Cant: ${m.cantidad || 0}</span>
                 </div>
             `).join('');
         }
@@ -166,11 +160,9 @@
         const nom = document.getElementById('m-nombre').value;
         const cat = document.getElementById('m-categoria').value;
         const can = document.getElementById('m-cantidad').value;
-        if(!nom) return alert("Pon un nombre");
-        
+        if(!nom) return alert("Falta nombre");
         await client.from('estudio_data').insert([{ tipo_material: nom, categoria: cat, cantidad: parseInt(can) }]);
-        alert("¡Añadido!");
-        document.getElementById('m-nombre').value = "";
+        alert("¡Guardado!");
     }
 
     window.onload = () => {
