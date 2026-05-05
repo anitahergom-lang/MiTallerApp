@@ -6,30 +6,65 @@
     <title>Mi Taller Rosa</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --br: #f1e1e5; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--f); margin: 0; padding: 15px; padding-bottom: 80px; }
+        :root { 
+            /* Modo Claro */
+            --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --br: #f1e1e5; --txt: #444; 
+        }
+
+        [data-theme="dark"] {
+            /* Modo Oscuro */
+            --p: #ff85a2; --pc: #4a2b34; --s: #f06292; --f: #121212; --b: #1e1e1e; --br: #333333; --txt: #fce4ec;
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--f); 
+            color: var(--txt);
+            margin: 0; padding: 15px; padding-bottom: 80px; 
+            transition: background 0.3s, color 0.3s; 
+        }
+
+        /* Menú y Navegación */
         .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 50px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .btn-nav { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 40px; font-size: 10px; text-transform: uppercase; }
         .btn-nav.active { background: var(--pc); color: var(--s); border: 1px solid var(--p); }
+
+        /* Filtros */
         .filtros-container { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0 15px 0; scrollbar-width: none; }
-        .btn-filtro { white-space: nowrap; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--br); background: white; color: #666; font-size: 12px; cursor: pointer; font-weight: 600; }
+        .btn-filtro { white-space: nowrap; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--br); background: var(--b); color: var(--txt); font-size: 12px; cursor: pointer; font-weight: 600; }
         .btn-filtro.active { background: var(--p); color: white; border-color: var(--p); }
+
+        /* Grid y Cards */
         .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
         .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; }
         .foto-material { width: 100%; height: 110px; object-fit: cover; }
         .info-material { padding: 10px; text-align: center; }
-        .info-material h4 { margin: 0; color: #444; font-size: 13px; font-weight: 700; }
+        .info-material h4 { margin: 0; color: var(--txt); font-size: 13px; font-weight: 700; }
+
+        /* Controles */
         .controles-stock { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 5px; }
         .btn-qty { background: var(--pc); color: var(--s); border: none; width: 30px; height: 30px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .card-form { background: white; padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 500px; margin: 0 auto; }
+        
+        /* Formulario */
+        .card-form { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 500px; margin: 0 auto; }
         .form-group { margin-bottom: 12px; }
         label { display: block; font-size: 11px; color: var(--s); font-weight: 700; margin-bottom: 4px; }
-        input, select, textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #eee; box-sizing: border-box; font-size: 14px; background: var(--f); }
+        input, select, textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--br); box-sizing: border-box; font-size: 14px; background: var(--f); color: var(--txt); }
         .btn-grande { width: 100%; background: var(--p); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        input[type="file"] { background: white; padding: 5px; }
+
+        /* Botón Modo Oscuro Flotante */
+        #dark-mode-toggle { 
+            position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; 
+            border-radius: 50%; border: none; background: var(--p); color: white; 
+            font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1000; 
+            display: flex; align-items: center; justify-content: center; transition: transform 0.2s;
+        }
+        #dark-mode-toggle:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
+
+    <button id="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
 
     <div class="menu-secciones">
         <button class="btn-nav" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
@@ -52,7 +87,7 @@
     <div id="vista-INICIO" style="display:none;">
         <div class="card-form">
             <h2 style="color:var(--s); text-align:center; margin:0 0 15px 0;">✨ Nuevo Material</h2>
-            <div class="form-group"><label>NOMBRE</label><input type="text" id="m-nombre" placeholder="Ej: Lana Merino"></div>
+            <div class="form-group"><label>NOMBRE DEL MATERIAL</label><input type="text" id="m-nombre" placeholder="Ej: Mega Ball Peacocks"></div>
             <div style="display:flex; gap:10px;">
                 <div style="flex:1;"><label>CATEGORÍA</label>
                     <select id="m-categoria">
@@ -61,15 +96,15 @@
                         <option value="Otros">🧸 Otros</option>
                     </select>
                 </div>
-                <div style="width:80px;"><label>CANT.</label><input type="number" id="m-cantidad" value="1"></div>
+                <div style="width:80px;"><label>CANTIDAD</label><input type="number" id="m-cantidad" value="1"></div>
             </div>
             <div style="display:flex; gap:10px; margin-top:10px;">
-                <div style="flex:1;"><label>GROSOR</label><input type="text" id="m-grosor"></div>
-                <div style="flex:1;"><label>COMPOSICIÓN</label><input type="text" id="m-composicion"></div>
+                <div style="flex:1;"><label>GROSOR</label><input type="text" id="m-grosor" placeholder="4-ply"></div>
+                <div style="flex:1;"><label>COMPOSICIÓN</label><input type="text" id="m-composicion" placeholder="100% Algodón"></div>
             </div>
-            <div class="form-group" style="margin-top:10px;"><label>TIENDA</label><input type="text" id="m-tienda"></div>
-            <div class="form-group"><label>FOTO (SUBIR ARCHIVO)</label><input type="file" id="m-archivo" accept="image/*"></div>
-            <div class="form-group"><label>NOTAS</label><textarea id="m-notas"></textarea></div>
+            <div class="form-group" style="margin-top:10px;"><label>¿DÓNDE SE COMPRÓ?</label><input type="text" id="m-tienda"></div>
+            <div class="form-group"><label>FOTO (SUBIR DIRECTO)</label><input type="file" id="m-archivo" accept="image/*"></div>
+            <div class="form-group"><label>NOTAS ADICIONALES</label><textarea id="m-notas"></textarea></div>
             <button class="btn-grande" id="btn-guardar" onclick="guardarNuevo()">GUARDAR EN MI TALLER</button>
         </div>
     </div>
@@ -81,6 +116,22 @@
 
     let lanasGlobal = [];
 
+    // --- FUNCIONES MODO OSCURO ---
+    function toggleDarkMode() {
+        const body = document.body;
+        const btn = document.getElementById('dark-mode-toggle');
+        if (body.getAttribute('data-theme') === 'dark') {
+            body.removeAttribute('data-theme');
+            btn.innerText = "🌙";
+            localStorage.setItem('theme', 'light');
+        } else {
+            body.setAttribute('data-theme', 'dark');
+            btn.innerText = "☀️";
+            localStorage.setItem('theme', 'dark');
+        }
+    }
+
+    // --- GESTIÓN DE DATOS ---
     async function cargarDatos() {
         const { data } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
         lanasGlobal = data || [];
@@ -113,9 +164,9 @@
         const btn = document.getElementById('btn-guardar');
         const file = document.getElementById('m-archivo').files[0];
         const nombre = document.getElementById('m-nombre').value;
-        if(!nombre) return alert("Ponle un nombre");
+        if(!nombre) return alert("Por favor, pon un nombre al material");
 
-        btn.innerText = "Subiendo...";
+        btn.innerText = "Subiendo foto...";
         btn.disabled = true;
 
         let fotoUrl = "";
@@ -138,7 +189,7 @@
             notas: notasFull
         }]);
 
-        alert("¡Guardado! 💖");
+        alert("¡Añadido al taller! 💖");
         location.reload();
     }
 
@@ -155,7 +206,14 @@
         renderizar(cat === 'Todo' ? lanasGlobal : lanasGlobal.filter(m => m.categoria === cat));
     }
 
-    window.onload = cargarDatos;
+    // Al cargar
+    window.onload = () => {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+            document.getElementById('dark-mode-toggle').innerText = "☀️";
+        }
+        cargarDatos();
+    };
 </script>
 </body>
 </html>
