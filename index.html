@@ -147,7 +147,6 @@
             <button class="btn-tool" onclick="limpiarCanvas('canvas-punto')">🗑️ Borrar</button>
         </div>
 
-        <!-- NUEVO CAMPO AÑADIDO: FOTO DE REFERENCIA DEL PUNTO -->
         <label>SUBIR FOTO DE REFERENCIA DEL PUNTO</label>
         <input type="file" id="p-foto-referencia-punto" accept="image/*" style="margin-bottom:15px;">
 
@@ -193,14 +192,29 @@
         canvas.width = canvas.offsetWidth;
         canvas.height = canvas.offsetHeight;
 
+        // Si es el canvas de cuerpos, cargar la imagen de referencia
+        if (id === 'canvas-cuerpos') {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.src = 'https://i.ibb.co/LST6XvV/cuerpos-referencia.png'; // URL de la imagen que proporcionaste
+            img.onload = () => {
+                const hRatio = canvas.width / img.width;
+                const vRatio = canvas.height / img.height;
+                const ratio = Math.min(hRatio, vRatio);
+                const centerShift_x = (canvas.width - img.width * ratio) / 2;
+                const centerShift_y = (canvas.height - img.height * ratio) / 2;
+                ctx.drawImage(img, 0, 0, img.width, img.height, centerShift_x, centerShift_y, img.width * ratio, img.height * ratio);
+            };
+        }
+
         function empezar(e) { dibujando = true; dibujar(e); }
         function parar() { dibujando = false; ctx.beginPath(); }
         
         function dibujar(e) {
             if (!dibujando) return;
             const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || e.touches[0].clientX) - rect.left;
-            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+            const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
 
             ctx.lineWidth = toolsState[id] === 'goma' ? 15 : 2;
             ctx.lineCap = 'round';
@@ -230,6 +244,7 @@
         const canvas = document.getElementById(id);
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (id === 'canvas-cuerpos') iniciarCanvas(id); // Recargar fondo al borrar
     }
 
     async function cargarDatos() {
