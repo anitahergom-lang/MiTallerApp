@@ -3,22 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Taller Rosa - Verificación</title>
+    <title>Mi Taller Rosa</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --t: #4a4a4a; --br: #f1e1e5; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--f); color: var(--t); margin: 0; padding: 15px; }
-        .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 20px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 20px; }
+        
+        /* Navegación */
+        .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 20px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .btn-nav { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 15px; font-size: 10px; text-transform: uppercase; }
         .btn-nav.active { background: var(--pc); color: var(--s); border-bottom: 3px solid var(--s); }
-        .filtros-materiales { display: flex; gap: 10px; overflow-x: auto; padding: 10px; margin-bottom: 10px; }
+
+        /* Filtros */
+        .filtros-materiales { display: flex; gap: 10px; overflow-x: auto; padding: 10px; margin-bottom: 10px; scrollbar-width: none; }
         .btn-filtro { padding: 10px 18px; border-radius: 25px; border: 1px solid var(--br); background: var(--b); white-space: nowrap; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; }
         .btn-filtro.active { background: var(--s); color: white; border-color: var(--s); }
+
+        /* Grids y Cards */
         .grid-estudio { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         .item-card { background: var(--b); padding: 12px; border-radius: 20px; border: 1px solid var(--br); text-align: center; position: relative; }
         .item-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 15px; margin-bottom: 8px; }
         .nombre-producto { font-weight: bold; font-size: 13px; margin-bottom: 8px; display: block; height: 32px; overflow: hidden; }
-        .btn-qty { width: 35px; height: 35px; border-radius: 10px; border: none; background: var(--pc); color: var(--s); font-weight: bold; cursor: pointer; }
+        .btn-qty { width: 35px; height: 35px; border-radius: 10px; border: none; background: var(--pc); color: var(--s); font-weight: bold; cursor: pointer; font-size: 18px; }
+
+        /* Formularios */
         .card-registro { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 450px; margin: auto; }
         input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--br); border-radius: 12px; font-size: 14px; box-sizing: border-box; }
         .btn-principal { background: var(--p); color: white; padding: 15px; border: none; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; }
@@ -28,23 +36,37 @@
 
     <div class="menu-secciones">
         <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 Inicio</button>
-        <button class="btn-nav" id="nav-MATERIALES" onclick="cambiarVista('MATERIALES')">📦 Materiales</button>
-        <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 Proyectos</button>
+        <button class="btn-nav" id="nav-MATERIALES" onclick="cambiarVista('MATERIALES')">📦 Stock</button>
+        <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 Ideas</button>
     </div>
 
+    <!-- Filtros (solo se ven en Stock) -->
     <div id="contenedor-filtros" class="filtros-materiales" style="display:none;"></div>
 
+    <!-- Sección INICIO: Registro de materiales -->
     <div id="seccion-registro" class="card-registro">
-        <h3 id="titulo-form" style="margin-top:0; color:var(--s); text-align:center;">✨ Nuevo Material</h3>
+        <h3 style="margin-top:0; color:var(--s); text-align:center;">✨ Nuevo Material</h3>
         <input type="text" id="m-nombre" placeholder="Nombre (ej: Lana Azul)">
         <select id="m-categoria"></select>
         <input type="number" id="m-cantidad" value="1">
         <input type="file" id="m-foto" accept="image/*">
-        <button id="btn-guardar" class="btn-principal" onclick="guardar()">AÑADIR</button>
+        <button class="btn-principal" onclick="guardar()">AÑADIR AL TALLER</button>
     </div>
 
+    <!-- Sección STOCK: Listado de materiales -->
     <div id="seccion-listado" style="display:none;">
         <div id="lista-stock" class="grid-estudio"></div>
+    </div>
+
+    <!-- Sección PROYECTOS: Aquí es donde van tus ideas -->
+    <div id="seccion-proyectos" style="display:none;">
+        <div class="card-registro">
+            <h3 style="margin-top:0; color:var(--s); text-align:center;">🎨 Nueva Idea</h3>
+            <input type="text" id="p-nombre" placeholder="Nombre del proyecto">
+            <input type="text" id="p-notas" placeholder="Notas o descripción">
+            <button class="btn-principal" onclick="guardarProyecto()">GUARDAR PROYECTO</button>
+        </div>
+        <div id="lista-proyectos" class="grid-estudio" style="margin-top:20px;"></div>
     </div>
 
 <script>
@@ -53,103 +75,111 @@
     const client = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     let stockGlobal = [];
+    let proyectosGlobal = [];
     let categoriasBase = [];
 
-    // LÓGICA DE FUERZA BRUTA
-    function obtenerEmoji(texto) {
-        if (!texto) return "🌸";
-        // Limpiamos el texto al extremo: minúsculas, sin espacios, sin acentos
-        const t = texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-        
-        console.log("Procesando categoría:", t); // Para que revises en la consola del navegador
-
+    function ponerEmoji(texto) {
+        const t = (texto || "").toLowerCase();
         if (t.includes("lana")) return "🧶";
         if (t.includes("tela")) return "👗";
         if (t.includes("hilo")) return "🧵";
         if (t.includes("accesorio")) return "🎀";
-        if (t.includes("otro")) return "🧸";
-        
-        return "🌸"; 
+        return "🧸";
     }
 
     async function iniciar() {
-        try {
-            const { data: catData } = await client.from('Secciones').select('nombre');
-            categoriasBase = catData ? catData.map(c => c.nombre.trim()) : [];
-            
-            // Llenar el SELECT del formulario
-            const sel = document.getElementById('m-categoria');
-            sel.innerHTML = categoriasBase.map(c => `<option value="${c}">${obtenerEmoji(c)} ${c}</option>`).join('');
-
-            await cargarDatos();
-            renderFiltros();
-        } catch (e) {
-            console.error("Error al iniciar:", e);
-        }
+        const { data } = await client.from('Secciones').select('nombre');
+        categoriasBase = data ? data.map(c => c.nombre.trim()) : [];
+        document.getElementById('m-categoria').innerHTML = categoriasBase.map(c => `<option value="${c}">${ponerEmoji(c)} ${c}</option>`).join('');
+        
+        await cargarStock();
+        await cargarProyectos();
     }
 
-    async function cargarDatos() {
+    async function cargarStock() {
         const { data } = await client.from('estudio_data').select('*').order('created_at', { ascending: false });
         stockGlobal = data || [];
-        renderStock(stockGlobal);
+        renderizarStock(stockGlobal);
+        renderizarFiltros();
     }
 
-    function renderStock(lista) {
-        const contenedor = document.getElementById('lista-stock');
-        contenedor.innerHTML = lista.map(m => `
+    async function cargarProyectos() {
+        // Asumiendo que tu tabla de proyectos se llama 'proyectos'
+        const { data } = await client.from('proyectos').select('*').order('created_at', { ascending: false });
+        proyectosGlobal = data || [];
+        renderizarProyectos();
+    }
+
+    function renderizarStock(lista) {
+        document.getElementById('lista-stock').innerHTML = lista.map(m => `
             <div class="item-card">
                 <img src="${m.contenido || 'https://via.placeholder.com/150/fce4ec/888?text=Sin+Foto'}">
                 <span class="nombre-producto">${m.tipo_material}</span>
-                <div class="controles-stock">
-                    <button class="btn-qty" onclick="actualizarCant(${m.id}, -1)">-</button>
-                    <span style="font-weight:bold;">${m.cantidad || 0}</span>
-                    <button class="btn-qty" onclick="actualizarCant(${m.id}, 1)">+</button>
+                <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
+                    <button class="btn-qty" onclick="cambiarCant(${m.id}, -1)">-</button>
+                    <b>${m.cantidad || 0}</b>
+                    <button class="btn-qty" onclick="cambiarCant(${m.id}, 1)">+</button>
                 </div>
             </div>
         `).join('');
     }
 
-    function renderFiltros() {
-        const contenedor = document.getElementById('contenedor-filtros');
+    function renderizarProyectos() {
+        document.getElementById('lista-proyectos').innerHTML = proyectosGlobal.map(p => `
+            <div class="item-card" style="padding:20px;">
+                <h4 style="margin:0; color:var(--s);">${p.nombre}</h4>
+                <p style="font-size:12px; color:#666;">${p.notas || ''}</p>
+            </div>
+        `).join('');
+    }
+
+    function renderizarFiltros() {
         let html = `<button class="btn-filtro active" onclick="filtrar('TODO', this)">✨ Todo</button>`;
         categoriasBase.forEach(cat => {
-            html += `<button class="btn-filtro" onclick="filtrar('${cat}', this)">${obtenerEmoji(cat)} ${cat}</button>`;
+            html += `<button class="btn-filtro" onclick="filtrar('${cat}', this)">${ponerEmoji(cat)} ${cat}</button>`;
         });
-        contenedor.innerHTML = html;
+        document.getElementById('contenedor-filtros').innerHTML = html;
     }
 
-    function filtrar(busqueda, boton) {
+    function filtrar(cat, btn) {
         document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
-        boton.classList.add('active');
-        renderStock(busqueda === 'TODO' ? stockGlobal : stockGlobal.filter(p => p.categoria === busqueda));
+        btn.classList.add('active');
+        renderizarStock(cat === 'TODO' ? stockGlobal : stockGlobal.filter(i => i.categoria === cat));
     }
 
-    function cambiarVista(vista) {
+    function cambiarVista(v) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
-        document.getElementById('nav-' + vista).classList.add('active');
-        document.getElementById('seccion-registro').style.display = (vista === 'INICIO' ? 'block' : 'none');
-        document.getElementById('seccion-listado').style.display = (vista === 'MATERIALES' ? 'block' : 'none');
-        document.getElementById('contenedor-filtros').style.display = (vista === 'MATERIALES' ? 'flex' : 'none');
+        document.getElementById('nav-' + v).classList.add('active');
+        
+        document.getElementById('seccion-registro').style.display = (v === 'INICIO' ? 'block' : 'none');
+        document.getElementById('seccion-listado').style.display = (v === 'MATERIALES' ? 'block' : 'none');
+        document.getElementById('seccion-proyectos').style.display = (v === 'PROYECTOS' ? 'block' : 'none');
+        document.getElementById('contenedor-filtros').style.display = (v === 'MATERIALES' ? 'flex' : 'none');
     }
 
-    async function actualizarCant(id, cambio) {
+    async function cambiarCant(id, n) {
         const item = stockGlobal.find(x => x.id === id);
-        const nuevaCant = Math.max(0, (item.cantidad || 0) + cambio);
-        item.cantidad = nuevaCant;
-        renderStock(stockGlobal);
-        await client.from('estudio_data').update({ cantidad: nuevaCant }).eq('id', id);
+        const nueva = Math.max(0, (item.cantidad || 0) + n);
+        item.cantidad = nueva;
+        renderizarStock(stockGlobal);
+        await client.from('estudio_data').update({ cantidad: nueva }).eq('id', id);
     }
 
     async function guardar() {
-        const nombre = document.getElementById('m-nombre').value;
+        const nom = document.getElementById('m-nombre').value;
         const cat = document.getElementById('m-categoria').value;
-        const cant = document.getElementById('m-cantidad').value;
-        if (!nombre) return alert("Escribe un nombre");
+        const can = document.getElementById('m-cantidad').value;
+        if (!nom) return alert("Pon un nombre");
+        await client.from('estudio_data').insert([{ tipo_material: nom, categoria: cat, cantidad: parseInt(can) }]);
+        location.reload();
+    }
 
-        const payload = { tipo_material: nombre, categoria: cat, cantidad: parseInt(cant) || 0 };
-        const { error } = await client.from('estudio_data').insert([payload]);
-        
-        if(!error) location.reload();
+    async function guardarProyecto() {
+        const nom = document.getElementById('p-nombre').value;
+        const notas = document.getElementById('p-notas').value;
+        if (!nom) return alert("Nombre del proyecto necesario");
+        await client.from('proyectos').insert([{ nombre: nom, notas: notas }]);
+        location.reload();
     }
 
     iniciar();
