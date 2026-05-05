@@ -3,47 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mi Taller - Diseño de Moda</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Mi Taller Rosa - Diseño de Moda</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --primario: #9c27b0; --secundario: #ce93d8; --fondo: #f4f4f9; --blanco: #ffffff; --texto: #333333; --borde: #eeeeee; --input-bg: #fafafa; }
-        [data-theme="dark"] { --fondo: #121212; --blanco: #1e1e1e; --texto: #e1e1e1; --borde: #333333; --input-bg: #2c2c2c; --secundario: #4a148c; }
+        :root { 
+            --primario: #ff85a2; /* Rosa suave principal */
+            --primario-claro: #fce4ec; 
+            --secundario: #f06292; 
+            --fondo: #fcf8f9; 
+            --blanco: #ffffff; 
+            --texto: #4a4a4a; 
+            --borde: #f1e1e5; 
+            --input-bg: #ffffff; 
+        }
+        [data-theme="dark"] { 
+            --fondo: #1a1617; 
+            --blanco: #2d2426; 
+            --texto: #fce4ec; 
+            --borde: #3d3436; 
+            --input-bg: #3d3436; 
+            --primario-claro: #4a1e28;
+        }
         
-        body { font-family: 'Segoe UI', sans-serif; background: var(--fondo); padding: 20px; color: var(--texto); margin: 0; padding-top: calc(env(safe-area-inset-top) + 20px); transition: background 0.3s; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--fondo); padding: 20px; color: var(--texto); margin: 0; padding-top: calc(env(safe-area-inset-top) + 20px); transition: 0.3s; }
         
-        .theme-toggle { position: fixed; top: calc(env(safe-area-inset-top) + 10px); right: 20px; z-index: 1001; background: var(--primario); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .theme-toggle { position: fixed; top: calc(env(safe-area-inset-top) + 10px); right: 20px; z-index: 1001; background: var(--primario); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(255, 133, 162, 0.3); }
         
-        .menu-secciones { text-align: center; margin-bottom: 15px; background: var(--blanco); padding: 12px; border-radius: 15px; display: flex; justify-content: center; gap: 8px; position: sticky; top: env(safe-area-inset-top); z-index: 100; border: 1px solid var(--borde); }
-        .btn-nav { padding: 10px 15px; font-weight: bold; border-radius: 10px; border: 1px solid var(--borde); cursor: pointer; background: var(--blanco); font-size: 12px; color: var(--texto); transition: 0.2s; flex: 1; max-width: 120px; }
-        .btn-nav.active { background: #fdf5ff; border-color: var(--primario); color: var(--primario); box-shadow: 0 0 10px rgba(156, 39, 176, 0.1); }
+        /* Menú Principal Mejorado */
+        .menu-secciones { text-align: center; margin-bottom: 20px; background: var(--blanco); padding: 8px; border-radius: 20px; display: flex; justify-content: center; gap: 5px; position: sticky; top: env(safe-area-inset-top); z-index: 100; border: 1px solid var(--borde); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .btn-nav { padding: 12px 10px; font-weight: 600; border-radius: 15px; border: 2px solid transparent; cursor: pointer; background: transparent; font-size: 11px; color: #888; transition: 0.3s; flex: 1; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .filtros-materiales { display: flex; gap: 8px; overflow-x: auto; padding: 5px 10px 15px 10px; justify-content: flex-start; -webkit-overflow-scrolling: touch; }
-        .btn-filtro { padding: 8px 14px; font-size: 12px; border-radius: 20px; border: 1px solid var(--borde); background: var(--blanco); color: var(--texto); cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 5px; shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .btn-filtro.active { background: var(--primario); color: white; border-color: var(--primario); }
+        /* Efecto de Sección Activa */
+        .btn-nav.active { 
+            background: var(--primario-claro); 
+            color: var(--secundario); 
+            border-bottom: 3px solid var(--secundario);
+            transform: translateY(-2px);
+        }
+        
+        /* Submenú de Filtros con Estilo Rosa */
+        .filtros-materiales { display: flex; gap: 10px; overflow-x: auto; padding: 5px 10px 20px 10px; justify-content: flex-start; scrollbar-width: none; }
+        .filtros-materiales::-webkit-scrollbar { display: none; }
+        .btn-filtro { padding: 8px 16px; font-size: 13px; border-radius: 25px; border: 1px solid var(--borde); background: var(--blanco); color: var(--texto); cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); transition: 0.2s; }
+        .btn-filtro.active { background: var(--secundario); color: white; border-color: var(--secundario); transform: scale(1.05); }
 
         .contenedor-seccion { max-width: 900px; margin: auto; }
-        .seccion-diseno { background: var(--blanco); border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 1px solid var(--borde); }
+        .seccion-diseno { background: var(--blanco); border-radius: 25px; padding: 25px; box-shadow: 0 10px 30px rgba(240, 98, 146, 0.1); border: 1px solid var(--borde); }
         
-        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid var(--borde); border-radius: 10px; background: var(--input-bg); color: var(--texto); font-size: 15px; }
+        input, select, textarea { width: 100%; padding: 14px; border: 1px solid var(--borde); border-radius: 12px; background: var(--input-bg); color: var(--texto); font-size: 15px; margin-bottom: 10px; outline: none; }
+        input:focus { border-color: var(--primario); }
         
-        .btn-principal { background: var(--primario); color: white; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; }
+        .btn-principal { background: var(--primario); color: white; padding: 16px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; transition: 0.3s; }
+        .btn-principal:active { transform: scale(0.98); background: var(--secundario); }
         
-        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 5px; }
-        .item-card { background: var(--blanco); padding: 12px; border-radius: 15px; border: 1px solid var(--borde); text-align: center; position: relative; }
-        .item-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 10px; background: #eee; }
+        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 10px; }
+        .item-card { background: var(--blanco); padding: 12px; border-radius: 20px; border: 1px solid var(--borde); text-align: center; position: relative; transition: 0.3s; }
+        .item-card:hover { border-color: var(--primario); }
+        .item-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 15px; background: #fff5f7; }
         
-        .btn-eliminar { position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.7); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 14px; font-weight: bold; z-index: 10; }
+        .btn-eliminar { position: absolute; top: -5px; right: -5px; background: #ff5252; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
-        .btn-qty { width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--primario); color: white; font-weight: bold; cursor: pointer; }
+        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 12px; }
+        .btn-qty { width: 32px; height: 32px; border-radius: 10px; border: none; background: var(--primario-claro); color: var(--secundario); font-weight: bold; cursor: pointer; }
         
-        .canvas-wrapper { position: relative; width: 100%; max-width: 400px; height: 530px; margin: 15px auto; background: #fff; border-radius: 15px; border: 2px solid var(--borde); overflow: hidden; touch-action: none; }
-        #silueta-estudio { position: absolute; width: 100%; height: 100%; object-fit: contain; pointer-events: none; opacity: 0.4; }
+        .canvas-wrapper { position: relative; width: 100%; max-width: 400px; height: 530px; margin: 15px auto; background: #fff; border-radius: 20px; border: 3px solid var(--primario-claro); overflow: hidden; touch-action: none; }
+        #silueta-estudio { position: absolute; width: 100%; height: 100%; object-fit: contain; pointer-events: none; opacity: 0.3; }
         canvas { position: absolute; top: 0; left: 0; }
     </style>
 </head>
@@ -52,36 +77,37 @@
     <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">☀️</button>
     
     <div class="menu-secciones">
-        <button class="btn-nav" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
-        <button class="btn-nav" id="nav-MATERIALES" onclick="cambiarVista('MATERIALES')">📦 MATERIALES</button>
-        <button class="btn-nav" id="nav-PROYECTOS" style="background:var(--secundario);color:white" onclick="cambiarVista('PROYECTOS')">📂 PROYECTOS</button>
+        <button class="btn-nav" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 Inicio</button>
+        <button class="btn-nav" id="nav-MATERIALES" onclick="cambiarVista('MATERIALES')">📦 Materiales</button>
+        <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 Proyectos</button>
     </div>
 
+    <!-- Filtros que solo aparecen en MATERIALES -->
     <div id="contenedor-filtros" class="filtros-materiales" style="display:none;"></div>
 
     <div class="contenedor-seccion">
         <div id="seccion-stock">
             <div id="formulario-registro" class="seccion-diseno" style="margin-bottom: 30px; display: none;">
-                <h3 style="margin-top:0">📦 Registrar en Inventario</h3>
-                <div class="grid-inputs">
-                    <input type="text" id="m-nombre" placeholder="Nombre (ej: Lana Merino)">
-                    <input type="number" id="m-cantidad" placeholder="Cantidad" value="1">
+                <h3 style="margin-top:0; color: var(--secundario);">🌸 Nuevo Material</h3>
+                <input type="text" id="m-nombre" placeholder="Nombre (ej: Lana Merino Rosa)">
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="m-cantidad" placeholder="Cant." value="1" style="width: 80px;">
                     <select id="m-categoria"></select>
-                    <input type="file" id="m-foto" accept="image/*">
                 </div>
-                <button class="btn-principal" onclick="subirMaterial()">AÑADIR AL TALLER</button>
+                <input type="file" id="m-foto" accept="image/*">
+                <button class="btn-principal" onclick="subirMaterial()">GUARDAR EN TALLER</button>
             </div>
             <div id="lista-stock" class="grid-estudio"></div>
         </div>
 
         <div id="seccion-proyectos" style="display:none;">
             <div class="seccion-diseno">
-                <h2 style="text-align:center; color:var(--primario)">✨ NUEVO DISEÑO</h2>
-                <input type="text" id="p-nombre" placeholder="Nombre del Proyecto" style="margin-bottom:10px">
-                <textarea id="p-notas" placeholder="Notas de confección..." style="margin-bottom:10px"></textarea>
+                <h2 style="text-align:center; color:var(--secundario)">✨ BOCETO CREATIVO</h2>
+                <input type="text" id="p-nombre" placeholder="Nombre del Diseño">
+                <textarea id="p-notas" placeholder="Inspiración, agujas, detalles..."></textarea>
                 <div class="canvas-wrapper"><img id="silueta-estudio" src="Silueta 3 cuerpos.jpg"><canvas id="lienzo" width="400" height="530"></canvas></div>
-                <div style="display:flex; gap:10px; margin-bottom:20px"><input type="color" id="pincel-color" value="#9c27b0" style="width:60px"><button onclick="limpiarLienzo()" style="flex:1">Limpiar</button></div>
-                <button class="btn-principal" onclick="guardarProyectoCompleto()">GUARDAR PROYECTO</button>
+                <div style="display:flex; gap:10px; margin-bottom:20px"><input type="color" id="pincel-color" value="#ff85a2" style="width:70px; height: 45px;"><button onclick="limpiarLienzo()" style="flex:1; border-radius: 12px; border: 1px solid var(--borde);">Borrar Todo</button></div>
+                <button class="btn-principal" onclick="guardarProyectoCompleto()">FINALIZAR PROYECTO</button>
             </div>
             <div id="historial-proyectos" class="grid-estudio"></div>
         </div>
@@ -100,28 +126,17 @@
     const ctx = canvas.getContext('2d');
     let pintando = false;
 
+    // Lógica de Emojis para los filtros
     function obtenerEmoji(nombreCat) {
         const n = nombreCat.toLowerCase();
         if (n.includes('lana')) return '🧶';
         if (n.includes('tela')) return '👗';
         if (n.includes('hilo')) return '🧵';
         if (n.includes('accesorio')) return '🎀';
-        if (n.includes('otro')) return '🧸';
-        return '📦';
-    }
-
-    function toggleTheme() {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-        document.getElementById('themeBtn').innerText = isDark ? '☀️' : '🌙';
-        localStorage.setItem('tema', isDark ? 'claro' : 'oscuro');
+        return '🌸';
     }
 
     async function init() {
-        if (localStorage.getItem('tema') === 'oscuro') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            document.getElementById('themeBtn').innerText = '🌙';
-        }
         const { data } = await client.from('Secciones').select('nombre');
         secciones = data ? data.map(s => s.nombre) : [];
         renderFiltros();
@@ -134,8 +149,7 @@
     function renderFiltros() {
         let html = `<button class="btn-filtro ${filtroActual === 'TODOS' ? 'active' : ''}" onclick="filtrarMateriales('TODOS')">✨ Todo</button>`;
         secciones.forEach(s => {
-            const emoji = obtenerEmoji(s);
-            html += `<button class="btn-filtro ${filtroActual === s ? 'active' : ''}" onclick="filtrarMateriales('${s}')">${emoji} ${s}</button>`;
+            html += `<button class="btn-filtro ${filtroActual === s ? 'active' : ''}" onclick="filtrarMateriales('${s}')">${obtenerEmoji(s)} ${s}</button>`;
         });
         document.getElementById('contenedor-filtros').innerHTML = html;
     }
@@ -155,12 +169,13 @@
             <div class="item-card">
                 <button class="btn-eliminar" onclick="eliminarProducto(${m.id})">×</button>
                 <img src="${m.contenido || 'https://via.placeholder.com/150'}" onerror="this.src='https://via.placeholder.com/150'">
-                <strong>${m.tipo_material}</strong>
-                <p style="font-size:11px; margin:5px 0; opacity:0.7">${m.categoria}</p>
-                <div class="controles-stock">
-                    <button class="btn-qty" onclick="actualizarCant(${m.id},-1)">-</button>
-                    <span>${m.cantidad || 0}</span>
-                    <button class="btn-qty" onclick="actualizarCant(${m.id},1)">+</button>
+                <div style="padding: 10px 5px">
+                    <strong style="font-size: 14px">${m.tipo_material}</strong>
+                    <div class="controles-stock">
+                        <button class="btn-qty" onclick="actualizarCant(${m.id},-1)">-</button>
+                        <span>${m.cantidad || 0}</span>
+                        <button class="btn-qty" onclick="actualizarCant(${m.id},1)">+</button>
+                    </div>
                 </div>
             </div>
         `).join('');
@@ -171,22 +186,13 @@
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
         document.getElementById(`nav-${v}`).classList.add('active');
 
-        const esMateriales = v === 'MATERIALES';
-        const esProyectos = v === 'PROYECTOS';
-        const esInicio = v === 'INICIO';
+        document.getElementById('seccion-stock').style.display = (v === 'PROYECTOS') ? 'none' : 'block';
+        document.getElementById('seccion-proyectos').style.display = (v === 'PROYECTOS') ? 'block' : 'none';
+        document.getElementById('formulario-registro').style.display = (v === 'INICIO') ? 'block' : 'none';
+        document.getElementById('contenedor-filtros').style.display = (v === 'MATERIALES') ? 'flex' : 'none';
 
-        document.getElementById('seccion-stock').style.display = esProyectos ? 'none' : 'block';
-        document.getElementById('seccion-proyectos').style.display = esProyectos ? 'block' : 'none';
-        document.getElementById('formulario-registro').style.display = esInicio ? 'block' : 'none';
-        document.getElementById('contenedor-filtros').style.display = esMateriales ? 'flex' : 'none';
-
-        if (esMateriales) {
-            filtrarMateriales('TODOS');
-        } else if (esInicio) {
-            renderStock(stockLocal);
-        } else if (esProyectos) {
-            cargarHistorial();
-        }
+        if (v === 'MATERIALES') filtrarMateriales('TODOS');
+        if (v === 'PROYECTOS') cargarHistorial();
     }
 
     function filtrarMateriales(cat) {
@@ -201,16 +207,14 @@
         const nc = Math.max(0, (i.cantidad || 0) + d);
         await client.from('estudio_data').update({ cantidad: nc }).eq('id', id);
         i.cantidad = nc;
-        filtrarMateriales(filtroActual);
+        renderStock(vistaActual === 'MATERIALES' && filtroActual !== 'TODOS' ? stockLocal.filter(x => x.categoria === filtroActual) : stockLocal);
     }
 
     async function eliminarProducto(id) {
-        if(confirm("¿Seguro que quieres eliminar este material?")) {
-            const { error } = await client.from('estudio_data').delete().eq('id', id);
-            if(!error) {
-                stockLocal = stockLocal.filter(x => x.id !== id);
-                filtrarMateriales(filtroActual);
-            }
+        if(confirm("¿Eliminar este material?")) {
+            await client.from('estudio_data').delete().eq('id', id);
+            stockLocal = stockLocal.filter(x => x.id !== id);
+            filtrarMateriales(filtroActual);
         }
     }
 
@@ -219,28 +223,13 @@
         const cantidad = document.getElementById('m-cantidad').value;
         const categoria = document.getElementById('m-categoria').value;
         const fotoFile = document.getElementById('m-foto').files[0];
-        if (!nombre) return alert("Falta el nombre");
+        if (!nombre) return alert("Ponle un nombre");
 
         let fotoUrl = "";
         if (fotoFile) {
-            const extension = fotoFile.name.split('.').pop();
-            const fileName = `img_${Date.now()}.${extension}`;
-            
-            let { data: upData, error: upErr } = await client.storage
-                .from('media') 
-                .upload(fileName, fotoFile, { cacheControl: '3600', upsert: false });
-            
-            if (upErr) {
-                const { data: retryData, error: retryErr } = await client.storage
-                    .from('MEDIA')
-                    .upload(fileName, fotoFile);
-                
-                if (retryErr) {
-                    return alert("Error Supabase: " + (retryErr.message || "Bucket no encontrado"));
-                }
-                const { data } = client.storage.from('MEDIA').getPublicUrl(fileName);
-                fotoUrl = data.publicUrl;
-            } else {
+            const fileName = `img_${Date.now()}`;
+            let { data: upData, error: upErr } = await client.storage.from('media').upload(fileName, fotoFile);
+            if (!upErr) {
                 const { data } = client.storage.from('media').getPublicUrl(fileName);
                 fotoUrl = data.publicUrl;
             }
@@ -253,39 +242,35 @@
             contenido: fotoUrl
         }]);
 
-        if (!error) {
-            alert("¡Material añadido!");
-            location.reload();
-        }
+        if (!error) location.reload();
     }
 
     function setupDibujo() {
-        ctx.lineWidth = 3; ctx.lineCap = 'round';
-        const cp = document.getElementById('pincel-color');
+        ctx.lineWidth = 4; ctx.lineCap = 'round';
         const getP = (e) => {
             const r = canvas.getBoundingClientRect();
             const x = (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - r.left;
             const y = (e.clientY || (e.touches ? e.touches[0].clientY : 0)) - r.top;
             return { x, y };
         };
-        canvas.onmousedown = (e) => { pintando = true; ctx.beginPath(); ctx.strokeStyle = cp.value; const p = getP(e); ctx.moveTo(p.x, p.y); };
+        canvas.onmousedown = (e) => { pintando = true; ctx.beginPath(); ctx.strokeStyle = document.getElementById('pincel-color').value; const p = getP(e); ctx.moveTo(p.x, p.y); };
         canvas.onmousemove = (e) => { if(pintando) { const p = getP(e); ctx.lineTo(p.x, p.y); ctx.stroke(); } };
         window.onmouseup = () => pintando = false;
-        canvas.ontouchstart = (e) => { e.preventDefault(); pintando = true; ctx.beginPath(); ctx.strokeStyle = cp.value; const p = getP(e); ctx.moveTo(p.x, p.y); };
+        canvas.ontouchstart = (e) => { e.preventDefault(); pintando = true; ctx.beginPath(); ctx.strokeStyle = document.getElementById('pincel-color').value; const p = getP(e); ctx.moveTo(p.x, p.y); };
         canvas.ontouchmove = (e) => { e.preventDefault(); if(pintando) { const p = getP(e); ctx.lineTo(p.x, p.y); ctx.stroke(); } };
     }
 
-    function limpiarLienzo() { ctx.clearRect(0,0,450,600); }
+    function limpiarLienzo() { ctx.clearRect(0,0,400,530); }
 
     async function guardarProyectoCompleto() {
         const nom = document.getElementById('p-nombre').value;
-        if(!nom) return alert("Falta nombre");
+        if(!nom) return alert("Nombre del proyecto necesario");
         await client.from('Proyectos').insert([{
             nombre: nom,
             diseno_canvas: canvas.toDataURL(),
             patron_punto: document.getElementById('p-notas').value
         }]);
-        alert("¡Proyecto Guardado!");
+        alert("¡Diseño guardado en Proyectos!");
         cambiarVista('PROYECTOS');
     }
 
@@ -297,6 +282,12 @@
                 <strong>${p.nombre}</strong>
             </div>
         `).join('');
+    }
+
+    function toggleTheme() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+        document.getElementById('themeBtn').innerText = isDark ? '☀️' : '🌙';
     }
 
     init();
