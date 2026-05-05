@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mi Taller Rosa - Versión Fix</title>
+    <title>Taller Rosa - Fix Final</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --t: #4a4a4a; --br: #f1e1e5; }
@@ -58,19 +58,32 @@
     let categoriasBase = [];
     let editandoId = null;
 
-    // EL "SUPER" TRADUCTOR DE EMOJIS (Limpia todo antes de comparar)
-    function darEmoji(texto) {
+    // DICCIONARIO FORZADO
+    const mapaEmojis = {
+        "lana": "🧶",
+        "telas": "👗",
+        "tela": "👗",
+        "hilos": "🧵",
+        "hilo": "🧵",
+        "accesorios": "🎀",
+        "otros": "🧸"
+    };
+
+    function obtenerEmojiForzado(texto, index) {
         if (!texto) return "🌸";
-        // Convertimos a minúsculas, quitamos acentos y espacios
-        const t = texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        const t = texto.toLowerCase().trim();
         
-        if (t.includes("lana")) return "🧶";
-        if (t.includes("tela")) return "👗";
-        if (t.includes("hilo")) return "🧵";
-        if (t.includes("accesorio")) return "🎀";
-        if (t.includes("otro")) return "🧸";
+        // 1. Intentar por palabra clave
+        for (let clave in mapaEmojis) {
+            if (t.includes(clave)) return mapaEmojis[clave];
+        }
+
+        // 2. Si falla y es el primero, segundo o tercero (basado en tu imagen)
+        if (index === 0) return "🧶"; // Lana
+        if (index === 1) return "👗"; // Telas
+        if (index === 2) return "🧵"; // Hilos
         
-        return "🌸"; 
+        return "🌸";
     }
 
     async function iniciar() {
@@ -78,7 +91,7 @@
         categoriasBase = catData ? catData.map(c => c.nombre.trim()) : [];
         
         const sel = document.getElementById('m-categoria');
-        sel.innerHTML = categoriasBase.map(c => `<option value="${c}">${darEmoji(c)} ${c}</option>`).join('');
+        sel.innerHTML = categoriasBase.map((c, i) => `<option value="${c}">${obtenerEmojiForzado(c, i)} ${c}</option>`).join('');
 
         await cargarDatos();
         renderFiltros();
@@ -109,9 +122,9 @@
 
     function renderFiltros() {
         const contenedor = document.getElementById('contenedor-filtros');
-        let html = `<button class="btn-filtro active" id="f-todo" onclick="filtrar('TODO', this)">✨ Todo</button>`;
-        categoriasBase.forEach(cat => {
-            html += `<button class="btn-filtro" onclick="filtrar('${cat}', this)">${darEmoji(cat)} ${cat}</button>`;
+        let html = `<button class="btn-filtro active" onclick="filtrar('TODO', this)">✨ Todo</button>`;
+        categoriasBase.forEach((cat, i) => {
+            html += `<button class="btn-filtro" onclick="filtrar('${cat}', this)">${obtenerEmojiForzado(cat, i)} ${cat}</button>`;
         });
         contenedor.innerHTML = html;
     }
@@ -148,19 +161,15 @@
         const cat = document.getElementById('m-categoria').value;
         const cant = document.getElementById('m-cantidad').value;
         if (!nombre) return alert("Escribe un nombre");
-
         const payload = { tipo_material: nombre, categoria: cat, cantidad: parseInt(cant) || 0 };
         const foto = document.getElementById('m-foto').files[0];
-        
         if (foto) {
             const name = `img_${Date.now()}`;
             await client.storage.from('media').upload(name, foto);
             payload.contenido = client.storage.from('media').getPublicUrl(name).data.publicUrl;
         }
-
         if (editandoId) await client.from('estudio_data').update(payload).eq('id', editandoId);
         else await client.from('estudio_data').insert([payload]);
-        
         location.reload();
     }
 
