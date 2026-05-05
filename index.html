@@ -74,7 +74,7 @@
     let categoriasBase = [];
     let editandoId = null;
 
-    // Diccionario de emojis (Asegúrate de que las llaves estén en minúsculas)
+    // Diccionario súper flexible (sin tildes y en minúsculas)
     const diccEmojis = {
         "telas": "👗",
         "hilos": "🧵",
@@ -83,10 +83,11 @@
         "lana": "🧶"
     };
 
-    // Función auxiliar para obtener el emoji según el nombre de la categoría
     function obtenerEmoji(nombreCat) {
-        const nombreLimpio = nombreCat.trim().toLowerCase();
-        return diccEmojis[nombreLimpio] || "🌸"; 
+        // Limpiamos el nombre: quitamos tildes, espacios y pasamos a minúsculas
+        const limpio = nombreCat.trim().toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
+        return diccEmojis[limpio] || "🌸"; 
     }
 
     async function iniciar() {
@@ -138,7 +139,7 @@
         if (busqueda === 'TODO') {
             renderStock(stockGlobal);
         } else {
-            const filtrados = stockGlobal.filter(p => (p.categoria || "").toLowerCase() === busqueda.toLowerCase());
+            const filtrados = stockGlobal.filter(p => (p.categoria || "").toLowerCase().trim() === busqueda.toLowerCase().trim());
             renderStock(filtrados);
         }
     }
