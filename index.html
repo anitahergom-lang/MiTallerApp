@@ -6,29 +6,28 @@
     <title>Mi Taller Rosa</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --t: #4a4a4a; --br: #f1e1e5; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--f); color: var(--t); margin: 0; padding: 15px; padding-bottom: 80px; }
+        :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --br: #f1e1e5; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--f); margin: 0; padding: 15px; padding-bottom: 80px; }
         
-        .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 50px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .btn-nav { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 40px; font-size: 11px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        /* Menu */
+        .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 50px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 25px; }
+        .btn-nav { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 40px; font-size: 11px; text-transform: uppercase; }
         .btn-nav.active { background: var(--pc); color: var(--s); border: 1px solid var(--p); }
 
+        /* Formulario imagen_da01b9.png */
         .card-registro { background: var(--b); padding: 30px; border-radius: 30px; border: 1px solid #f1e1e5; max-width: 500px; margin: 20px auto; }
         .titulo-form { color: var(--s); font-size: 24px; font-weight: bold; margin-bottom: 25px; text-align: center; }
         .label-input { color: var(--p); font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; display: block; text-align: left; }
-        
         .row { display: flex; gap: 15px; margin-bottom: 15px; }
         .col { flex: 1; text-align: left; }
-        input, select, textarea { width: 100%; padding: 14px 18px; border: 1.5px solid #fff5f7; border-radius: 15px; box-sizing: border-box; font-size: 15px; color: #666; background: #fffdfd; }
+        input, select, textarea { width: 100%; padding: 14px 18px; border: 1.5px solid #fff5f7; border-radius: 15px; box-sizing: border-box; font-size: 15px; background: #fffdfd; }
+        .btn-principal { background: var(--p); color: white; padding: 18px; border: none; border-radius: 18px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 20px; }
 
-        .btn-principal { background: var(--p); color: white; padding: 18px; border: none; border-radius: 18px; width: 100%; font-weight: bold; font-size: 16px; text-transform: uppercase; cursor: pointer; margin-top: 20px; }
-
-        /* Estilo tarjetas con iconos */
+        /* Tarjetas con ✏️ y ❌ */
         .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
         .item-card { background: var(--b); border-radius: 20px; border: 1px solid var(--br); overflow: hidden; position: relative; }
-        .acciones-card { position: absolute; top: 5px; right: 5px; display: flex; gap: 5px; z-index: 10; }
-        .btn-accion { background: white; border: 1px solid var(--br); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        
+        .acciones-card { position: absolute; top: 8px; right: 8px; display: flex; gap: 5px; z-index: 10; }
+        .btn-accion { background: white; border: 1px solid var(--br); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .foto-material { width: 100%; height: 120px; object-fit: cover; background: #fff0f3; display: flex; align-items: center; justify-content: center; font-size: 40px; }
         .info-material { padding: 10px; text-align: center; }
     </style>
@@ -41,6 +40,7 @@
         <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
     </div>
 
+    <!-- FORMULARIO IGUAL A LA IMAGEN -->
     <div id="seccion-inicio" class="card-registro">
         <div class="titulo-form" id="txt-titulo">✨ Nuevo Material</div>
         <input type="hidden" id="m-id">
@@ -112,12 +112,13 @@
     }
 
     async function cargarStock() {
-        const { data } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
-        if(data) { lanasCargadas = data; renderizarStock(); }
+        const { data, error } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
+        if(!error) { lanasCargadas = data; renderizarStock(); }
     }
 
     function renderizarStock() {
-        document.getElementById('lista-stock').innerHTML = lanasCargadas.map(m => `
+        const lista = document.getElementById('lista-stock');
+        lista.innerHTML = lanasCargadas.map(m => `
             <div class="item-card">
                 <div class="acciones-card">
                     <button class="btn-accion" onclick="editarMaterial(${m.id})">✏️</button>
@@ -126,7 +127,7 @@
                 <div class="foto-material">${m.contenido ? `<img src="${m.contenido}" style="width:100%;height:100%;object-fit:cover;">` : '🧶'}</div>
                 <div class="info-material">
                     <h4 style="margin:0; font-size:13px;">${m.tipo_material}</h4>
-                    <p style="margin:0; font-size:11px;">Stock: ${m.cantidad}</p>
+                    <p style="margin:5px 0 0 0; font-size:11px; color:gray;">Stock: ${m.cantidad}</p>
                 </div>
             </div>
         `).join('');
@@ -146,7 +147,7 @@
     }
 
     async function borrarMaterial(id) {
-        if(confirm("¿Seguro que quieres borrar este material?")) {
+        if(confirm("¿Borrar este material para siempre?")) {
             await client.from('estudio_data').delete().eq('id', id);
             cargarStock();
         }
@@ -157,6 +158,9 @@
         document.getElementById('m-nombre').value = "";
         document.getElementById('m-cantidad').value = "1";
         document.getElementById('m-composicion').value = "";
+        document.getElementById('m-grosor').value = "";
+        document.getElementById('m-tienda').value = "";
+        document.getElementById('m-notas').value = "";
         document.getElementById('txt-titulo').innerText = "✨ Nuevo Material";
         document.getElementById('btn-guardar').innerText = "AÑADIR MATERIAL";
         document.getElementById('btn-cancelar').style.display = "none";
@@ -175,8 +179,9 @@
             ? await client.from('estudio_data').update(datos).eq('id', id)
             : await client.from('estudio_data').insert([datos]);
 
-        if (error) alert("Error al guardar");
-        else {
+        if (error) {
+            alert("Error al guardar. Revisa tu conexión.");
+        } else {
             limpiarForm();
             cambiarVista('MATERIALES');
         }
