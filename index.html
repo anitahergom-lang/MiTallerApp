@@ -199,20 +199,25 @@
 
         let fotoUrl = "";
         if (fotoFile) {
-            // USANDO "MEDIA" en mayúsculas como indica tu panel de políticas
-            const fileName = `${Date.now()}_${fotoFile.name.replace(/\s+/g, '_')}`;
-            const { error: upErr } = await client.storage.from('MEDIA').upload(fileName, fotoFile, {
-                contentType: fotoFile.type,
-                upsert: true
-            });
+            // Generamos nombre simple sin caracteres raros
+            const extension = fotoFile.name.split('.').pop();
+            const fileName = `img_${Date.now()}.${extension}`;
             
-            if (!upErr) {
-                const { data } = client.storage.from('MEDIA').getPublicUrl(fileName);
-                if (data) fotoUrl = data.publicUrl;
-            } else {
-                console.error("Error al subir:", upErr);
-                return alert("Error al subir imagen. Prueba con otra foto o nombre corto.");
+            // Intento de subida con configuración simplificada
+            const { data: upData, error: upErr } = await client.storage
+                .from('MEDIA')
+                .upload(fileName, fotoFile, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+            
+            if (upErr) {
+                console.error("Error detallado:", upErr);
+                return alert("Error Supabase: " + (upErr.message || "Archivo demasiado grande o formato no soportado"));
             }
+
+            const { data } = client.storage.from('MEDIA').getPublicUrl(fileName);
+            if (data) fotoUrl = data.publicUrl;
         }
 
         const { error } = await client.from('estudio_data').insert([{
