@@ -49,10 +49,6 @@
 
         .controles-stock { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 12px; }
         .btn-qty { width: 32px; height: 32px; border-radius: 10px; border: none; background: var(--primario-claro); color: var(--secundario); font-weight: bold; cursor: pointer; }
-        
-        .canvas-wrapper { position: relative; width: 100%; max-width: 400px; height: 530px; margin: 15px auto; background: #fff; border-radius: 20px; border: 3px solid var(--primario-claro); overflow: hidden; }
-        #silueta-estudio { position: absolute; width: 100%; height: 100%; object-fit: contain; pointer-events: none; opacity: 0.3; }
-        canvas { position: absolute; top: 0; left: 0; touch-action: none; }
     </style>
 </head>
 <body>
@@ -69,6 +65,7 @@
 
     <div class="contenedor-seccion">
         <div id="seccion-stock">
+            <!-- Formulario de Registro -->
             <div id="formulario-registro" class="seccion-diseno" style="margin-bottom: 30px; display: none;">
                 <h3 id="form-titulo" style="margin-top:0; color: var(--secundario);">🌸 Registro de Material</h3>
                 <input type="text" id="m-nombre" placeholder="Nombre (ej: Lana Merino Soft)">
@@ -98,15 +95,11 @@
         </div>
 
         <div id="seccion-proyectos" style="display:none;">
+            <!-- Contenido Proyectos Simplificado -->
             <div class="seccion-diseno">
-                <h2 style="text-align:center; color:var(--secundario)">✨ BOCETO CREATIVO</h2>
-                <input type="text" id="p-nombre" placeholder="Nombre del Diseño">
-                <textarea id="p-notas" placeholder="Inspiración, detalles..."></textarea>
-                <div class="canvas-wrapper"><img id="silueta-estudio" src="Silueta 3 cuerpos.jpg"><canvas id="lienzo" width="400" height="530"></canvas></div>
-                <div style="display:flex; gap:10px; margin-bottom:20px"><input type="color" id="pincel-color" value="#ff85a2" style="width:70px; height: 45px;"><button onclick="limpiarLienzo()" style="flex:1; border-radius: 12px; border: 1px solid var(--borde);">Borrar</button></div>
-                <button class="btn-principal" onclick="guardarProyectoCompleto()">GUARDAR DISEÑO</button>
+                <h2 style="text-align:center; color:var(--secundario)">✨ BOCETOS</h2>
+                <div id="historial-proyectos" class="grid-estudio"></div>
             </div>
-            <div id="historial-proyectos" class="grid-estudio"></div>
         </div>
     </div>
 
@@ -118,28 +111,14 @@
     let stockLocal = [];
     let secciones = [];
     let editandoId = null;
-    let filtroActual = 'TODOS';
-    const canvas = document.getElementById('lienzo');
-    const ctx = canvas.getContext('2d');
-    let pintando = false;
 
     async function init() {
         const { data } = await client.from('Secciones').select('nombre');
-        secciones = data ? data.map(s => s.nombre) : [];
+        secciones = data ? data.map(s => s.nombre.trim()) : [];
         renderFiltros();
         renderSelect();
         await cargarStock();
-        setupDibujo();
         cambiarVista('INICIO');
-    }
-
-    function renderSelect() {
-        const sel = document.getElementById('m-categoria');
-        sel.innerHTML = secciones.map(s => `<option value="${s}">${s}</option>`).join('');
-    }
-
-    function mostrarCamposExtra(cat) {
-        document.getElementById('campos-lana').style.display = (cat.toLowerCase().includes('lana')) ? 'block' : 'none';
     }
 
     async function cargarStock() {
@@ -151,7 +130,9 @@
     function renderStock(items) {
         document.getElementById('lista-stock').innerHTML = items.map(m => {
             let infoExtra = "";
-            if (m.notas && m.categoria && m.categoria.toLowerCase().includes('lana')) {
+            const esLana = m.categoria && m.categoria.toLowerCase().includes('lana');
+            
+            if (m.notas && esLana) {
                 const partes = m.notas.split(' | ');
                 infoExtra = `
                     <div style="font-size: 11px; color: #777; margin-top: 8px; text-align: left; background: #fffafb; padding: 8px; border-radius: 10px; border: 1px solid #fce4ec;">
@@ -170,6 +151,7 @@
                 <img src="${imagenSrc}">
                 <div style="padding: 10px 5px">
                     <strong style="font-size: 14px">${m.tipo_material}</strong>
+                    <div style="color:var(--secundario); font-size:10px;">${m.categoria || ''}</div>
                     ${infoExtra}
                     <div class="controles-stock">
                         <button class="btn-qty" onclick="actualizarCant(${m.id},-1)">-</button>
@@ -181,21 +163,25 @@
         }).join('');
     }
 
-    // CORRECCIÓN DE FILTROS: Comparación más robusta
+    // FILTRO ARREGLADO: Más flexible
     function filtrarMateriales(cat) {
-        filtroActual = cat;
-        // Actualizar UI de botones
+        // Actualizar botones
         document.querySelectorAll('.btn-filtro').forEach(btn => {
-            btn.classList.toggle('active', btn.getAttribute('onclick').includes(`'${cat}'`));
+            btn.classList.remove('active');
+            if(btn.innerText.includes(cat) || (cat === 'TODOS' && btn.innerText.includes('Todo'))) {
+                btn.classList.add('active');
+            }
         });
 
         if (cat === 'TODOS') {
             renderStock(stockLocal);
         } else {
-            // Filtramos ignorando mayúsculas/minúsculas y espacios
-            const filtrados = stockLocal.filter(i => 
-                i.categoria && i.categoria.toLowerCase().trim() === cat.toLowerCase().trim()
-            );
+            // Filtramos si la categoría CONTIENE el texto (ej: "Lanas" contiene "Lana")
+            const filtrados = stockLocal.filter(i => {
+                const catItem = (i.categoria || "").toLowerCase().trim();
+                const catBusqueda = cat.toLowerCase().trim();
+                return catItem.includes(catBusqueda);
+            });
             renderStock(filtrados);
         }
     }
@@ -208,23 +194,27 @@
         document.getElementById('contenedor-filtros').innerHTML = html;
     }
 
+    function renderSelect() {
+        const sel = document.getElementById('m-categoria');
+        sel.innerHTML = secciones.map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+
+    function mostrarCamposExtra(cat) {
+        document.getElementById('campos-lana').style.display = (cat.toLowerCase().includes('lana')) ? 'block' : 'none';
+    }
+
     async function subirMaterial() {
         const nombre = document.getElementById('m-nombre').value;
         const categoria = document.getElementById('m-categoria').value;
         const fotoFile = document.getElementById('m-foto').files[0];
-        if (!nombre) return alert("Por favor, pon un nombre");
+        if (!nombre) return alert("Pon un nombre");
 
         let notasFinales = "";
         if(categoria.toLowerCase().includes('lana')) {
             notasFinales = `${document.getElementById('m-composicion').value || '-'} | ${document.getElementById('m-grosor').value || '-'} | ${document.getElementById('m-tienda').value || '-'} | ${document.getElementById('m-estado-uso').value}`;
         }
 
-        const payload = {
-            tipo_material: nombre, 
-            cantidad: parseInt(document.getElementById('m-cantidad').value),
-            categoria: categoria, 
-            notas: notasFinales
-        };
+        const payload = { tipo_material: nombre, cantidad: parseInt(document.getElementById('m-cantidad').value), categoria: categoria, notas: notasFinales };
 
         if (fotoFile) {
             const fileName = `img_${Date.now()}`;
@@ -232,11 +222,8 @@
             if (data) payload.contenido = client.storage.from('media').getPublicUrl(fileName).data.publicUrl;
         }
 
-        if(editandoId) {
-            await client.from('estudio_data').update(payload).eq('id', editandoId);
-        } else {
-            await client.from('estudio_data').insert([payload]);
-        }
+        if(editandoId) { await client.from('estudio_data').update(payload).eq('id', editandoId); } 
+        else { await client.from('estudio_data').insert([payload]); }
         location.reload();
     }
 
@@ -250,8 +237,8 @@
         document.getElementById('btn-cancelar').style.display = "block";
         document.getElementById('m-nombre').value = m.tipo_material || '';
         document.getElementById('m-cantidad').value = m.cantidad || 1;
-        document.getElementById('m-categoria').value = m.categoria;
-        mostrarCamposExtra(m.categoria);
+        document.getElementById('m-categoria').value = m.categoria || '';
+        mostrarCamposExtra(m.categoria || '');
         if(m.categoria && m.categoria.toLowerCase().includes('lana')) {
             const partes = m.notas ? m.notas.split(' | ') : [];
             document.getElementById('m-composicion').value = partes[0] || '';
@@ -269,7 +256,6 @@
         document.getElementById('formulario-registro').style.display = (v === 'INICIO') ? 'block' : 'none';
         document.getElementById('contenedor-filtros').style.display = (v === 'MATERIALES') ? 'flex' : 'none';
         if (v === 'MATERIALES') filtrarMateriales('TODOS');
-        if (v === 'PROYECTOS') cargarHistorial();
     }
 
     async function eliminarProducto(id) {
@@ -281,33 +267,6 @@
         const nc = Math.max(0, (i.cantidad || 0) + d);
         await client.from('estudio_data').update({ cantidad: nc }).eq('id', id);
         location.reload();
-    }
-
-    function setupDibujo() {
-        const getP = (e) => {
-            const r = canvas.getBoundingClientRect();
-            return { x: (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - r.left, y: (e.clientY || (e.touches ? e.touches[0].clientY : 0)) - r.top };
-        };
-        canvas.onmousedown = (e) => { pintando = true; ctx.beginPath(); ctx.strokeStyle = document.getElementById('pincel-color').value; ctx.lineWidth = 4; const p = getP(e); ctx.moveTo(p.x, p.y); };
-        canvas.onmousemove = (e) => { if(pintando) { const p = getP(e); ctx.lineTo(p.x, p.y); ctx.stroke(); } };
-        window.onmouseup = () => pintando = false;
-        canvas.ontouchstart = (e) => { pintando = true; ctx.beginPath(); const p = getP(e); ctx.moveTo(p.x, p.y); };
-        canvas.ontouchmove = (e) => { if(pintando) { const p = getP(e); ctx.lineTo(p.x, p.y); ctx.stroke(); } };
-    }
-
-    function limpiarLienzo() { ctx.clearRect(0,0,400,530); }
-
-    async function guardarProyectoCompleto() {
-        const nom = document.getElementById('p-nombre').value;
-        if(!nom) return alert("Pon nombre");
-        await client.from('Proyectos').insert([{ nombre: nom, diseno_canvas: canvas.toDataURL(), patron_punto: document.getElementById('p-notas').value }]);
-        location.reload();
-    }
-
-    async function cargarHistorial() {
-        const { data } = await client.from('Proyectos').select('*').order('created_at', { ascending: false });
-        document.getElementById('historial-proyectos').innerHTML = (data || []).map(p => `
-            <div class="item-card"><img src="${p.diseno_canvas}"><strong>${p.nombre}</strong></div>`).join('');
     }
 
     function toggleTheme() {
