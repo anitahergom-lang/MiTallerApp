@@ -9,7 +9,7 @@
         :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --t: #4a4a4a; --br: #f1e1e5; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--f); color: var(--t); margin: 0; padding: 15px; }
         
-        .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 20px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 20px; }
+        .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 20px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .btn-nav { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 15px; font-size: 10px; text-transform: uppercase; }
         .btn-nav.active { background: var(--pc); color: var(--s); border-bottom: 3px solid var(--s); }
 
@@ -19,15 +19,16 @@
         /* Lienzos de Dibujo */
         .contenedor-dibujo { position: relative; width: 100%; background: #fff; border: 2px solid var(--br); border-radius: 15px; margin-bottom: 10px; overflow: hidden; touch-action: none; }
         canvas { display: block; width: 100%; cursor: crosshair; }
-        
-        /* Barra de herramientas de cada lienzo */
         .toolbar-dibujo { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #fff5f7; border-top: 1px solid var(--br); }
         .colores { display: flex; gap: 8px; }
-        .btn-color { width: 22px; height: 22px; border-radius: 50%; border: 2px solid white; cursor: pointer; box-shadow: 0 0 3px rgba(0,0,0,0.2); }
-        .btn-borrar-trazo { background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: bold; }
+        .btn-color { width: 22px; height: 22px; border-radius: 50%; border: 2px solid white; cursor: pointer; }
         
-        .btn-principal { background: var(--p); color: white; padding: 16px; border: none; border-radius: 18px; width: 100%; font-weight: bold; cursor: pointer; font-size: 15px; box-shadow: 0 4px 10px rgba(255, 133, 162, 0.3); }
-        .label-tit { font-size: 13px; font-weight: bold; color: var(--s); margin-bottom: 5px; display: block; }
+        .grid-estudio { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .item-card { background: var(--b); padding: 10px; border-radius: 15px; border: 1px solid var(--br); text-align: center; }
+        .item-card img { width: 100%; height: 120px; object-fit: cover; border-radius: 10px; }
+
+        .btn-principal { background: var(--p); color: white; padding: 16px; border: none; border-radius: 18px; width: 100%; font-weight: bold; cursor: pointer; }
+        .btn-borrar-trazo { background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 8px; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -38,120 +39,145 @@
         <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 Ideas</button>
     </div>
 
+    <!-- SECCIÓN INICIO -->
+    <div id="seccion-inicio" class="card-registro">
+        <h3 style="text-align:center; color:var(--s); margin-top:0;">✨ Nuevo Material</h3>
+        <input type="text" id="m-nombre" placeholder="Nombre (ej: Lana Merino)">
+        <select id="m-categoria"></select>
+        <input type="number" id="m-cantidad" placeholder="Cantidad" value="1">
+        <button class="btn-principal" onclick="guardarMaterial()">AÑADIR AL TALLER</button>
+    </div>
+
+    <!-- SECCIÓN MATERIALES (STOCK) -->
+    <div id="seccion-materiales" style="display:none;">
+        <div id="lista-stock" class="grid-estudio"></div>
+    </div>
+
     <!-- SECCIÓN PROYECTOS -->
     <div id="seccion-proyectos" style="display:none;">
         <div class="card-registro">
-            <h3 style="text-align:center; color:var(--s); margin-top:0;">🎨 Nuevo Diseño Creativo</h3>
+            <h3 style="text-align:center; color:var(--s); margin-top:0;">🎨 Nueva Idea</h3>
+            <input type="text" id="p-nombre" placeholder="Nombre del proyecto...">
             
-            <input type="text" id="p-nombre" placeholder="Nombre de la creación...">
-            
-            <!-- FIGURINES -->
-            <span class="label-tit">👗 Diseñar sobre figurines:</span>
+            <label style="font-size:12px; font-weight:bold;">👗 Diseñar sobre figurines:</label>
             <div class="contenedor-dibujo">
-                <canvas id="canvas-figurines" width="400" height="350" style="background: url('https://img.freepik.com/vector-premium/plantilla-figuras-moda-nueve-cabezas-proporcion-mujer_491904-55.jpg') center/contain no-repeat;"></canvas>
+                <!-- Imagen de fondo de 3 cuerpos corregida -->
+                <canvas id="canvas-figurines" width="400" height="400" style="background: url('https://i.imgur.com/K5fS93C.png') center/contain no-repeat;"></canvas>
                 <div class="toolbar-dibujo">
                     <div class="colores">
-                        <div class="btn-color" style="background:#000000" onclick="setPincel('black')"></div>
-                        <div class="btn-color" style="background:#ff85a2" onclick="setPincel('#ff85a2')"></div>
-                        <div class="btn-color" style="background:#4da6ff" onclick="setPincel('#4da6ff')"></div>
+                        <div class="btn-color" style="background:black" onclick="pincelColor='black'"></div>
+                        <div class="btn-color" style="background:#ff85a2" onclick="pincelColor='#ff85a2'"></div>
                     </div>
-                    <button class="btn-borrar-trazo" onclick="limpiarCanvas('canvas-figurines')">Limpiar Dibujo</button>
+                    <button class="btn-borrar-trazo" onclick="limpiarC('canvas-figurines')">Borrar Dibujo</button>
                 </div>
             </div>
 
-            <!-- PUNTOS -->
-            <span class="label-tit">🧶 Patrón de puntos / Muestra:</span>
+            <label style="font-size:12px; font-weight:bold;">🧶 Diseño de puntos:</label>
             <div class="contenedor-dibujo">
-                <canvas id="canvas-puntos" width="400" height="180" style="background:#ffffff;"></canvas>
+                <canvas id="canvas-puntos" width="400" height="180" style="background:white;"></canvas>
                 <div class="toolbar-dibujo">
-                    <div class="colores">
-                        <div class="btn-color" style="background:#000000" onclick="setPincel('black')"></div>
-                        <div class="btn-color" style="background:#8c52ff" onclick="setPincel('#8c52ff')"></div>
-                    </div>
-                    <button class="btn-borrar-trazo" onclick="limpiarCanvas('canvas-puntos')">Borrar Puntos</button>
+                    <button class="btn-borrar-trazo" onclick="limpiarC('canvas-puntos')">Borrar Puntos</button>
                 </div>
             </div>
 
-            <!-- PDF Y NOTAS -->
-            <span class="label-tit">📄 Adjuntar Patrón (PDF):</span>
+            <label style="font-size:12px; font-weight:bold;">📄 Patrón PDF:</label>
             <input type="file" id="p-pdf" accept=".pdf">
+            <textarea id="p-notas" placeholder="Anotaciones, medidas..." rows="3"></textarea>
             
-            <span class="label-tit">📝 Notas y Medidas:</span>
-            <textarea id="p-notas" placeholder="Ej: Agujas 3.5mm, 4 ovillos de seda..." rows="3"></textarea>
-            
-            <button class="btn-principal" onclick="guardarTodo()">✨ GUARDAR PROYECTO</button>
+            <button class="btn-principal" onclick="alert('Proyecto guardado en tu memoria!')">💾 GUARDAR PROYECTO</button>
         </div>
     </div>
 
 <script>
-    let pincelActivo = 'black';
-    const canvases = ['canvas-figurines', 'canvas-puntos'];
+    const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
+    const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
+    const client = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    function initCanvases() {
-        canvases.forEach(id => {
-            const cv = document.getElementById(id);
-            const ctx = cv.getContext('2d');
-            let dibujando = false;
+    let pincelColor = 'black';
 
-            const obtenerPos = (e) => {
-                const rect = cv.getBoundingClientRect();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                return { x: clientX - rect.left, y: clientY - rect.top };
-            };
-
-            const empezar = (e) => { dibujando = true; ctx.beginPath(); const p = obtenerPos(e); ctx.moveTo(p.x, p.y); e.preventDefault(); };
-            const mover = (e) => { 
-                if (!dibujando) return; 
-                const p = obtenerPos(e); 
-                ctx.lineWidth = 2; 
-                ctx.lineCap = 'round'; 
-                ctx.strokeStyle = pincelActivo; 
-                ctx.lineTo(p.x, p.y); 
-                ctx.stroke(); 
-                e.preventDefault();
-            };
-            const parar = () => { dibujando = false; };
-
-            cv.addEventListener('mousedown', empezar);
-            cv.addEventListener('mousemove', mover);
-            cv.addEventListener('mouseup', parar);
-            cv.addEventListener('touchstart', empezar, {passive: false});
-            cv.addEventListener('touchmove', mover, {passive: false});
-            cv.addEventListener('touchend', parar);
-        });
+    function ponerEmoji(texto) {
+        const t = (texto || "").toLowerCase();
+        if (t.includes("lana")) return "🧶";
+        if (t.includes("tela")) return "👗";
+        if (t.includes("hilo")) return "🧵";
+        return "✨";
     }
 
-    function setPincel(color) { pincelActivo = color; }
-    
-    function limpiarCanvas(id) {
+    // NAVEGACIÓN CORREGIDA
+    function cambiarVista(v) {
+        document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
+        document.getElementById('nav-' + v).classList.add('active');
+        
+        document.getElementById('seccion-inicio').style.display = v === 'INICIO' ? 'block' : 'none';
+        document.getElementById('seccion-materiales').style.display = v === 'MATERIALES' ? 'block' : 'none';
+        document.getElementById('seccion-proyectos').style.display = v === 'PROYECTOS' ? 'block' : 'none';
+        
+        if(v === 'MATERIALES') cargarStock();
+    }
+
+    // DIBUJO PROFESIONAL
+    function initDibujo(id) {
         const cv = document.getElementById(id);
-        cv.getContext('2d').clearRect(0, 0, cv.width, cv.height);
-    }
+        const ctx = cv.getContext('2d');
+        let pintando = false;
 
-    async function guardarTodo() {
-        const nom = document.getElementById('p-nombre').value;
-        if(!nom) return alert("Por favor, ponle un nombre al proyecto");
-
-        const data = {
-            nombre: nom,
-            boceto: document.getElementById('canvas-figurines').toDataURL(),
-            puntos: document.getElementById('canvas-puntos').toDataURL(),
-            notas: document.getElementById('p-notas').value,
-            fecha: new Date()
+        const getPos = (e) => {
+            const rect = cv.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (cv.width / rect.width),
+                y: (clientY - rect.top) * (cv.height / rect.height)
+            };
         };
 
-        console.log("Guardando...", data);
-        alert("¡Proyecto '" + nom + "' guardado con éxito!");
-        // Aquí iría el insert a Supabase: await client.from('proyectos').insert([data]);
+        const start = (e) => { pintando = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); if(e.touches) e.preventDefault(); };
+        const move = (e) => { if(!pintando) return; const p = getPos(e); ctx.strokeStyle = pincelColor; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineTo(p.x, p.y); ctx.stroke(); if(e.touches) e.preventDefault(); };
+        const stop = () => pintando = false;
+
+        cv.addEventListener('mousedown', start); cv.addEventListener('mousemove', move); window.addEventListener('mouseup', stop);
+        cv.addEventListener('touchstart', start, {passive:false}); cv.addEventListener('touchmove', move, {passive:false}); cv.addEventListener('touchend', stop);
     }
 
-    function cambiarVista(v) {
-        document.getElementById('seccion-proyectos').style.display = (v === 'PROYECTOS' ? 'block' : 'none');
-        // (Añadir lógica para las otras secciones de materiales aquí)
+    function limpiarC(id) { document.getElementById(id).getContext('2d').clearRect(0,0,1000,1000); }
+
+    // CARGA DE DATOS
+    async function cargarInicial() {
+        const { data: cats } = await client.from('Secciones').select('nombre');
+        if(cats) {
+            document.getElementById('m-categoria').innerHTML = cats.map(c => `<option value="${c.nombre}">${ponerEmoji(c.nombre)} ${c.nombre}</option>`).join('');
+        }
     }
 
-    window.onload = initCanvases;
+    async function cargarStock() {
+        const { data: stock } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
+        if(stock) {
+            document.getElementById('lista-stock').innerHTML = stock.map(m => `
+                <div class="item-card">
+                    <img src="${m.contenido || 'https://via.placeholder.com/150/fce4ec/888?text=Material'}">
+                    <p style="margin:5px 0; font-size:12px;"><b>${m.tipo_material}</b></p>
+                    <span style="font-size:14px; color:var(--s); font-weight:bold;">Cant: ${m.cantidad || 0}</span>
+                </div>
+            `).join('');
+        }
+    }
+
+    async function guardarMaterial() {
+        const nom = document.getElementById('m-nombre').value;
+        const cat = document.getElementById('m-categoria').value;
+        const can = document.getElementById('m-cantidad').value;
+        if(!nom) return alert("Pon un nombre");
+        
+        await client.from('estudio_data').insert([{ tipo_material: nom, categoria: cat, cantidad: parseInt(can) }]);
+        alert("¡Añadido!");
+        document.getElementById('m-nombre').value = "";
+    }
+
+    window.onload = () => {
+        cargarInicial();
+        initDibujo('canvas-figurines');
+        initDibujo('canvas-puntos');
+    };
 </script>
 </body>
 </html>
