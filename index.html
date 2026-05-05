@@ -24,24 +24,26 @@
 
         /* Filtros */
         .filtros-materiales { display: flex; gap: 10px; overflow-x: auto; padding: 5px 10px 20px 10px; margin-bottom: 10px; scrollbar-width: none; }
-        .btn-filtro { padding: 8px 16px; border-radius: 25px; border: 1px solid var(--borde); background: var(--blanco); white-space: nowrap; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; color: var(--texto); }
+        .btn-filtro { padding: 8px 16px; border-radius: 25px; border: 1px solid var(--borde); background: var(--blanco); white-space: nowrap; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; color: var(--texto); transition: 0.3s; }
         .btn-filtro.active { background: var(--secundario); color: white; border-color: var(--secundario); }
 
-        /* Tarjetas de Producto */
+        /* Grid y Tarjetas */
         .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-        .item-card { background: var(--blanco); padding: 15px; border-radius: 20px; border: 1px solid var(--borde); text-align: center; position: relative; }
-        .item-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 15px; margin-bottom: 10px; }
+        .item-card { background: var(--blanco); padding: 15px; border-radius: 20px; border: 1px solid var(--borde); text-align: center; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .item-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 15px; margin-bottom: 10px; background: #eee; }
         
-        .nombre-producto { font-weight: bold; font-size: 14px; margin-bottom: 10px; display: block; }
-
+        .nombre-producto { font-weight: bold; font-size: 14px; margin-bottom: 10px; display: block; min-height: 1.2em; }
         .controles-stock { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 5px; }
-        .btn-qty { width: 32px; height: 32px; border-radius: 8px; border: none; background: var(--primario-claro); color: var(--secundario); font-weight: bold; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .btn-qty { width: 32px; height: 32px; border-radius: 8px; border: none; background: var(--primario-claro); color: var(--secundario); font-weight: bold; cursor: pointer; font-size: 18px; }
         
-        .btn-editar { position: absolute; top: 5px; left: 5px; background: #FFC107; border: none; border-radius: 50%; width: 26px; height: 26px; color: white; cursor: pointer; z-index: 5; }
-        .btn-eliminar { position: absolute; top: 5px; right: 5px; background: #ff5252; border: none; border-radius: 50%; width: 26px; height: 26px; color: white; cursor: pointer; z-index: 5; }
+        /* Botones Edición/Borrado */
+        .btn-editar { position: absolute; top: 5px; left: 5px; background: #FFC107; border: none; border-radius: 50%; width: 26px; height: 26px; color: white; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .btn-eliminar { position: absolute; top: 5px; right: 5px; background: #ff5252; border: none; border-radius: 50%; width: 26px; height: 26px; color: white; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         
-        input, select { width: 100%; padding: 14px; margin-bottom: 10px; border: 1px solid var(--borde); border-radius: 12px; box-sizing: border-box; }
-        .btn-principal { background: var(--primario); color: white; padding: 16px; border: none; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; }
+        /* Formularios */
+        input, select { width: 100%; padding: 14px; margin-bottom: 10px; border: 1px solid var(--borde); border-radius: 12px; box-sizing: border-box; font-size: 14px; }
+        .btn-principal { background: var(--primario); color: white; padding: 16px; border: none; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .btn-principal:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -54,6 +56,7 @@
 
     <div id="contenedor-filtros" class="filtros-materiales" style="display:none;"></div>
 
+    <!-- SECCIÓN REGISTRO -->
     <div id="seccion-registro" style="max-width: 500px; margin: auto;">
         <div style="background: var(--blanco); padding: 25px; border-radius: 25px; border: 1px solid var(--borde);">
             <h3 id="titulo-form" style="margin-top:0; color:var(--secundario)">✨ Registro de Material</h3>
@@ -61,10 +64,11 @@
             <select id="m-categoria"></select>
             <input type="number" id="m-cantidad" placeholder="Cantidad" value="1">
             <input type="file" id="m-foto" accept="image/*">
-            <button class="btn-principal" onclick="guardar()">AÑADIR AL TALLER</button>
+            <button id="btn-guardar" class="btn-principal" onclick="guardar()">AÑADIR AL TALLER</button>
         </div>
     </div>
 
+    <!-- SECCIÓN MI STOCK -->
     <div id="seccion-listado" style="display:none;">
         <div id="lista-stock" class="grid-estudio"></div>
     </div>
@@ -78,7 +82,7 @@
     let categoriasBase = [];
     let editandoId = null;
 
-    // --- MAPA DE EMOJIS SOLICITADO ---
+    // Mapa de emojis exacto
     const emojiMapa = {
         "Lana": "🧶",
         "Telas": "👗",
@@ -88,28 +92,35 @@
     };
 
     async function iniciar() {
+        // 1. Cargar Categorías desde la tabla "Secciones"
         const { data: catData } = await client.from('Secciones').select('nombre');
         categoriasBase = catData ? catData.map(c => c.nombre.trim()) : [];
         
-        // Carga el select de registro con emojis
+        // 2. Llenar el Select de Registro
         const sel = document.getElementById('m-categoria');
         sel.innerHTML = categoriasBase.map(c => {
             const emoji = emojiMapa[c] || "🌸"; 
             return `<option value="${c}">${emoji} ${c}</option>`;
         }).join('');
 
+        // 3. Cargar datos iniciales
         await cargarDatos();
         renderFiltros();
     }
 
     async function cargarDatos() {
-        const { data } = await client.from('estudio_data').select('*').order('created_at', { ascending: false });
+        const { data, error } = await client.from('estudio_data').select('*').order('created_at', { ascending: false });
+        if (error) console.error("Error cargando datos:", error);
         stockGlobal = data || [];
         renderStock(stockGlobal);
     }
 
     function renderStock(lista) {
         const contenedor = document.getElementById('lista-stock');
+        if (lista.length === 0) {
+            contenedor.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #aaa;">No hay materiales en esta sección.</p>`;
+            return;
+        }
         contenedor.innerHTML = lista.map(m => `
             <div class="item-card">
                 <button class="btn-editar" onclick="prepararEdicion(${m.id})">✏️</button>
@@ -129,7 +140,7 @@
         const contenedor = document.getElementById('contenedor-filtros');
         let html = `<button class="btn-filtro active" onclick="filtrar('TODO', this)">✨ Todo</button>`;
         categoriasBase.forEach(cat => {
-            const emoji = emojiMapa[cat] || "🌸"; // Usa el emoji del mapa o flor por defecto
+            const emoji = emojiMapa[cat] || "🌸";
             html += `<button class="btn-filtro" onclick="filtrar('${cat}', this)">${emoji} ${cat}</button>`;
         });
         contenedor.innerHTML = html;
@@ -142,7 +153,9 @@
         if (busqueda === 'TODO') {
             renderStock(stockGlobal);
         } else {
-            const filtrados = stockGlobal.filter(p => (p.categoria || "").toLowerCase().includes(busqueda.toLowerCase()));
+            const filtrados = stockGlobal.filter(p => 
+                (p.categoria || "").toLowerCase() === busqueda.toLowerCase()
+            );
             renderStock(filtrados);
         }
     }
@@ -150,53 +163,104 @@
     function cambiarVista(vista) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
         document.getElementById('nav-' + vista).classList.add('active');
+        
         document.getElementById('seccion-registro').style.display = (vista === 'INICIO' ? 'block' : 'none');
         document.getElementById('seccion-listado').style.display = (vista === 'MATERIALES' ? 'block' : 'none');
         document.getElementById('contenedor-filtros').style.display = (vista === 'MATERIALES' ? 'flex' : 'none');
+        
         if(vista === 'MATERIALES') cargarDatos();
+        if(vista === 'INICIO' && !editandoId) resetearFormulario();
     }
 
     async function actualizarCant(id, cambio) {
         const item = stockGlobal.find(x => x.id === id);
         const nuevaCant = Math.max(0, (item.cantidad || 0) + cambio);
+        
+        // Actualización optimista (primero en pantalla para que se sienta rápido)
+        item.cantidad = nuevaCant;
+        renderStock(stockGlobal);
+
         const { error } = await client.from('estudio_data').update({ cantidad: nuevaCant }).eq('id', id);
-        if (!error) {
-            item.cantidad = nuevaCant;
-            renderStock(stockGlobal);
+        if (error) {
+            alert("Error al actualizar cantidad");
+            cargarDatos(); // Revertir si falla
         }
     }
 
     async function guardar() {
+        const btn = document.getElementById('btn-guardar');
         const nombre = document.getElementById('m-nombre').value;
         const cat = document.getElementById('m-categoria').value;
-        if (!nombre) return;
-        const payload = { tipo_material: nombre, categoria: cat, cantidad: parseInt(document.getElementById('m-cantidad').value) || 0 };
-        const foto = document.getElementById('m-foto').files[0];
-        if (foto) {
-            const name = `img_${Date.now()}`;
-            await client.storage.from('media').upload(name, foto);
-            payload.contenido = client.storage.from('media').getPublicUrl(name).data.publicUrl;
+        const cant = document.getElementById('m-cantidad').value;
+        const fotoFile = document.getElementById('m-foto').files[0];
+
+        if (!nombre) return alert("Por favor, pon un nombre al material");
+        
+        btn.disabled = true;
+        btn.innerText = "GUARDANDO...";
+
+        let urlFoto = null;
+        if (fotoFile) {
+            const nombreFoto = `img_${Date.now()}`;
+            const { data, error } = await client.storage.from('media').upload(nombreFoto, fotoFile);
+            if (data) {
+                const { data: publicData } = client.storage.from('media').getPublicUrl(nombreFoto);
+                urlFoto = publicData.publicUrl;
+            }
         }
-        if (editandoId) await client.from('estudio_data').update(payload).eq('id', editandoId);
-        else await client.from('estudio_data').insert([payload]);
-        location.reload();
+
+        const datos = {
+            tipo_material: nombre,
+            categoria: cat,
+            cantidad: parseInt(cant) || 0
+        };
+        if (urlFoto) datos.contenido = urlFoto;
+
+        let res;
+        if (editandoId) {
+            res = await client.from('estudio_data').update(datos).eq('id', editandoId);
+            editandoId = null;
+        } else {
+            res = await client.from('estudio_data').insert([datos]);
+        }
+
+        if (res.error) {
+            alert("Error al guardar");
+            btn.disabled = false;
+            btn.innerText = "AÑADIR AL TALLER";
+        } else {
+            resetearFormulario();
+            cambiarVista('MATERIALES');
+        }
     }
 
     function prepararEdicion(id) {
         const m = stockGlobal.find(x => x.id === id);
         editandoId = id;
         cambiarVista('INICIO');
-        document.getElementById('titulo-form').innerText = "✏️ Editando";
+        
+        document.getElementById('titulo-form').innerText = "✏️ Editando Material";
         document.getElementById('m-nombre').value = m.tipo_material;
         document.getElementById('m-categoria').value = m.categoria;
         document.getElementById('m-cantidad').value = m.cantidad;
+        document.getElementById('btn-guardar').innerText = "GUARDAR CAMBIOS";
     }
 
     async function eliminar(id) {
-        if(confirm("¿Eliminar?")) {
-            await client.from('estudio_data').delete().eq('id', id);
-            cargarDatos();
+        if(confirm("¿Seguro que quieres eliminar este material?")) {
+            const { error } = await client.from('estudio_data').delete().eq('id', id);
+            if (!error) cargarDatos();
         }
+    }
+
+    function resetearFormulario() {
+        editandoId = null;
+        document.getElementById('titulo-form').innerText = "✨ Registro de Material";
+        document.getElementById('m-nombre').value = "";
+        document.getElementById('m-cantidad').value = "1";
+        document.getElementById('m-foto').value = "";
+        document.getElementById('btn-guardar').disabled = false;
+        document.getElementById('btn-guardar').innerText = "AÑADIR AL TALLER";
     }
 
     iniciar();
