@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mi Taller Rosa - Diseño de Moda</title>
+    <title>Mi Taller Rosa</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { 
@@ -17,30 +17,27 @@
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--fondo); color: var(--texto); margin: 0; padding: 20px; }
         
-        /* Navegación */
-        .menu-secciones { display: flex; gap: 8px; background: var(--blanco); padding: 8px; border-radius: 20px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--borde); margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); justify-content: center; }
-        .btn-nav { flex: 1; padding: 12px 10px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 15px; font-size: 11px; text-transform: uppercase; transition: 0.3s; }
+        .menu-secciones { display: flex; gap: 8px; background: var(--blanco); padding: 8px; border-radius: 20px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--borde); margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .btn-nav { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 15px; font-size: 11px; text-transform: uppercase; }
         .btn-nav.active { background: var(--primario-claro); color: var(--secundario); border-bottom: 3px solid var(--secundario); }
 
-        /* Filtros */
         .filtros-materiales { display: flex; gap: 10px; overflow-x: auto; padding: 5px 10px 20px 10px; margin-bottom: 10px; scrollbar-width: none; }
-        .btn-filtro { padding: 8px 16px; border-radius: 25px; border: 1px solid var(--borde); background: var(--blanco); white-space: nowrap; cursor: pointer; font-size: 13px; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
-        .btn-filtro.active { background: var(--secundario); color: white; border-color: var(--secundario); transform: scale(1.05); }
+        .btn-filtro { padding: 8px 16px; border-radius: 25px; border: 1px solid var(--borde); background: var(--blanco); white-space: nowrap; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; color: var(--texto); }
+        .btn-filtro.active { background: var(--secundario); color: white; border-color: var(--secundario); }
 
-        /* Grid y Tarjetas */
-        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
-        .item-card { background: var(--blanco); padding: 12px; border-radius: 20px; border: 1px solid var(--borde); text-align: center; position: relative; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .item-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 15px; margin-bottom: 10px; }
+        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+        .item-card { background: var(--blanco); padding: 15px; border-radius: 20px; border: 1px solid var(--borde); text-align: center; position: relative; }
+        .item-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 15px; margin-bottom: 10px; }
         
-        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 10px; }
-        .btn-qty { width: 30px; height: 30px; border-radius: 10px; border: none; background: var(--primario-claro); color: var(--secundario); font-weight: bold; cursor: pointer; }
+        .nombre-producto { font-weight: bold; font-size: 14px; margin-bottom: 10px; display: block; }
+        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 5px; }
+        .btn-qty { width: 32px; height: 32px; border-radius: 8px; border: none; background: var(--primario-claro); color: var(--secundario); font-weight: bold; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
         
-        /* Botones de acción */
-        .btn-editar { position: absolute; top: -5px; left: -5px; background: #FFC107; border: none; border-radius: 50%; width: 28px; height: 28px; color: white; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; }
-        .btn-eliminar { position: absolute; top: -5px; right: -5px; background: #ff5252; border: none; border-radius: 50%; width: 28px; height: 28px; color: white; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; }
+        .btn-editar { position: absolute; top: 5px; left: 5px; background: #FFC107; border: none; border-radius: 50%; width: 26px; height: 26px; color: white; cursor: pointer; z-index: 5; }
+        .btn-eliminar { position: absolute; top: 5px; right: 5px; background: #ff5252; border: none; border-radius: 50%; width: 26px; height: 26px; color: white; cursor: pointer; z-index: 5; }
         
-        input, select { width: 100%; padding: 14px; margin-bottom: 10px; border: 1px solid var(--borde); border-radius: 12px; box-sizing: border-box; background: white; }
-        .btn-principal { background: var(--primario); color: white; padding: 16px; border: none; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 10px rgba(255, 133, 162, 0.3); }
+        input, select { width: 100%; padding: 14px; margin-bottom: 10px; border: 1px solid var(--borde); border-radius: 12px; box-sizing: border-box; }
+        .btn-principal { background: var(--primario); color: white; padding: 16px; border: none; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -53,11 +50,10 @@
 
     <div id="contenedor-filtros" class="filtros-materiales" style="display:none;"></div>
 
-    <!-- SECCIÓN REGISTRO -->
     <div id="seccion-registro" style="max-width: 500px; margin: auto;">
         <div style="background: var(--blanco); padding: 25px; border-radius: 25px; border: 1px solid var(--borde);">
-            <h3 id="titulo-form" style="margin-top:0; color:var(--secundario)">🌸 Registro de Material</h3>
-            <input type="text" id="m-nombre" placeholder="Nombre (ej: Lana Merino Soft)">
+            <h3 id="titulo-form" style="margin-top:0; color:var(--secundario)">✨ Registro de Material</h3>
+            <input type="text" id="m-nombre" placeholder="Nombre del material">
             <select id="m-categoria"></select>
             <input type="number" id="m-cantidad" placeholder="Cantidad" value="1">
             <input type="file" id="m-foto" accept="image/*">
@@ -65,7 +61,6 @@
         </div>
     </div>
 
-    <!-- SECCIÓN MI STOCK -->
     <div id="seccion-listado" style="display:none;">
         <div id="lista-stock" class="grid-estudio"></div>
     </div>
@@ -76,24 +71,27 @@
     const client = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     let stockGlobal = [];
-    let seccionesOriginales = [];
+    let categoriasBase = [];
     let editandoId = null;
 
-    // Mapa de emojis para que los filtros recuperen su alegría
-    const emojiMap = {
+    // Mapa de emojis personalizado
+    const emojiMapa = {
         "Lana": "🧶",
-        "Telas": "🧵",
-        "Hilos": "🪡",
-        "Otros": "✨",
-        "Accesorios": "🎀"
+        "Telas": "👗",
+        "Hilos": "🧵",
+        "Accesorios": "🎀",
+        "Otros": "🧸"
     };
 
     async function iniciar() {
         const { data: catData } = await client.from('Secciones').select('nombre');
-        seccionesOriginales = catData ? catData.map(c => c.nombre.trim()) : [];
+        categoriasBase = catData ? catData.map(c => c.nombre.trim()) : [];
         
         const sel = document.getElementById('m-categoria');
-        sel.innerHTML = seccionesOriginales.map(c => `<option value="${c}">${c}</option>`).join('');
+        sel.innerHTML = categoriasBase.map(c => {
+            const emoji = emojiMapa[c] || "🌸";
+            return `<option value="${c}">${emoji} ${c}</option>`;
+        }).join('');
 
         await cargarDatos();
         renderFiltros();
@@ -112,13 +110,12 @@
                 <button class="btn-editar" onclick="prepararEdicion(${m.id})">✏️</button>
                 <button class="btn-eliminar" onclick="eliminar(${m.id})">×</button>
                 <img src="${m.contenido || 'https://via.placeholder.com/150/fce4ec/888?text=Sin+Foto'}">
-                <div style="font-weight:bold; font-size:14px; color:var(--texto);">${m.tipo_material}</div>
+                <span class="nombre-producto">${m.tipo_material}</span>
                 <div class="controles-stock">
                     <button class="btn-qty" onclick="actualizarCant(${m.id}, -1)">-</button>
-                    <span>${m.cantidad || 0}</span>
+                    <span style="font-weight:bold; min-width:20px;">${m.cantidad || 0}</span>
                     <button class="btn-qty" onclick="actualizarCant(${m.id}, 1)">+</button>
                 </div>
-                <div style="font-size:10px; color:#aaa; margin-top:8px;">${m.categoria || ''}</div>
             </div>
         `).join('');
     }
@@ -126,9 +123,9 @@
     function renderFiltros() {
         const contenedor = document.getElementById('contenedor-filtros');
         let html = `<button class="btn-filtro active" onclick="filtrar('TODO', this)">✨ Todo</button>`;
-        seccionesOriginales.forEach(s => {
-            const emoji = emojiMap[s] || "🌸";
-            html += `<button class="btn-filtro" onclick="filtrar('${s}', this)">${emoji} ${s}</button>`;
+        categoriasBase.forEach(cat => {
+            const emoji = emojiMapa[cat] || "🌸";
+            html += `<button class="btn-filtro" onclick="filtrar('${cat}', this)">${emoji} ${cat}</button>`;
         });
         contenedor.innerHTML = html;
     }
@@ -136,15 +133,10 @@
     function filtrar(busqueda, boton) {
         document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
         boton.classList.add('active');
-
         if (busqueda === 'TODO') {
             renderStock(stockGlobal);
         } else {
-            const filtrados = stockGlobal.filter(prod => {
-                const catProd = (prod.categoria || "").toLowerCase();
-                const b = busqueda.toLowerCase();
-                return catProd.includes(b) || b.includes(catProd);
-            });
+            const filtrados = stockGlobal.filter(p => (p.categoria || "").toLowerCase().includes(busqueda.toLowerCase()));
             renderStock(filtrados);
         }
     }
@@ -152,11 +144,9 @@
     function cambiarVista(vista) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
         document.getElementById('nav-' + vista).classList.add('active');
-        
         document.getElementById('seccion-registro').style.display = (vista === 'INICIO' ? 'block' : 'none');
         document.getElementById('seccion-listado').style.display = (vista === 'MATERIALES' ? 'block' : 'none');
         document.getElementById('contenedor-filtros').style.display = (vista === 'MATERIALES' ? 'flex' : 'none');
-        
         if(vista === 'MATERIALES') cargarDatos();
     }
 
@@ -173,23 +163,16 @@
     async function guardar() {
         const nombre = document.getElementById('m-nombre').value;
         const cat = document.getElementById('m-categoria').value;
-        if (!nombre) return alert("Pon un nombre");
-
+        if (!nombre) return;
         const payload = { tipo_material: nombre, categoria: cat, cantidad: parseInt(document.getElementById('m-cantidad').value) || 0 };
         const foto = document.getElementById('m-foto').files[0];
-        
         if (foto) {
             const name = `img_${Date.now()}`;
-            const { data } = await client.storage.from('media').upload(name, foto);
-            if (data) payload.contenido = client.storage.from('media').getPublicUrl(name).data.publicUrl;
+            await client.storage.from('media').upload(name, foto);
+            payload.contenido = client.storage.from('media').getPublicUrl(name).data.publicUrl;
         }
-
-        if (editandoId) {
-            await client.from('estudio_data').update(payload).eq('id', editandoId);
-            editandoId = null;
-        } else {
-            await client.from('estudio_data').insert([payload]);
-        }
+        if (editandoId) await client.from('estudio_data').update(payload).eq('id', editandoId);
+        else await client.from('estudio_data').insert([payload]);
         location.reload();
     }
 
@@ -197,7 +180,7 @@
         const m = stockGlobal.find(x => x.id === id);
         editandoId = id;
         cambiarVista('INICIO');
-        document.getElementById('titulo-form').innerText = "✏️ Editando Material";
+        document.getElementById('titulo-form').innerText = "✏️ Editando";
         document.getElementById('m-nombre').value = m.tipo_material;
         document.getElementById('m-categoria').value = m.categoria;
         document.getElementById('m-cantidad').value = m.cantidad;
