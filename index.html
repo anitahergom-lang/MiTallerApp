@@ -27,20 +27,8 @@
         .foto-material { width: 100%; height: 110px; object-fit: cover; }
         .info-material { padding: 10px; text-align: center; }
         
-        .btn-edit-float { 
-            position: absolute; top: 10px; right: 10px; 
-            background: rgba(0, 0, 0, 0.7); color: white; border: none; 
-            width: 30px; height: 30px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; font-size: 14px; z-index: 5;
-        }
-        .btn-delete-float { 
-            position: absolute; top: 10px; left: 10px; 
-            background: rgba(255, 0, 0, 0.7); color: white; border: none; 
-            width: 30px; height: 30px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; font-size: 14px; z-index: 5;
-        }
+        .btn-edit-float { position: absolute; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.7); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; z-index: 5; }
+        .btn-delete-float { position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.7); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; z-index: 5; }
 
         .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-top: 5px; }
         .badge-idea { background: #e2e3e5; color: #383d41; }
@@ -55,32 +43,60 @@
 
         .canvas-container { background: white; border: 1px solid var(--br); border-radius: 15px; margin-top: 10px; position: relative; overflow: hidden; }
         .canvas-base { display: block; width: 100%; height: 250px; cursor: crosshair; }
-        .canvas-grid { 
-            background-image: 
-                linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
+        .canvas-grid { background-image: linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
         .canvas-tools { display: flex; gap: 5px; margin-top: 5px; margin-bottom: 15px; }
         .btn-tool { flex: 1; padding: 8px; font-size: 12px; border: 1px solid var(--br); border-radius: 8px; background: var(--b); cursor: pointer; color: var(--txt); }
         .btn-tool.active { background: var(--pc); border-color: var(--p); color: var(--s); }
 
         #dark-mode-toggle { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        
         .controles-stock { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 5px; }
         .btn-qty { background: var(--pc); border: none; width: 25px; height: 25px; border-radius: 50%; color: var(--s); font-weight: bold; cursor: pointer; }
+
+        /* ESTILOS ESPECIFICOS PARA LA LISTA DE PDFS */
+        .pdf-item {
+            background: var(--b);
+            border: 1px solid var(--br);
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+            text-decoration: none;
+            color: var(--txt);
+            transition: 0.2s;
+        }
+        .pdf-item:hover {
+            border-color: var(--p);
+            background: var(--pc);
+        }
+        .pdf-icon {
+            font-size: 24px;
+            color: var(--s);
+        }
+        .pdf-info {
+            flex: 1;
+        }
+        .pdf-nombre {
+            font-weight: 600;
+            font-size: 14px;
+            margin: 0;
+        }
+        .pdf-fecha {
+            font-size: 11px;
+            color: #888;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
 
 <button id="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
 
-<!-- MENU ACTUALIZADO -->
 <div class="menu-secciones">
     <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
     <button class="btn-nav" id="nav-STOCK" onclick="cambiarVista('STOCK')">📦 STOCK</button>
     <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
-    <!-- Nuevo botón añadido -->
     <button class="btn-nav" id="nav-PDFS" onclick="cambiarVista('PDFS')">📂 PDFs</button>
 </div>
 
@@ -174,11 +190,22 @@
     <div id="lista-proyectos" class="grid-estudio"></div>
 </div>
 
-<!-- NUEVA VISTA PDFS (VACÍA DE MOMENTO) -->
+<!-- VISTA PDFS (ZONA DE SUBIDA Y LISTA ACTUALIZADA) -->
 <div id="vista-PDFS" style="display:none;">
+    <div class="card-form" style="margin-bottom:20px;">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">📂 Subir Patrón PDF</h2>
+        <label>NOMBRE DEL PATRÓN</label>
+        <input type="text" id="pdf-nombre" placeholder="Ej: Chal de Verano - Susimiu">
+        <label>SELECCIONAR ARCHIVO PDF</label>
+        <input type="file" id="pdf-archivo" accept=".pdf" style="margin-bottom:10px;">
+        <button class="btn-grande" style="background:var(--s)" onclick="subirPDF()">SUBIR A LA BIBLIOTECA</button>
+    </div>
+    
     <div class="card-form">
-        <h2 style="color:var(--s); text-align:center; margin-top:0;">📂 Mi Biblioteca de PDFs</h2>
-        <p style="text-align:center; color:var(--txt);">Aquí verás tus patrones subidos. ¡Paso a paso! 🎀</p>
+        <h3 style="color:var(--txt); margin-top:0;">📋 Mis Patrones</h3>
+        <div id="lista-pdfs">
+            <!-- Aquí aparecerán los PDFs -->
+        </div>
     </div>
 </div>
 
@@ -189,6 +216,7 @@
 
     let lanasGlobal = [];
     let proyectosGlobal = [];
+    let pdfsGlobal = []; // Global para PDFs
     let toolsState = { 'canvas-punto': 'pincel', 'canvas-cuerpos': 'pincel' };
 
     function setTool(canvasId, tool) {
@@ -241,6 +269,7 @@
             const { data: proy } = await client.from('proyectos_data').select('*').order('created_at', {ascending: false});
             proyectosGlobal = proy || [];
             renderizarProyectos(proyectosGlobal);
+            cargarPDFs(); // Cargar PDFs también
         } catch (error) {
             console.error("Error cargando datos:", error);
         }
@@ -311,6 +340,99 @@
         `).join('');
     }
 
+    // --- LOGICA PARA PDFS ---
+
+    async function subirPDF() {
+        const nombre = document.getElementById('pdf-nombre').value;
+        const file = document.getElementById('pdf-archivo').files[0];
+
+        if(!nombre || !file) {
+            alert("Por favor, rellena el nombre y selecciona un archivo PDF 🎀");
+            return;
+        }
+
+        try {
+            // 1. Subir el archivo al Storage (Bucket: 'patrones_pdf')
+            const fileName = `${Date.now()}_${file.name}`;
+            const { data: storageData, error: storageError } = await client.storage
+                .from('patrones_pdf')
+                .upload(fileName, file);
+
+            if(storageError) throw storageError;
+
+            // 2. Obtener la URL pública
+            const { data: urlData } = client.storage.from('patrones_pdf').getPublicUrl(fileName);
+            const pdfUrl = urlData.publicUrl;
+
+            // 3. Guardar la referencia en la base de datos (Tabla: 'pdfs_data')
+            await client.from('pdfs_data').insert([{
+                nombre: nombre,
+                url: pdfUrl
+            }]);
+
+            alert("¡PDF subido correctamente! 📄✨");
+            document.getElementById('pdf-nombre').value = "";
+            document.getElementById('pdf-archivo').value = "";
+            cargarPDFs();
+
+        } catch (error) {
+            console.error("Error subiendo PDF:", error);
+            alert("Hubo un error al subir el PDF. Revisa la consola.");
+        }
+    }
+
+    async function cargarPDFs() {
+        const { data, error } = await client.from('pdfs_data').select('*').order('created_at', {ascending: false});
+        if(error) {
+            console.error("Error cargando PDFs:", error);
+            return;
+        }
+        pdfsGlobal = data;
+        renderizarPDFs(data);
+    }
+
+    function renderizarPDFs(lista) {
+        if(lista.length === 0) {
+            document.getElementById('lista-pdfs').innerHTML = '<p style="text-align:center; color:#888; font-size:12px;">No hay patrones subidos aún.</p>';
+            return;
+        }
+        document.getElementById('lista-pdfs').innerHTML = lista.map(pdf => {
+            const fecha = new Date(pdf.created_at).toLocaleDateString('es-ES');
+            return `
+                <div class="pdf-item-container" style="position:relative;">
+                    <button class="btn-delete-float" style="top:5px; left:5px; width:22px; height:22px; font-size:10px;" onclick="eliminarPDF(${pdf.id}, '${pdf.url}')">✖</button>
+                    <a href="${pdf.url}" target="_blank" class="pdf-item">
+                        <div class="pdf-icon">📄</div>
+                        <div class="pdf-info">
+                            <p class="pdf-nombre">${pdf.nombre}</p>
+                            <p class="pdf-fecha">Subido: ${fecha}</p>
+                        </div>
+                    </a>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function eliminarPDF(id, url) {
+        if(!confirm("¿Seguro que quieres borrar este patrón?")) return;
+
+        try {
+            // 1. Borrar de la base de datos
+            await client.from('pdfs_data').delete().eq('id', id);
+            
+            // 2. Opcional: Borrar el archivo físico del storage (requiere extraer el nombre de la URL)
+            // const fileName = url.split('/').pop();
+            // await client.storage.from('patrones_pdf').remove([fileName]);
+
+            alert("Patrón borrado.");
+            cargarPDFs();
+        } catch (error) {
+            console.error("Error borrando PDF:", error);
+        }
+    }
+
+    // --- FIN LOGICA PDFS ---
+
     async function guardarNuevo(tipo) {
         const idEdit = document.getElementById('m-id').value;
         const file = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo').files[0];
@@ -361,10 +483,13 @@
         document.getElementById('vista-INICIO').style.display = v === 'INICIO' ? 'block' : 'none';
         document.getElementById('vista-STOCK').style.display = v === 'STOCK' ? 'block' : 'none';
         document.getElementById('vista-PROYECTOS').style.display = v === 'PROYECTOS' ? 'block' : 'none';
-        document.getElementById('vista-PDFS').style.display = v === 'PDFS' ? 'block' : 'none'; // Vista PDFs
+        document.getElementById('vista-PDFS').style.display = v === 'PDFS' ? 'block' : 'none'; // Mostrar vista PDFs
         
         if(v === 'PROYECTOS') {
             setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
+        }
+        if(v === 'PDFS') {
+            cargarPDFs(); // Cargar lista al entrar
         }
     }
 
