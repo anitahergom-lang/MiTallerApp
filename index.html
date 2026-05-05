@@ -3,68 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mi Taller Rosa</title>
+    <title>Mi Taller Rosa - Premium</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --t: #4a4a4a; --br: #f1e1e5; --blue: #3498db; }
+        :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --t: #4a4a4a; --br: #f1e1e5; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--f); color: var(--t); margin: 0; padding: 15px; padding-bottom: 80px; }
         
+        /* Navegación */
         .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 50px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .btn-nav { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 40px; font-size: 11px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-nav.active { background: var(--pc); color: var(--s); border: 1px solid var(--p); }
 
-        /* Formulario */
-        .card-registro { background: var(--b); padding: 40px 25px; border-radius: 40px; border: 1px solid #f1e1e5; max-width: 450px; margin: 20px auto; box-shadow: 0 10px 40px rgba(255, 133, 162, 0.08); text-align: center; }
-        .titulo-form { color: var(--s); font-size: 24px; font-weight: bold; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        input, select { width: 100%; padding: 16px 20px; margin-bottom: 18px; border: 1.5px solid #eee; border-radius: 18px; box-sizing: border-box; font-size: 16px; color: #666; background: #fff; }
-        .btn-principal { background: var(--p); color: white; padding: 18px; border: none; border-radius: 20px; width: 100%; font-weight: bold; font-size: 16px; text-transform: uppercase; cursor: pointer; box-shadow: 0 5px 15px rgba(255, 133, 162, 0.3); }
-
-        /* Tarjetas con botones de acción */
-        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .item-card { background: var(--b); border-radius: 20px; border: 1px solid var(--br); overflow: hidden; display: flex; flex-direction: column; position: relative; }
+        /* Formulario Estilo Foto Nueva */
+        .card-registro { background: var(--b); padding: 30px; border-radius: 30px; border: 1px solid #f1e1e5; max-width: 500px; margin: 20px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+        .titulo-form { color: var(--s); font-size: 24px; font-weight: bold; margin-bottom: 25px; text-align: center; }
         
-        /* Botones superiores de la tarjeta */
-        .acciones-card { position: absolute; top: 8px; right: 8px; display: flex; gap: 5px; z-index: 10; }
-        .btn-accion { background: white; border: 1px solid var(--br); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .btn-borrar:hover { background: #fee; border-color: #f88; }
-        .btn-editar:hover { background: #eef; border-color: #88f; }
+        .label-input { color: var(--p); font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; display: block; text-align: left; }
+        
+        .row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .col { flex: 1; text-align: left; }
 
-        .foto-material { width: 100%; height: 130px; object-fit: cover; background: #fff0f3; display: flex; align-items: center; justify-content: center; font-size: 40px; }
-        .info-material { padding: 12px; text-align: center; }
-        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 5px; }
-        .btn-stock { background: var(--pc); border: none; color: var(--s); width: 28px; height: 28px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        input, select, textarea { 
+            width: 100%; padding: 14px 18px; border: 1.5px solid #fff5f7; border-radius: 15px; 
+            box-sizing: border-box; font-size: 15px; color: #666; background: #fffdfd; transition: 0.3s;
+        }
+        input:focus { outline: none; border-color: var(--p); background: #fff; }
+
+        .btn-principal { 
+            background: var(--p); color: white; padding: 18px; border: none; border-radius: 18px; 
+            width: 100%; font-weight: bold; font-size: 16px; text-transform: uppercase; 
+            cursor: pointer; margin-top: 20px; box-shadow: 0 5px 15px rgba(255, 133, 162, 0.2); 
+        }
+
+        /* Tarjetas Stock */
+        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        .item-card { background: var(--b); border-radius: 20px; border: 1px solid var(--br); overflow: hidden; position: relative; }
+        .acciones-card { position: absolute; top: 8px; right: 8px; display: flex; gap: 5px; z-index: 10; }
+        .btn-accion { background: white; border: 1px solid var(--br); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        
+        .foto-material { width: 100%; height: 120px; object-fit: cover; background: #fff0f3; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+        .info-material { padding: 10px; text-align: center; }
     </style>
 </head>
 <body>
 
     <div class="menu-secciones">
         <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
-        <button class="btn-nav" id="nav-MATERIALES" onclick="cambiarVista('MATERIALES')">📦 MATERIALES</button>
+        <button class="btn-nav" id="nav-MATERIALES" onclick="cambiarVista('MATERIALES')">📦 STOCK</button>
         <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
     </div>
 
-    <!-- SECCIÓN INICIO -->
+    <!-- SECCION INICIO (DISEÑO FOTO) -->
     <div id="seccion-inicio" class="card-registro">
         <div class="titulo-form" id="txt-titulo">✨ Nuevo Material</div>
-        <input type="hidden" id="m-id"> <!-- ID oculto para saber si editamos -->
-        
-        <input type="text" id="m-nombre" placeholder="Nombre (ej: Lana Azul)">
-        <select id="m-categoria">
-            <option value="Lana">Lana</option>
-            <option value="Telas">Telas</option>
-            <option value="Hilos">Hilos</option>
-            <option value="Accesorios">Accesorios</option>
-            <option value="Otros">Otros</option>
-        </select>
-        <input type="number" id="m-cantidad" value="1">
-        <input type="text" id="m-composicion" placeholder="Composición">
-        <input type="file" id="m-foto-archivo" accept="image/*">
+        <input type="hidden" id="m-id">
 
-        <button class="btn-principal" id="btn-guardar" onclick="ejecutarGuardado()">AÑADIR</button>
-        <button id="btn-cancelar" style="display:none; margin-top:10px; background:none; border:none; color:gray; cursor:pointer;" onclick="limpiarForm()">Cancelar Edición</button>
+        <label class="label-input">Nombre del Material</label>
+        <input type="text" id="m-nombre" placeholder="Ej: Algodón XL" style="margin-bottom:20px">
+
+        <div class="row">
+            <div class="col">
+                <label class="label-input">Categoría</label>
+                <select id="m-categoria">
+                    <option value="Lana">Lana</option>
+                    <option value="Telas">Telas</option>
+                    <option value="Hilos">Hilos</option>
+                </select>
+            </div>
+            <div class="col">
+                <label class="label-input">Cantidad</label>
+                <input type="number" id="m-cantidad" value="1">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <label class="label-input">Composición</label>
+                <input type="text" id="m-composicion" placeholder="Ej: 100% Algodón">
+            </div>
+            <div class="col">
+                <label class="label-input">Grosor</label>
+                <input type="text" id="m-grosor" placeholder="Ej: 3.5mm">
+            </div>
+        </div>
+
+        <label class="label-input">Tienda / Origen</label>
+        <input type="text" id="m-tienda" placeholder="Ej: Amazon, Tienda Local" style="margin-bottom:20px">
+
+        <label class="label-input">Foto (Opcional)</label>
+        <input type="file" id="m-foto-archivo" accept="image/*" style="margin-bottom:20px">
+
+        <label class="label-input">Notas</label>
+        <textarea id="m-notas" rows="3" placeholder="Añade algún detalle extra..."></textarea>
+
+        <button class="btn-principal" id="btn-guardar" onclick="ejecutarGuardado()">AÑADIR MATERIAL</button>
+        <button id="btn-cancelar" style="display:none; margin-top:10px; background:none; border:none; color:gray; width:100%; cursor:pointer;" onclick="limpiarForm()">Cancelar</button>
     </div>
 
-    <!-- SECCIÓN MATERIALES -->
+    <!-- SECCION STOCK -->
     <div id="seccion-materiales" style="display:none;">
         <div id="lista-stock" class="grid-estudio"></div>
     </div>
@@ -98,45 +134,33 @@
         document.getElementById('lista-stock').innerHTML = lanasCargadas.map(m => `
             <div class="item-card">
                 <div class="acciones-card">
-                    <button class="btn-accion btn-editar" onclick="editarMaterial(${m.id})">✏️</button>
-                    <button class="btn-accion btn-borrar" onclick="borrarMaterial(${m.id})">❌</button>
+                    <button class="btn-accion" onclick="editarMaterial(${m.id})">✏️</button>
+                    <button class="btn-accion" onclick="borrarMaterial(${m.id})">❌</button>
                 </div>
                 <div class="foto-material">${m.contenido ? `<img src="${m.contenido}" style="width:100%;height:100%;object-fit:cover;">` : '🧶'}</div>
                 <div class="info-material">
                     <h4 style="margin:0; font-size:13px;">${m.tipo_material}</h4>
-                    <div class="controles-stock">
-                        <button class="btn-stock" onclick="ajustarStock(${m.id}, -1)">-</button>
-                        <span style="font-weight:bold;">${m.cantidad}</span>
-                        <button class="btn-stock" onclick="ajustarStock(${m.id}, 1)">+</button>
-                    </div>
+                    <small>${m.cantidad} unidades</small>
                 </div>
             </div>
         `).join('');
     }
 
-    // --- FUNCIONES NUEVAS: EDITAR Y BORRAR ---
-
     function editarMaterial(id) {
-        const m = lanasCargadas.find(item => item.id === id);
-        if(!m) return;
-        
-        // Rellenar formulario
+        const m = lanasCargadas.find(i => i.id === id);
         document.getElementById('m-id').value = m.id;
         document.getElementById('m-nombre').value = m.tipo_material;
-        document.getElementById('m-categoria').value = m.categoria;
+        document.getElementById('m-categoria').value = m.categoria || 'Lana';
         document.getElementById('m-cantidad').value = m.cantidad;
-        document.getElementById('m-composicion').value = m.composicion;
-        
-        // Cambiar textos
-        document.getElementById('txt-titulo').innerText = "✏️ Editar Material";
+        document.getElementById('m-composicion').value = m.composicion || '';
+        document.getElementById('txt-titulo').innerText = "✏️ Editando...";
         document.getElementById('btn-guardar').innerText = "GUARDAR CAMBIOS";
         document.getElementById('btn-cancelar').style.display = "block";
-        
         cambiarVista('INICIO');
     }
 
     async function borrarMaterial(id) {
-        if(confirm("¿Seguro que quieres borrar este material?")) {
+        if(confirm("¿Borrar material?")) {
             await client.from('estudio_data').delete().eq('id', id);
             cargarStock();
         }
@@ -146,18 +170,9 @@
         document.getElementById('m-id').value = "";
         document.getElementById('m-nombre').value = "";
         document.getElementById('m-cantidad').value = "1";
-        document.getElementById('m-composicion').value = "";
         document.getElementById('txt-titulo').innerText = "✨ Nuevo Material";
-        document.getElementById('btn-guardar').innerText = "AÑADIR";
+        document.getElementById('btn-guardar').innerText = "AÑADIR MATERIAL";
         document.getElementById('btn-cancelar').style.display = "none";
-    }
-
-    async function ajustarStock(id, cambio) {
-        const m = lanasCargadas.find(item => item.id === id);
-        if(!m) return;
-        m.cantidad = Math.max(0, m.cantidad + cambio);
-        renderizarStock();
-        await client.from('estudio_data').update({ cantidad: m.cantidad }).eq('id', id);
     }
 
     async function ejecutarGuardado() {
@@ -182,16 +197,12 @@
         };
         if(urlFoto) datos.contenido = urlFoto;
 
-        let res;
-        if(id) {
-            res = await client.from('estudio_data').update(datos).eq('id', id);
-        } else {
-            res = await client.from('estudio_data').insert([datos]);
-        }
+        const { error } = id 
+            ? await client.from('estudio_data').update(datos).eq('id', id)
+            : await client.from('estudio_data').insert([datos]);
 
-        if (res.error) alert("Error al guardar");
+        if (error) alert("Error: Revisa las columnas de tu base de datos");
         else {
-            alert(id ? "¡Actualizado!" : "¡Añadido!");
             limpiarForm();
             cambiarVista('MATERIALES');
         }
