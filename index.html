@@ -100,12 +100,14 @@
                 <input type="number" id="m-cantidad" value="1">
             </div>
         </div>
+        <label>COMPOSICIÓN</label>
+        <input type="text" id="m-composicion" placeholder="Ej: 100% Algodón, 50% Lana 50% Acrílico">
         <label>TIENDA DONDE SE COMPRÓ</label>
         <input type="text" id="m-tienda" placeholder="Ej: Mercería del Barrio">
         <label>GROSOR / WPI</label>
         <input type="text" id="m-grosor" placeholder="Ej: Fingering, 3mm...">
         <label>NOTAS ADICIONALES</label>
-        <textarea id="m-notas" placeholder="Nº de lote, composición, etc..."></textarea>
+        <textarea id="m-notas" placeholder="Nº de lote, etc..."></textarea>
         <label>FOTO DEL MATERIAL</label>
         <input type="file" id="m-archivo" accept="image/*">
         <button id="btn-accion-stock" class="btn-grande" onclick="guardarNuevo('stock')">GUARDAR EN STOCK</button>
@@ -224,13 +226,10 @@
         if(v === 'PDFS') cargarPDFs();
     }
 
-    // --- LÓGICA DE FILTRADO STOCK (ARREGLO SOLICITADO) ---
+    // --- LÓGICA DE FILTRADO STOCK ---
     function filtrar(cat) {
-        // Actualizar UI de los botones de filtro
         document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('active'));
         document.getElementById('filtro-' + cat).classList.add('active');
-
-        // Filtrar la lista global
         if (cat === 'Todo') {
             renderizarStock(lanasGlobal);
         } else {
@@ -270,7 +269,6 @@
         `).join('');
     }
 
-    // --- EL RESTO DEL CÓDIGO PERMANECE IGUAL ---
     function renderizarProyectos(lista) {
         document.getElementById('lista-proyectos').innerHTML = lista.map(p => `
             <div class="item-card">
@@ -383,6 +381,7 @@
                 tipo_material: document.getElementById('m-nombre').value,
                 categoria: document.getElementById('m-categoria').value,
                 cantidad: parseInt(document.getElementById('m-cantidad').value),
+                composicion: document.getElementById('m-composicion').value,
                 tienda: document.getElementById('m-tienda').value,
                 grosor: document.getElementById('m-grosor').value,
                 notas: document.getElementById('m-notas').value
