@@ -1,3 +1,5 @@
+// SUSTITUYE la función cargarStock() actual por esta versión con subsecciones:
+
 async function cargarStock() {
     const { data, error } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
     
@@ -12,59 +14,43 @@ async function cargarStock() {
             return acc;
         }, {});
 
-        // 2. Emojis exactos recuperados
+        // 2. Definimos los emojis para cada subsección (puedes cambiarlos aquí)
         const emojisCat = {
-            "Telas": "👗",
-            "Otros": "🧸",
-            "Hilos": "🧵",
             "Lanas": "🧶",
-            "Accesorios": "🎀"
+            "Telas": "✂️",
+            "Accesorios": "📍",
+            "Otros": "📦"
         };
 
         // 3. Generamos el HTML con separadores de subsección
         let htmlFinal = "";
 
-        // Ordenamos las categorías para que siempre salgan igual
-        const ordenCategorias = ["Lanas", "Hilos", "Telas", "Accesorios", "Otros"];
-        
-        // Primero las categorías que conocemos en orden
-        ordenCategorias.forEach(cat => {
-            if (grupos[cat]) {
-                htmlFinal += generarBloqueCategoria(cat, emojisCat[cat], grupos[cat]);
-                delete grupos[cat]; // Para no repetir
-            }
-        });
-
-        // Si queda alguna categoría extra que no esté en la lista
         for (const cat in grupos) {
-            htmlFinal += generarBloqueCategoria(cat, "✨", grupos[cat]);
+            const emoji = emojisCat[cat] || "✨";
+            
+            // Añadimos el título de la subsección
+            htmlFinal += `
+                <div style="grid-column: 1 / -1; margin-top: 20px; border-bottom: 2px solid var(--pc); padding-bottom: 5px;">
+                    <h3 style="color: var(--s); margin: 0; font-size: 18px;">${emoji} ${cat}</h3>
+                </div>
+            `;
+
+            // Añadimos las tarjetas de esa subsección
+            htmlFinal += grupos[cat].map(m => `
+                <div class="item-card">
+                    <div class="foto-material">
+                        ${m.contenido ? `<img src="${m.contenido}" style="width:100%;height:100%;object-fit:cover;">` : '🧶'}
+                    </div>
+                    <div class="info-material">
+                        <h4>${m.tipo_material}</h4>
+                        <p>${m.composicion || ''} ${m.grosor ? '· '+m.grosor : ''}</p>
+                        <div class="badge-cantidad">${m.cantidad} uds</div>
+                        <button class="btn-edit" onclick="prepararEdicion(${m.id})">✏️ MODIFICAR</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
         document.getElementById('lista-stock').innerHTML = htmlFinal;
     }
-}
-
-// Función auxiliar para mantener el código limpio y no tocar el diseño
-function generarBloqueCategoria(nombre, emoji, items) {
-    let html = `
-        <div style="grid-column: 1 / -1; margin-top: 20px; border-bottom: 2px solid var(--pc); padding-bottom: 5px;">
-            <h3 style="color: var(--s); margin: 0; font-size: 18px;">${nombre} ${emoji}</h3>
-        </div>
-    `;
-
-    html += items.map(m => `
-        <div class="item-card">
-            <div class="foto-material">
-                ${m.contenido ? `<img src="${m.contenido}" style="width:100%;height:100%;object-fit:cover;">` : '🧶'}
-            </div>
-            <div class="info-material">
-                <h4>${m.tipo_material}</h4>
-                <p>${m.composicion || ''} ${m.grosor ? '· '+m.grosor : ''}</p>
-                <div class="badge-cantidad">${m.cantidad} uds</div>
-                <button class="btn-edit" onclick="prepararEdicion(${m.id})">✏️ MODIFICAR</button>
-            </div>
-        </div>
-    `).join('');
-    
-    return html;
 }
