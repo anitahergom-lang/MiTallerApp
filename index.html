@@ -30,11 +30,6 @@
         .btn-edit-float { position: absolute; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.7); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; z-index: 5; }
         .btn-delete-float { position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.7); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; z-index: 5; }
 
-        .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-top: 5px; }
-        .badge-idea { background: #e2e3e5; color: #383d41; }
-        .badge-proceso { background: #fff3cd; color: #856404; }
-        .badge-listo { background: #d4edda; color: #155724; }
-
         .card-form { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 500px; margin: 0 auto; margin-bottom: 20px; }
         label { display: block; font-size: 11px; color: var(--s); font-weight: 700; margin: 10px 0 4px 4px; }
         input, select, textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--br); box-sizing: border-box; font-size: 14px; background: var(--f); color: var(--txt); }
@@ -62,7 +57,6 @@
 <div id="vista-INICIO">
     <div class="card-form">
         <h2 id="titulo-form-stock" style="color:var(--s); text-align:center; margin-top:0;">📦 Añadir Material</h2>
-        <!-- Campo oculto para guardar el ID si estamos editando -->
         <input type="hidden" id="m-id">
         
         <label>NOMBRE DEL MATERIAL</label>
@@ -84,6 +78,9 @@
                 <input type="number" id="m-cantidad" value="1">
             </div>
         </div>
+
+        <label>COMPOSICIÓN</label>
+        <input type="text" id="m-composicion" placeholder="Ej: 100% Algodón, Lana Virgen...">
         
         <label>TIENDA DONDE SE COMPRÓ</label>
         <input type="text" id="m-tienda" placeholder="Ej: Mercería del Barrio">
@@ -92,7 +89,7 @@
         <input type="text" id="m-grosor" placeholder="Ej: Fingering, 3mm...">
         
         <label>NOTAS ADICIONALES</label>
-        <textarea id="m-notas" placeholder="Nº de lote, composición, etc..."></textarea>
+        <textarea id="m-notas" placeholder="Nº de lote, etc..."></textarea>
         
         <label>FOTO DEL MATERIAL</label>
         <input type="file" id="m-archivo" accept="image/*">
@@ -115,10 +112,10 @@
     <div id="lista-stock" class="grid-estudio"></div>
 </div>
 
-<!-- Resto de vistas se mantienen igual pero ocultas por defecto -->
-<div id="vista-PROYECTOS" style="display:none;"><p style="text-align:center;">Sección Proyectos</p></div>
-<div id="vista-PDFS" style="display:none;"><p style="text-align:center;">Sección PDFs</p></div>
-<div id="vista-REGALOS" style="display:none;"><p style="text-align:center;">Sección Regalos</p></div>
+<!-- Vistas vacías para mantener la estructura -->
+<div id="vista-PROYECTOS" style="display:none;"></div>
+<div id="vista-PDFS" style="display:none;"></div>
+<div id="vista-REGALOS" style="display:none;"></div>
 
 <script>
     const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
@@ -131,11 +128,9 @@
     function cambiarVista(v) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
         document.getElementById('nav-' + v).classList.add('active');
-        
         ['INICIO', 'STOCK', 'PROYECTOS', 'PDFS', 'REGALOS'].forEach(vista => {
             document.getElementById('vista-' + vista).style.display = (v === vista) ? 'block' : 'none';
         });
-
         if(v === 'STOCK') filtrar('Todo');
     }
 
@@ -148,7 +143,6 @@
         }
     }
 
-    // --- RENDERIZAR STOCK ---
     function renderizarStock(lista) {
         document.getElementById('lista-stock').innerHTML = lista.map(m => `
             <div class="item-card">
@@ -157,6 +151,7 @@
                 <img src="${m.contenido || 'https://via.placeholder.com/150?text=Sin+Foto'}" class="foto-material">
                 <div class="info-material">
                     <h4 style="font-size:12px; margin:5px 0;">${m.tipo_material}</h4>
+                    <p style="font-size:10px; color:var(--s); margin:2px 0;">${m.composicion || ''}</p>
                     <div class="controles-stock">
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
                         <span style="font-weight:bold">${m.cantidad}</span>
@@ -167,26 +162,24 @@
         `).join('');
     }
 
-    // --- FUNCIÓN DE MODIFICAR (LA QUE FALTABA) ---
+    // --- CARGAR EDICIÓN ---
     function cargarEdicion(id) {
         const item = lanasGlobal.find(m => m.id === id);
         if(!item) return;
 
-        // 1. Llenar el formulario con los datos actuales
         document.getElementById('m-id').value = item.id;
         document.getElementById('m-nombre').value = item.tipo_material;
         document.getElementById('m-categoria').value = item.categoria;
         document.getElementById('m-cantidad').value = item.cantidad;
+        document.getElementById('m-composicion').value = item.composicion || '';
         document.getElementById('m-tienda').value = item.tienda || '';
         document.getElementById('m-grosor').value = item.grosor || '';
         document.getElementById('m-notas').value = item.notas || '';
 
-        // 2. Cambiar textos del formulario
         document.getElementById('titulo-form-stock').innerText = "✏️ Editando Material";
         document.getElementById('btn-accion-stock').innerText = "ACTUALIZAR CAMBIOS";
         document.getElementById('btn-cancelar-stock').style.display = "block";
 
-        // 3. Saltamos a la pestaña INICIO para editar
         cambiarVista('INICIO');
     }
 
@@ -194,6 +187,7 @@
         document.getElementById('m-id').value = "";
         document.getElementById('m-nombre').value = "";
         document.getElementById('m-cantidad').value = "1";
+        document.getElementById('m-composicion').value = "";
         document.getElementById('m-tienda').value = "";
         document.getElementById('m-grosor').value = "";
         document.getElementById('m-notas').value = "";
@@ -204,7 +198,7 @@
         document.getElementById('btn-cancelar-stock').style.display = "none";
     }
 
-    // --- GUARDAR O ACTUALIZAR ---
+    // --- GUARDAR / ACTUALIZAR ---
     async function guardarNuevo(tipo) {
         if(tipo !== 'stock') return;
 
@@ -216,12 +210,12 @@
             tipo_material: nombre,
             categoria: document.getElementById('m-categoria').value,
             cantidad: parseInt(document.getElementById('m-cantidad').value),
+            composicion: document.getElementById('m-composicion').value,
             tienda: document.getElementById('m-tienda').value,
             grosor: document.getElementById('m-grosor').value,
             notas: document.getElementById('m-notas').value
         };
 
-        // Manejo de foto (opcional)
         const file = document.getElementById('m-archivo').files[0];
         if(file) {
             const fileName = `${Date.now()}_${file.name}`;
@@ -231,13 +225,11 @@
         }
 
         if(id) {
-            // ACTUALIZAR
             await client.from('estudio_data').update(datos).eq('id', id);
-            alert("¡Material actualizado! ✨");
+            alert("¡Actualizado! ✨");
         } else {
-            // INSERTAR
             await client.from('estudio_data').insert([datos]);
-            alert("¡Añadido al stock! 💖");
+            alert("¡Añadido! 💖");
         }
 
         limpiarFormularioStock();
@@ -245,17 +237,8 @@
         cambiarVista('STOCK');
     }
 
-    // --- FILTRADO ---
-    function filtrar(cat) {
-        document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
-        document.getElementById('f-' + cat).classList.add('active');
-        const filtrados = (cat === 'Todo') ? lanasGlobal : lanasGlobal.filter(m => m.categoria === cat);
-        renderizarStock(filtrados);
-    }
-
-    // --- ELIMINAR Y STOCK RÁPIDO ---
     async function eliminarStock(id) {
-        if(confirm("¿Seguro que quieres borrar este material? 🗑️")) {
+        if(confirm("¿Borrar material? 🗑️")) {
             await client.from('estudio_data').delete().eq('id', id);
             cargarDatos();
         }
@@ -266,6 +249,13 @@
         const nuevaCant = Math.max(0, item.cantidad + cambio);
         await client.from('estudio_data').update({ cantidad: nuevaCant }).eq('id', id);
         cargarDatos();
+    }
+
+    function filtrar(cat) {
+        document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
+        document.getElementById('f-' + cat).classList.add('active');
+        const filtrados = (cat === 'Todo') ? lanasGlobal : lanasGlobal.filter(m => m.categoria === cat);
+        renderizarStock(filtrados);
     }
 
     function toggleDarkMode() {
