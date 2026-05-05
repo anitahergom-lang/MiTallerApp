@@ -37,9 +37,18 @@
         input, select, textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--br); box-sizing: border-box; font-size: 14px; background: var(--f); color: var(--txt); }
         .btn-grande { width: 100%; background: var(--p); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; }
 
+        /* Mejora Cuadrícula y Herramientas */
         .canvas-container { background: white; border: 1px solid var(--br); border-radius: 15px; margin-top: 10px; position: relative; overflow: hidden; }
-        .canvas-base { display: block; width: 100%; height: 200px; cursor: crosshair; }
-        .canvas-cuerpos { height: 300px; background-color: #f9f9f9; background-image: linear-gradient(to right, #eee 1px, transparent 1px), linear-gradient(to bottom, #eee 1px, transparent 1px); background-size: 20px 20px; }
+        .canvas-base { display: block; width: 100%; height: 250px; cursor: crosshair; }
+        .canvas-grid { 
+            background-image: 
+                linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .canvas-tools { display: flex; gap: 5px; margin-top: 5px; }
+        .btn-tool { flex: 1; padding: 8px; font-size: 12px; border: 1px solid var(--br); border-radius: 8px; background: var(--b); cursor: pointer; }
+        .btn-tool.active { background: var(--pc); border-color: var(--p); }
 
         #dark-mode-toggle { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
     </style>
@@ -54,6 +63,7 @@
     <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
 </div>
 
+<!-- VISTA STOCK (Sin cambios) -->
 <div id="vista-STOCK">
     <div class="filtros-container">
         <button class="btn-filtro active" onclick="filtrar('Todo')">✨ Todo</button>
@@ -66,6 +76,7 @@
     <div id="lista-stock" class="grid-estudio"></div>
 </div>
 
+<!-- VISTA INICIO (Sin cambios) -->
 <div id="vista-INICIO" style="display:none;">
     <div class="card-form">
         <h2 style="color:var(--s); text-align:center; margin-top:0;">📦 Añadir Material</h2>
@@ -85,6 +96,7 @@
     </div>
 </div>
 
+<!-- VISTA PROYECTOS -->
 <div id="vista-PROYECTOS" style="display:none;">
     <div class="card-form" style="margin-bottom:20px;">
         <h2 style="color:var(--s); text-align:center; margin-top:0;">🧶 Nuevo Proyecto</h2>
@@ -102,17 +114,26 @@
         <label>NOTAS DEL PROYECTO</label>
         <textarea id="p-notas" placeholder="Escribe aquí el patrón, agujas usadas, etc..."></textarea>
 
-        <label>DIBUJO DEL PUNTO / ESQUEMA</label>
+        <!-- SECCIÓN DIBUJO DEL PUNTO CON CUADRÍCULA Y HERRAMIENTAS -->
+        <label>DIBUJO DEL PUNTO / ESQUEMA (CUADRÍCULA)</label>
         <div class="canvas-container">
-            <canvas id="canvas-punto" class="canvas-base"></canvas>
+            <canvas id="canvas-punto" class="canvas-base canvas-grid"></canvas>
         </div>
-        <button class="btn-nav" style="font-size: 8px; padding: 5px;" onclick="limpiarCanvas('canvas-punto')">Limpiar Dibujo</button>
+        <div class="canvas-tools">
+            <button class="btn-tool active" id="tool-pincel-punto" onclick="setTool('canvas-punto', 'pincel')">🖌️ Pincel</button>
+            <button class="btn-tool" id="tool-goma-punto" onclick="setTool('canvas-punto', 'goma')">🧽 Goma</button>
+            <button class="btn-tool" onclick="limpiarCanvas('canvas-punto')">🗑️ Borrar Todo</button>
+        </div>
 
         <label>DISEÑO SOBRE CUERPOS (BASE)</label>
         <div class="canvas-container">
-            <canvas id="canvas-cuerpos" class="canvas-base canvas-cuerpos"></canvas>
+            <canvas id="canvas-cuerpos" class="canvas-base"></canvas>
         </div>
-        <button class="btn-nav" style="font-size: 8px; padding: 5px;" onclick="limpiarCanvas('canvas-cuerpos')">Limpiar Diseño</button>
+        <div class="canvas-tools">
+            <button class="btn-tool active" id="tool-pincel-cuerpos" onclick="setTool('canvas-cuerpos', 'pincel')">🖌️ Pincel</button>
+            <button class="btn-tool" id="tool-goma-cuerpos" onclick="setTool('canvas-cuerpos', 'goma')">🧽 Goma</button>
+            <button class="btn-tool" onclick="limpiarCanvas('canvas-cuerpos')">🗑️ Borrar Todo</button>
+        </div>
 
         <label>FOTO FINAL</label>
         <input type="file" id="p-archivo" accept="image/*">
@@ -129,11 +150,23 @@
 
     let lanasGlobal = [];
     let proyectosGlobal = [];
+    let toolsState = { 'canvas-punto': 'pincel', 'canvas-cuerpos': 'pincel' };
+
+    function setTool(canvasId, tool) {
+        toolsState[canvasId] = tool;
+        const prefix = canvasId === 'canvas-punto' ? 'punto' : 'cuerpos';
+        document.getElementById(`tool-pincel-${prefix}`).classList.toggle('active', tool === 'pincel');
+        document.getElementById(`tool-goma-${prefix}`).classList.toggle('active', tool === 'goma');
+    }
 
     function iniciarCanvas(id) {
         const canvas = document.getElementById(id);
         const ctx = canvas.getContext('2d');
         let dibujando = false;
+
+        // Ajustar tamaño real del canvas al tamaño visual de la pantalla
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
 
         function empezar(e) { dibujando = true; dibujar(e); }
         function parar() { dibujando = false; ctx.beginPath(); }
@@ -144,9 +177,15 @@
             const x = (e.clientX || e.touches[0].clientX) - rect.left;
             const y = (e.clientY || e.touches[0].clientY) - rect.top;
 
-            ctx.lineWidth = 2;
+            ctx.lineWidth = toolsState[id] === 'goma' ? 15 : 2;
             ctx.lineCap = 'round';
-            ctx.strokeStyle = document.body.getAttribute('data-theme') === 'dark' ? '#ff85a2' : '#f06292';
+            
+            if (toolsState[id] === 'goma') {
+                ctx.globalCompositeOperation = 'destination-out'; // Esto borra realmente el trazo
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = document.body.getAttribute('data-theme') === 'dark' ? '#ff85a2' : '#f06292';
+            }
 
             ctx.lineTo(x, y);
             ctx.stroke();
@@ -250,8 +289,11 @@
         document.getElementById('vista-PROYECTOS').style.display = v === 'PROYECTOS' ? 'block' : 'none';
         
         if(v === 'PROYECTOS') {
-            iniciarCanvas('canvas-punto');
-            iniciarCanvas('canvas-cuerpos');
+            // Un pequeño delay para asegurar que el canvas es visible antes de iniciar
+            setTimeout(() => {
+                iniciarCanvas('canvas-punto');
+                iniciarCanvas('canvas-cuerpos');
+            }, 100);
         }
     }
 
