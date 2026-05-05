@@ -1,3 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mi Taller Rosa</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { 
+            --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --br: #f1e1e5; --txt: #444; 
+        }
+        [data-theme="dark"] {
+            --p: #ff85a2; --pc: #4a2b34; --s: #f06292; --f: #121212; --b: #1e1e1e; --br: #333333; --txt: #fce4ec;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--f); color: var(--txt); margin: 0; padding: 15px; padding-bottom: 80px; transition: 0.3s; }
+        
+        .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 50px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .btn-nav { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 40px; font-size: 10px; text-transform: uppercase; }
+        .btn-nav.active { background: var(--pc); color: var(--s); border: 1px solid var(--p); }
+
+        .filtros-container { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0 15px 0; scrollbar-width: none; }
+        .btn-filtro { white-space: nowrap; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--br); background: var(--b); color: var(--txt); font-size: 12px; cursor: pointer; font-weight: 600; }
+        .btn-filtro.active { background: var(--p); color: white; border-color: var(--p); }
+
+        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
+        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; }
+        .foto-material { width: 100%; height: 110px; object-fit: cover; }
+        .info-material { padding: 10px; text-align: center; }
+        
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-top: 5px; }
+        .badge-idea { background: #e2e3e5; color: #383d41; }
+        .badge-proceso { background: #fff3cd; color: #856404; }
+        .badge-listo { background: #d4edda; color: #155724; }
+
+        .card-form { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 500px; margin: 0 auto; }
+        label { display: block; font-size: 11px; color: var(--s); font-weight: 700; margin: 10px 0 4px 4px; }
+        input, select, textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--br); box-sizing: border-box; font-size: 14px; background: var(--f); color: var(--txt); }
+        textarea { height: 80px; resize: none; }
+        .btn-grande { width: 100%; background: var(--p); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; }
+
+        .canvas-container { background: white; border: 1px solid var(--br); border-radius: 15px; margin-top: 10px; position: relative; overflow: hidden; }
+        .canvas-base { display: block; width: 100%; height: 250px; cursor: crosshair; }
+        .canvas-grid { 
+            background-image: 
+                linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .canvas-tools { display: flex; gap: 5px; margin-top: 5px; margin-bottom: 15px; }
+        .btn-tool { flex: 1; padding: 8px; font-size: 12px; border: 1px solid var(--br); border-radius: 8px; background: var(--b); cursor: pointer; color: var(--txt); }
+        .btn-tool.active { background: var(--pc); border-color: var(--p); color: var(--s); }
+
+        #dark-mode-toggle { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        
+        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 5px; }
+        .btn-qty { background: var(--pc); border: none; width: 25px; height: 25px; border-radius: 50%; color: var(--s); font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<button id="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+
+<div class="menu-secciones">
+    <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
+    <button class="btn-nav" id="nav-STOCK" onclick="cambiarVista('STOCK')">📦 STOCK</button>
+    <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
+</div>
+
+<!-- VISTA INICIO -->
+<div id="vista-INICIO">
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">📦 Añadir Material</h2>
+        <label>NOMBRE DEL MATERIAL</label>
+        <input type="text" id="m-nombre" placeholder="Ej: Lana Merino Azul">
+        
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label>CATEGORÍA</label>
+                <select id="m-categoria">
+                    <option value="Lana">🧶 Lana</option>
+                    <option value="Telas">👗 Telas</option>
+                    <option value="Hilos">🧵 Hilos</option>
+                    <option value="Accesorios">🎀 Accesorios</option>
+                    <option value="Otros">🧸 Otros</option>
+                </select>
+            </div>
+            <div style="width:80px;">
+                <label>CANTIDAD</label>
+                <input type="number" id="m-cantidad" value="1">
+            </div>
+        </div>
+
+        <label>TIENDA DONDE SE COMPRÓ</label>
+        <input type="text" id="m-tienda" placeholder="Ej: Mercería del Barrio">
+
+        <label>GROSOR / WPI</label>
+        <input type="text" id="m-grosor" placeholder="Ej: Fingering, 3mm...">
+
+        <label>NOTAS ADICIONALES</label>
+        <textarea id="m-notas" placeholder="Nº de lote, composición, etc..."></textarea>
+        
+        <label>FOTO DEL MATERIAL</label>
+        <input type="file" id="m-archivo" accept="image/*">
+        
+        <button class="btn-grande" onclick="guardarNuevo('stock')">GUARDAR EN STOCK</button>
+    </div>
+</div>
+
+<!-- VISTA STOCK -->
+<div id="vista-STOCK" style="display:none;">
+    <div class="filtros-container">
+        <button class="btn-filtro active" onclick="filtrar('Todo')">✨ Todo</button>
+        <button class="btn-filtro" onclick="filtrar('Lana')">🧶 Lana</button>
+        <button class="btn-filtro" onclick="filtrar('Telas')">👗 Telas</button>
+        <button class="btn-filtro" onclick="filtrar('Hilos')">🧵 Hilos</button>
+        <button class="btn-filtro" onclick="filtrar('Accesorios')">🎀 Accesorios</button>
+        <button class="btn-filtro" onclick="filtrar('Otros')">🧸 Otros</button>
+    </div>
+    <div id="lista-stock" class="grid-estudio"></div>
+</div>
+
 <!-- VISTA PROYECTOS -->
 <div id="vista-PROYECTOS" style="display:none;">
     <div class="card-form" style="margin-bottom:20px;">
@@ -16,7 +137,6 @@
         <label>NOTAS DEL PROYECTO</label>
         <textarea id="p-notas" placeholder="Escribe aquí el patrón, agujas usadas, etc..."></textarea>
 
-        <!-- SECCIÓN DIBUJO DEL PUNTO -->
         <label>DIBUJO DEL PUNTO (CUADRÍCULA)</label>
         <div class="canvas-container">
             <canvas id="canvas-punto" class="canvas-base canvas-grid"></canvas>
@@ -26,10 +146,6 @@
             <button class="btn-tool" id="tool-goma-punto" onclick="setTool('canvas-punto', 'goma')">🧽 Goma</button>
             <button class="btn-tool" onclick="limpiarCanvas('canvas-punto')">🗑️ Borrar</button>
         </div>
-
-        <!-- NUEVA SECCIÓN: FOTO DE REFERENCIA DEL PUNTO -->
-        <label>SUBIR REFERENCIA DE PUNTO (FOTO)</label>
-        <input type="file" id="p-foto-punto" accept="image/*" style="margin-bottom:15px;">
 
         <label>DISEÑO SOBRE CUERPOS (BASE)</label>
         <div class="canvas-container">
@@ -41,10 +157,197 @@
             <button class="btn-tool" onclick="limpiarCanvas('canvas-cuerpos')">🗑️ Borrar</button>
         </div>
 
-        <label>FOTO FINAL DEL PROYECTO</label>
+        <label>FOTO FINAL</label>
         <input type="file" id="p-archivo" accept="image/*">
         
         <button class="btn-grande" style="background:#856404" onclick="guardarNuevo('proyecto')">CREAR PROYECTO</button>
     </div>
     <div id="lista-proyectos" class="grid-estudio"></div>
 </div>
+
+<script>
+    const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
+    const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
+    const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    let lanasGlobal = [];
+    let proyectosGlobal = [];
+    let toolsState = { 'canvas-punto': 'pincel', 'canvas-cuerpos': 'pincel' };
+
+    function setTool(canvasId, tool) {
+        toolsState[canvasId] = tool;
+        const prefix = canvasId === 'canvas-punto' ? 'punto' : 'cuerpos';
+        document.getElementById(`tool-pincel-${prefix}`).classList.toggle('active', tool === 'pincel');
+        document.getElementById(`tool-goma-${prefix}`).classList.toggle('active', tool === 'goma');
+    }
+
+    function iniciarCanvas(id) {
+        const canvas = document.getElementById(id);
+        const ctx = canvas.getContext('2d');
+        let dibujando = false;
+
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        function empezar(e) { dibujando = true; dibujar(e); }
+        function parar() { dibujando = false; ctx.beginPath(); }
+        
+        function dibujar(e) {
+            if (!dibujando) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+            ctx.lineWidth = toolsState[id] === 'goma' ? 15 : 2;
+            ctx.lineCap = 'round';
+            
+            if (toolsState[id] === 'goma') {
+                ctx.globalCompositeOperation = 'destination-out';
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = document.body.getAttribute('data-theme') === 'dark' ? '#ff85a2' : '#f06292';
+            }
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        canvas.addEventListener('mousedown', empezar);
+        canvas.addEventListener('mousemove', dibujar);
+        canvas.addEventListener('mouseup', parar);
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); empezar(e.touches[0]); });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); dibujar(e.touches[0]); });
+        canvas.addEventListener('touchend', parar);
+    }
+
+    function limpiarCanvas(id) {
+        const canvas = document.getElementById(id);
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    async function cargarDatos() {
+        const { data: stock } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
+        lanasGlobal = stock || [];
+        renderizarStock(lanasGlobal);
+
+        const { data: proy } = await client.from('proyectos_data').select('*').order('created_at', {ascending: false});
+        proyectosGlobal = proy || [];
+        renderizarProyectos(proyectosGlobal);
+    }
+
+    function renderizarStock(lista) {
+        document.getElementById('lista-stock').innerHTML = lista.map(m => `
+            <div class="item-card">
+                <img src="${m.contenido || 'https://via.placeholder.com/150?text=Sin+Foto'}" class="foto-material">
+                <div class="info-material">
+                    <h4>${m.tipo_material}</h4>
+                    <div class="controles-stock">
+                        <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
+                        <span style="font-weight:bold">${m.cantidad}</span>
+                        <button class="btn-qty" onclick="cambiarStock(${m.id}, 1)">+</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderizarProyectos(lista) {
+        document.getElementById('lista-proyectos').innerHTML = lista.map(p => `
+            <div class="item-card">
+                <img src="${p.foto || 'https://via.placeholder.com/150?text=Proyecto'}" class="foto-material">
+                <div class="info-material">
+                    <h4 style="margin-bottom:5px">${p.nombre}</h4>
+                    <span class="badge ${p.estado === 'Terminado' ? 'badge-listo' : (p.estado === 'Idea' ? 'badge-idea' : 'badge-proceso')}">${p.estado}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function guardarNuevo(tipo) {
+        const file = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo').files[0];
+        let fotoUrl = "";
+
+        if(file) {
+            const fileName = `${Date.now()}_${file.name}`;
+            await client.storage.from('fotos_estudio').upload(fileName, file);
+            const { data: urlData } = client.storage.from('fotos_estudio').getPublicUrl(fileName);
+            fotoUrl = urlData.publicUrl;
+        }
+
+        if(tipo === 'stock') {
+            await client.from('estudio_data').insert([{
+                tipo_material: document.getElementById('m-nombre').value,
+                categoria: document.getElementById('m-categoria').value,
+                cantidad: parseInt(document.getElementById('m-cantidad').value),
+                tienda: document.getElementById('m-tienda').value, // Nuevo campo
+                grosor: document.getElementById('m-grosor').value, // Nuevo campo
+                notas: document.getElementById('m-notas').value,   // Nuevo campo
+                contenido: fotoUrl
+            }]);
+        } else {
+            await client.from('proyectos_data').insert([{
+                nombre: document.getElementById('p-nombre').value,
+                estado: document.getElementById('p-estado').value,
+                notas: document.getElementById('p-notas').value,
+                foto: fotoUrl
+            }]);
+        }
+        alert("¡Guardado correctamente! 💖");
+        location.reload();
+    }
+
+    async function cambiarStock(id, n) {
+        const item = lanasGlobal.find(m => m.id === id);
+        await client.from('estudio_data').update({ cantidad: Math.max(0, (item.cantidad || 0) + n) }).eq('id', id);
+        cargarDatos();
+    }
+
+    function cambiarVista(v) {
+        document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
+        document.getElementById('nav-' + v).classList.add('active');
+        document.getElementById('vista-INICIO').style.display = v === 'INICIO' ? 'block' : 'none';
+        document.getElementById('vista-STOCK').style.display = v === 'STOCK' ? 'block' : 'none';
+        document.getElementById('vista-PROYECTOS').style.display = v === 'PROYECTOS' ? 'block' : 'none';
+        
+        if(v === 'PROYECTOS') {
+            setTimeout(() => {
+                iniciarCanvas('canvas-punto');
+                iniciarCanvas('canvas-cuerpos');
+            }, 100);
+        }
+    }
+
+    function filtrar(cat) {
+        document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        const filtrados = cat === 'Todo' ? lanasGlobal : lanasGlobal.filter(m => m.categoria === cat);
+        renderizarStock(filtrados);
+    }
+
+    function toggleDarkMode() {
+        const body = document.body;
+        const btn = document.getElementById('dark-mode-toggle');
+        if (body.getAttribute('data-theme') === 'dark') {
+            body.removeAttribute('data-theme');
+            btn.innerText = "🌙";
+            localStorage.setItem('theme', 'light');
+        } else {
+            body.setAttribute('data-theme', 'dark');
+            btn.innerText = "☀️";
+            localStorage.setItem('theme', 'dark');
+        }
+    }
+
+    window.onload = () => {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+            document.getElementById('dark-mode-toggle').innerText = "☀️";
+        }
+        cargarDatos();
+    };
+</script>
+</body>
+</html>
