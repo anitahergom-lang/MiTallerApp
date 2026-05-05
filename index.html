@@ -116,33 +116,83 @@
 <!-- VISTA STOCK -->
 <div id="vista-STOCK" style="display:none;">
     <div class="filtros-container">
-        <button class="btn-filtro active" onclick="filtrar('Todo')">✨ Todo</button>
-        <button class="btn-filtro" onclick="filtrar('Lana')">🧶 Lana</button>
-        <button class="btn-filtro" onclick="filtrar('Telas')">👗 Telas</button>
-        <button class="btn-filtro" onclick="filtrar('Hilos')">🧵 Hilos</button>
-        <button class="btn-filtro" onclick="filtrar('Accesorios')">🎀 Accesorios</button>
-        <button class="btn-filtro" onclick="filtrar('Otros')">🧸 Otros</button>
+        <button class="btn-filtro active" id="filtro-Todo" onclick="filtrar('Todo')">✨ Todo</button>
+        <button class="btn-filtro" id="filtro-Lana" onclick="filtrar('Lana')">🧶 Lana</button>
+        <button class="btn-filtro" id="filtro-Telas" onclick="filtrar('Telas')">👗 Telas</button>
+        <button class="btn-filtro" id="filtro-Hilos" onclick="filtrar('Hilos')">🧵 Hilos</button>
+        <button class="btn-filtro" id="filtro-Accesorios" onclick="filtrar('Accesorios')">🎀 Accesorios</button>
+        <button class="btn-filtro" id="filtro-Otros" onclick="filtrar('Otros')">🧸 Otros</button>
     </div>
     <div id="lista-stock" class="grid-estudio"></div>
 </div>
 
 <!-- VISTA PROYECTOS -->
 <div id="vista-PROYECTOS" style="display:none;">
-    <!-- ... (Contenido de proyectos) ... -->
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">✨ Nuevo Proyecto</h2>
+        <label>NOMBRE DEL PROYECTO</label>
+        <input type="text" id="p-nombre" placeholder="Ej: Jersey de Invierno">
+        <label>ESTADO</label>
+        <select id="p-estado">
+            <option value="Idea">💡 Idea</option>
+            <option value="En proceso">⏳ En proceso</option>
+            <option value="Terminado">✅ Terminado</option>
+        </select>
+        <label>NOTAS DEL PROYECTO</label>
+        <textarea id="p-notas" placeholder="Patrón, agujas usadas..."></textarea>
+        <label>DIBUJO DEL PUNTO</label>
+        <div class="canvas-container"><canvas id="canvas-punto" class="canvas-base canvas-grid"></canvas></div>
+        <div class="canvas-tools">
+            <button class="btn-tool active" id="tool-pincel-punto" onclick="setTool('canvas-punto', 'pincel')">🖌️ Pincel</button>
+            <button class="btn-tool" id="tool-goma-punto" onclick="setTool('canvas-punto', 'goma')">🧽 Goma</button>
+            <button class="btn-tool" onclick="limpiarCanvas('canvas-punto')">🗑️</button>
+        </div>
+        <label>DISEÑO SOBRE CUERPOS</label>
+        <div class="canvas-container"><canvas id="canvas-cuerpos" class="canvas-base"></canvas></div>
+        <div class="canvas-tools">
+            <button class="btn-tool active" id="tool-pincel-cuerpos" onclick="setTool('canvas-cuerpos', 'pincel')">🖌️ Pincel</button>
+            <button class="btn-tool" id="tool-goma-cuerpos" onclick="setTool('canvas-cuerpos', 'goma')">🧽 Goma</button>
+            <button class="btn-tool" onclick="limpiarCanvas('canvas-cuerpos')">🗑️</button>
+        </div>
+        <label>FOTO FINAL</label>
+        <input type="file" id="p-archivo" accept="image/*">
+        <button class="btn-grande" style="background:var(--p)" onclick="guardarNuevo('proyecto')">CREAR PROYECTO</button>
+    </div>
     <div id="lista-proyectos" class="grid-estudio"></div>
 </div>
 
 <!-- VISTA PDFS -->
 <div id="vista-PDFS" style="display:none;">
-    <!-- ... (Contenido de PDFs) ... -->
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">📂 Subir Patrón PDF</h2>
+        <label>NOMBRE DEL PATRÓN</label>
+        <input type="text" id="pdf-nombre" placeholder="Ej: Chal Susimiu">
+        <input type="file" id="pdf-archivo" accept=".pdf" style="margin-top:10px;">
+        <button class="btn-grande" style="background:var(--s)" onclick="subirPDF()">SUBIR A BIBLIOTECA</button>
+    </div>
     <div id="lista-pdfs"></div>
 </div>
 
 <!-- VISTA REGALOS -->
 <div id="vista-REGALOS" style="display:none;">
-    <!-- ... (Contenido de Regalos) ... -->
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">🎁 Regalos y Encargos</h2>
+        <label>¿PARA QUIÉN ES?</label>
+        <input type="text" id="reg-persona" placeholder="Nombre de la persona">
+        <label>¿QUÉ VAS A REGALAR/HACER?</label>
+        <input type="text" id="reg-detalle" placeholder="Ej: Manta de apego">
+        <label>GUSTOS Y PREFERENCIAS</label>
+        <textarea id="reg-preferencias" placeholder="Le gustan los colores pastel, odia la lana virgen..."></textarea>
+        <label>ENLAZAR DISEÑO (PROYECTO)</label>
+        <select id="reg-enlace-proyecto"><option value="">Ninguno</option></select>
+        <label>ENLAZAR PATRÓN PDF</label>
+        <select id="reg-enlace-pdf"><option value="">Ninguno</option></select>
+        <button class="btn-grande" style="background:var(--p)" onclick="guardarRegalo()">AÑADIR AL MAPA</button>
+    </div>
+    <h3 style="color:var(--s); padding-left:10px;">📍 Mapa de Regalos Pendientes</h3>
     <div id="lista-regalos-pendientes"></div>
-    <div id="lista-regalos-entregados"></div>
+    <h3 style="color:var(--txt); padding-left:10px; margin-top:30px; opacity:0.6;">✅ Entregados (Historial)</h3>
+    <div id="lista-regalos-entregados" style="opacity:0.6;"></div>
 </div>
 
 <script>
@@ -154,11 +204,13 @@
     let proyectosGlobal = [];
     let pdfsGlobal = [];
     let regalosGlobal = [];
+    let toolsState = { 'canvas-punto': 'pincel', 'canvas-cuerpos': 'pincel' };
 
     // --- NAVEGACIÓN ---
     function cambiarVista(v) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
-        document.getElementById('nav-' + v).classList.add('active');
+        const navBtn = document.getElementById('nav-' + v);
+        if(navBtn) navBtn.classList.add('active');
         
         document.getElementById('vista-INICIO').style.display = v === 'INICIO' ? 'block' : 'none';
         document.getElementById('vista-STOCK').style.display = v === 'STOCK' ? 'block' : 'none';
@@ -167,34 +219,37 @@
         document.getElementById('vista-REGALOS').style.display = v === 'REGALOS' ? 'block' : 'none';
         
         if(v === 'STOCK') filtrar('Todo');
+        if(v === 'PROYECTOS') setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
+        if(v === 'REGALOS') cargarRegalos();
+        if(v === 'PDFS') cargarPDFs();
     }
 
-    // --- LÓGICA DE STOCK Y FILTRADO ---
-    async function cargarDatos() {
-        const { data: stock } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
-        lanasGlobal = stock || [];
-        renderizarStock(lanasGlobal);
-        
-        const { data: proy } = await client.from('proyectos_data').select('*').order('created_at', {ascending: false});
-        proyectosGlobal = proy || [];
-        
-        const { data: pdfs } = await client.from('pdfs_data').select('*');
-        pdfsGlobal = pdfs || [];
-    }
+    // --- LÓGICA DE FILTRADO STOCK (ARREGLO SOLICITADO) ---
+    function filtrar(cat) {
+        // Actualizar UI de los botones de filtro
+        document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('filtro-' + cat).classList.add('active');
 
-    function filtrar(categoria) {
-        // Actualizar UI de botones
-        document.querySelectorAll('.btn-filtro').forEach(btn => {
-            btn.classList.toggle('active', btn.innerText.includes(categoria) || (categoria === 'Todo' && btn.innerText.includes('Todo')));
-        });
-
-        // Filtrar datos
-        if (categoria === 'Todo') {
+        // Filtrar la lista global
+        if (cat === 'Todo') {
             renderizarStock(lanasGlobal);
         } else {
-            const filtrados = lanasGlobal.filter(m => m.categoria === categoria);
+            const filtrados = lanasGlobal.filter(m => m.categoria === cat);
             renderizarStock(filtrados);
         }
+    }
+
+    // --- LÓGICA DE DATOS ---
+    async function cargarDatos() {
+        try {
+            const { data: stock } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
+            lanasGlobal = stock || [];
+            renderizarStock(lanasGlobal);
+            const { data: proy } = await client.from('proyectos_data').select('*').order('created_at', {ascending: false});
+            proyectosGlobal = proy || [];
+            renderizarProyectos(proyectosGlobal);
+            cargarPDFs();
+        } catch (e) { console.error(e); }
     }
 
     function renderizarStock(lista) {
@@ -215,25 +270,190 @@
         `).join('');
     }
 
-    async function cambiarStock(id, cambio) {
-        const item = lanasGlobal.find(l => l.id === id);
-        const nuevaCant = Math.max(0, item.cantidad + cambio);
-        await client.from('estudio_data').update({ cantidad: nuevaCant }).eq('id', id);
+    // --- EL RESTO DEL CÓDIGO PERMANECE IGUAL ---
+    function renderizarProyectos(lista) {
+        document.getElementById('lista-proyectos').innerHTML = lista.map(p => `
+            <div class="item-card">
+                <img src="${p.foto || 'https://via.placeholder.com/150?text=Proyecto'}" class="foto-material">
+                <div class="info-material">
+                    <h4 style="margin-bottom:5px; font-size:13px;">${p.nombre}</h4>
+                    <span class="badge ${p.estado === 'Terminado' ? 'badge-listo' : (p.estado === 'Idea' ? 'badge-idea' : 'badge-proceso')}">${p.estado}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function cargarPDFs() {
+        const { data } = await client.from('pdfs_data').select('*').order('created_at', {ascending: false});
+        pdfsGlobal = data || [];
+        document.getElementById('lista-pdfs').innerHTML = pdfsGlobal.map(pdf => `
+            <div class="pdf-item-container" style="position:relative;">
+                <button class="btn-delete-float" style="top:5px; left:5px; width:22px; height:22px; font-size:10px;" onclick="eliminarPDF(${pdf.id})">✖</button>
+                <a href="${pdf.url}" target="_blank" class="pdf-item">
+                    <div class="pdf-icon">📄</div>
+                    <div class="pdf-info">
+                        <p class="pdf-nombre">${pdf.nombre}</p>
+                        <p class="pdf-fecha">Subido: ${new Date(pdf.created_at).toLocaleDateString()}</p>
+                    </div>
+                </a>
+            </div>
+        `).join('');
+    }
+
+    async function subirPDF() {
+        const nombre = document.getElementById('pdf-nombre').value;
+        const file = document.getElementById('pdf-archivo').files[0];
+        if(!nombre || !file) return alert("Faltan datos 🎀");
+        const fileName = `${Date.now()}_${file.name}`;
+        await client.storage.from('patrones_pdf').upload(fileName, file);
+        const { data: urlData } = client.storage.from('patrones_pdf').getPublicUrl(fileName);
+        await client.from('pdfs_data').insert([{ nombre, url: urlData.publicUrl }]);
+        alert("¡Patrón guardado!");
+        cargarPDFs();
+    }
+
+    async function cargarRegalos() {
+        const { data } = await client.from('regalos_data').select('*').order('created_at', {ascending: false});
+        regalosGlobal = data || [];
+        const selProy = document.getElementById('reg-enlace-proyecto');
+        const selPdf = document.getElementById('reg-enlace-pdf');
+        selProy.innerHTML = '<option value="">Ninguno</option>' + proyectosGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+        selPdf.innerHTML = '<option value="">Ninguno</option>' + pdfsGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+        renderizarRegalos();
+    }
+
+    function renderizarRegalos() {
+        const pendientes = regalosGlobal.filter(r => r.estado === 'Pendiente');
+        const entregados = regalosGlobal.filter(r => r.estado === 'Entregado');
+        const htmlRegalo = (r) => {
+            const proyEnlazado = proyectosGlobal.find(p => p.id == r.diseno_id);
+            const pdfEnlazado = pdfsGlobal.find(p => p.id == r.pdf_id);
+            return `
+                <div class="regalo-item">
+                    <div class="regalo-icon">🎁</div>
+                    <div class="regalo-info">
+                        <p class="regalo-nombre">Para: ${r.persona}</p>
+                        <p style="font-size:13px; margin:2px 0;">Regalo: ${r.detalle_regalo}</p>
+                        <div class="preferencias-box">Gustos: ${r.preferencias}</div>
+                        ${proyEnlazado ? `<span class="enlace-tag">🎨 Proyecto: ${proyEnlazado.nombre}</span>` : ''}
+                        ${pdfEnlazado ? `<span class="enlace-tag">📄 PDF: ${pdfEnlazado.nombre}</span>` : ''}
+                    </div>
+                    ${r.estado === 'Pendiente' ? `<button onclick="marcarEntregado(${r.id})" style="border:none; background:var(--p); color:white; border-radius:10px; padding:8px; cursor:pointer;">✨</button>` : ''}
+                </div>
+            `;
+        };
+        document.getElementById('lista-regalos-pendientes').innerHTML = pendientes.map(htmlRegalo).join('');
+        document.getElementById('lista-regalos-entregados').innerHTML = entregados.map(htmlRegalo).join('');
+    }
+
+    async function guardarRegalo() {
+        const persona = document.getElementById('reg-persona').value;
+        const detalle = document.getElementById('reg-detalle').value;
+        const prefs = document.getElementById('reg-preferencias').value;
+        const pId = document.getElementById('reg-enlace-proyecto').value;
+        const pdfId = document.getElementById('reg-enlace-pdf').value;
+        if(!persona || !detalle) return alert("Pon el nombre y lo que vas a regalar 🎀");
+        await client.from('regalos_data').insert([{
+            persona: persona, detalle_regalo: detalle, preferencias: prefs,
+            diseno_id: pId ? parseInt(pId) : null, pdf_id: pdfId ? parseInt(pdfId) : null, estado: 'Pendiente'
+        }]);
+        alert("¡Regalo añadido! 💖");
+        cargarRegalos();
+    }
+
+    async function marcarEntregado(id) {
+        if(confirm("¿Ya lo has entregado? ✨")) {
+            await client.from('regalos_data').update({ estado: 'Entregado' }).eq('id', id);
+            cargarRegalos();
+        }
+    }
+
+    async function guardarNuevo(tipo) {
+        const idEdit = document.getElementById('m-id').value;
+        const fileInput = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo');
+        let fotoUrl = "";
+        if(fileInput.files[0]) {
+            const f = fileInput.files[0];
+            const name = `${Date.now()}_${f.name}`;
+            await client.storage.from('fotos_estudio').upload(name, f);
+            fotoUrl = client.storage.from('fotos_estudio').getPublicUrl(name).data.publicUrl;
+        }
+        if(tipo === 'stock') {
+            const datos = {
+                tipo_material: document.getElementById('m-nombre').value,
+                categoria: document.getElementById('m-categoria').value,
+                cantidad: parseInt(document.getElementById('m-cantidad').value),
+                tienda: document.getElementById('m-tienda').value,
+                grosor: document.getElementById('m-grosor').value,
+                notas: document.getElementById('m-notas').value
+            };
+            if(fotoUrl) datos.contenido = fotoUrl;
+            if(idEdit) await client.from('estudio_data').update(datos).eq('id', idEdit);
+            else await client.from('estudio_data').insert([datos]);
+        } else {
+            await client.from('proyectos_data').insert([{
+                nombre: document.getElementById('p-nombre').value,
+                estado: document.getElementById('p-estado').value,
+                notas: document.getElementById('p-notas').value,
+                foto: fotoUrl
+            }]);
+        }
+        alert("¡Guardado! 💖");
         cargarDatos();
+        cambiarVista(tipo === 'stock' ? 'STOCK' : 'PROYECTOS');
     }
 
     async function eliminarStock(id) {
-        if(confirm("¿Seguro que quieres eliminarlo?")) {
+        if(confirm("¿Borrar material?")) {
             await client.from('estudio_data').delete().eq('id', id);
             cargarDatos();
         }
     }
 
-    function toggleDarkMode() {
-        const isDark = document.body.getAttribute('data-theme') === 'dark';
-        document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-        localStorage.setItem('theme', isDark ? 'light' : 'dark');
+    async function cambiarStock(id, cambio) {
+        const item = lanasGlobal.find(l => l.id === id);
+        const n = Math.max(0, item.cantidad + cambio);
+        await client.from('estudio_data').update({ cantidad: n }).eq('id', id);
+        cargarDatos();
     }
+
+    function toggleDarkMode() {
+        const body = document.body;
+        const current = body.getAttribute('data-theme');
+        if(current === 'dark') { body.removeAttribute('data-theme'); localStorage.setItem('theme', 'light'); }
+        else { body.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); }
+    }
+
+    function iniciarCanvas(id) {
+        const canvas = document.getElementById(id);
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+        let paint = false;
+        const getPos = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            return { x: (e.clientX || e.touches[0].clientX) - rect.left, y: (e.clientY || e.touches[0].clientY) - rect.top };
+        };
+        const start = (e) => { paint = true; draw(e); };
+        const end = () => { paint = false; ctx.beginPath(); };
+        const draw = (e) => {
+            if(!paint) return;
+            const pos = getPos(e);
+            ctx.lineWidth = toolsState[id] === 'goma' ? 15 : 2;
+            ctx.lineCap = 'round';
+            ctx.globalCompositeOperation = toolsState[id] === 'goma' ? 'destination-out' : 'source-over';
+            ctx.strokeStyle = '#f06292';
+            ctx.lineTo(pos.x, pos.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
+        };
+        canvas.onmousedown = start; canvas.onmousemove = draw; canvas.onmouseup = end;
+        canvas.ontouchstart = start; canvas.ontouchmove = draw; canvas.ontouchend = end;
+    }
+    
+    function setTool(id, t) { 
+        toolsState[id] = t; 
+        document.querySelectorAll(`#tool-pincel-${id.split('-')[1]}, #tool-goma-${id.split('-')[1]}`).forEach(b => b.classList.remove('active'));
+        document.getElementById(`tool-${t}-${id.split('-')[1]}`).classList.add('active');
+    }
+    function limpiarCanvas(id) { const c = document.getElementById(id); c.getContext('2d').clearRect(0,0,c.width,c.height); }
 
     window.onload = () => {
         if(localStorage.getItem('theme') === 'dark') document.body.setAttribute('data-theme', 'dark');
