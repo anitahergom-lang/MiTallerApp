@@ -27,23 +27,20 @@
         .foto-material { width: 100%; height: 110px; object-fit: cover; }
         .info-material { padding: 10px; text-align: center; }
         
-        /* BOTÓN DE EDICIÓN ESTILO FOTO REFERENCIA */
+        /* BOTONES FLOTANTES */
         .btn-edit-float { 
-            position: absolute; 
-            top: 10px; 
-            right: 10px; 
-            background: rgba(0, 0, 0, 0.7); 
-            color: white; 
-            border: none; 
-            width: 32px; 
-            height: 32px; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            cursor: pointer; 
-            font-size: 16px;
-            z-index: 5;
+            position: absolute; top: 10px; right: 10px; 
+            background: rgba(0, 0, 0, 0.7); color: white; border: none; 
+            width: 30px; height: 30px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; font-size: 14px; z-index: 5;
+        }
+        .btn-delete-float { 
+            position: absolute; top: 10px; left: 10px; 
+            background: rgba(255, 0, 0, 0.7); color: white; border: none; 
+            width: 30px; height: 30px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; font-size: 14px; z-index: 5;
         }
 
         .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-top: 5px; }
@@ -89,7 +86,7 @@
 <div id="vista-INICIO">
     <div class="card-form">
         <h2 id="titulo-formulario" style="color:var(--s); text-align:center; margin-top:0;">📦 Añadir Material</h2>
-        <input type="hidden" id="m-id"> <!-- Campo oculto para el ID si editamos -->
+        <input type="hidden" id="m-id">
         
         <label>NOMBRE DEL MATERIAL</label>
         <input type="text" id="m-nombre" placeholder="Ej: Lana Merino Azul">
@@ -204,10 +201,8 @@
         let dibujando = false;
         canvas.width = canvas.offsetWidth;
         canvas.height = canvas.offsetHeight;
-
         function empezar(e) { dibujando = true; dibujar(e); }
         function parar() { dibujando = false; ctx.beginPath(); }
-        
         function dibujar(e) {
             if (!dibujando) return;
             const rect = canvas.getBoundingClientRect();
@@ -220,15 +215,9 @@
                 ctx.globalCompositeOperation = 'source-over';
                 ctx.strokeStyle = document.body.getAttribute('data-theme') === 'dark' ? '#ff85a2' : '#f06292';
             }
-            ctx.lineTo(x, y);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x, y);
+            ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y);
         }
-
-        canvas.addEventListener('mousedown', empezar);
-        canvas.addEventListener('mousemove', dibujar);
-        canvas.addEventListener('mouseup', parar);
+        canvas.addEventListener('mousedown', empezar); canvas.addEventListener('mousemove', dibujar); canvas.addEventListener('mouseup', parar);
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); empezar(e.touches[0]); });
         canvas.addEventListener('touchmove', (e) => { e.preventDefault(); dibujar(e.touches[0]); });
         canvas.addEventListener('touchend', parar);
@@ -244,7 +233,6 @@
         const { data: stock } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
         lanasGlobal = stock || [];
         renderizarStock(lanasGlobal);
-
         const { data: proy } = await client.from('proyectos_data').select('*').order('created_at', {ascending: false});
         proyectosGlobal = proy || [];
         renderizarProyectos(proyectosGlobal);
@@ -253,6 +241,7 @@
     function renderizarStock(lista) {
         document.getElementById('lista-stock').innerHTML = lista.map(m => `
             <div class="item-card">
+                <button class="btn-delete-float" onclick="eliminarStock(${m.id})">✖</button>
                 <button class="btn-edit-float" onclick="cargarEdicion(${m.id})">✏️</button>
                 <img src="${m.contenido || 'https://via.placeholder.com/150?text=Sin+Foto'}" class="foto-material">
                 <div class="info-material">
@@ -267,11 +256,17 @@
         `).join('');
     }
 
-    // FUNCIÓN PARA CARGAR LOS DATOS EN EL FORMULARIO
+    // FUNCIÓN PARA ELIMINAR
+    async function eliminarStock(id) {
+        if(confirm("¿Estás segura de que quieres eliminar este material? 🎀")) {
+            await client.from('estudio_data').delete().eq('id', id);
+            cargarDatos();
+        }
+    }
+
     function cargarEdicion(id) {
         const item = lanasGlobal.find(m => m.id === id);
         if(!item) return;
-
         document.getElementById('m-id').value = item.id;
         document.getElementById('m-nombre').value = item.tipo_material;
         document.getElementById('m-categoria').value = item.categoria;
@@ -279,11 +274,9 @@
         document.getElementById('m-tienda').value = item.tienda || "";
         document.getElementById('m-grosor').value = item.grosor || "";
         document.getElementById('m-notas').value = item.notas || "";
-        
         document.getElementById('titulo-formulario').innerText = "✏️ Modificar Material";
         document.getElementById('btn-accion-stock').innerText = "ACTUALIZAR CAMBIOS";
         document.getElementById('btn-cancelar-edit').style.display = "block";
-        
         cambiarVista('INICIO');
     }
 
@@ -315,14 +308,12 @@
         const idEdit = document.getElementById('m-id').value;
         const file = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo').files[0];
         let fotoUrl = "";
-
         if(file) {
             const fileName = `${Date.now()}_${file.name}`;
             await client.storage.from('fotos_estudio').upload(fileName, file);
             const { data: urlData } = client.storage.from('fotos_estudio').getPublicUrl(fileName);
             fotoUrl = urlData.publicUrl;
         }
-
         if(tipo === 'stock') {
             const datos = {
                 tipo_material: document.getElementById('m-nombre').value,
@@ -333,12 +324,8 @@
                 notas: document.getElementById('m-notas').value
             };
             if(fotoUrl) datos.contenido = fotoUrl;
-
-            if(idEdit) {
-                await client.from('estudio_data').update(datos).eq('id', idEdit);
-            } else {
-                await client.from('estudio_data').insert([datos]);
-            }
+            if(idEdit) { await client.from('estudio_data').update(datos).eq('id', idEdit); } 
+            else { await client.from('estudio_data').insert([datos]); }
         } else {
             await client.from('proyectos_data').insert([{
                 nombre: document.getElementById('p-nombre').value,
@@ -364,10 +351,7 @@
         document.getElementById('vista-STOCK').style.display = v === 'STOCK' ? 'block' : 'none';
         document.getElementById('vista-PROYECTOS').style.display = v === 'PROYECTOS' ? 'block' : 'none';
         if(v === 'PROYECTOS') {
-            setTimeout(() => {
-                iniciarCanvas('canvas-punto');
-                iniciarCanvas('canvas-cuerpos');
-            }, 100);
+            setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
         }
     }
 
@@ -382,13 +366,9 @@
         const body = document.body;
         const btn = document.getElementById('dark-mode-toggle');
         if (body.getAttribute('data-theme') === 'dark') {
-            body.removeAttribute('data-theme');
-            btn.innerText = "🌙";
-            localStorage.setItem('theme', 'light');
+            body.removeAttribute('data-theme'); btn.innerText = "🌙"; localStorage.setItem('theme', 'light');
         } else {
-            body.setAttribute('data-theme', 'dark');
-            btn.innerText = "☀️";
-            localStorage.setItem('theme', 'dark');
+            body.setAttribute('data-theme', 'dark'); btn.innerText = "☀️"; localStorage.setItem('theme', 'dark');
         }
     }
 
