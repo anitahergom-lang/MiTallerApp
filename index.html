@@ -2,136 +2,81 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mi Taller Rosa</title>
+    <title>MI TALLER V2</title> <!-- CAMBIO DE TÍTULO PARA COMPROBAR -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --br: #f1e1e5; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--f); margin: 0; padding: 15px; padding-bottom: 80px; }
-        
-        .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 50px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 15px; }
-        .btn-nav { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 40px; font-size: 10px; text-transform: uppercase; }
-        .btn-nav.active { background: var(--pc); color: var(--s); border: 1px solid var(--p); }
-
-        /* NUEVA BARRA DE SUBSECCIONES */
-        .filtros-container { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0 15px 0; scrollbar-width: none; }
-        .btn-filtro { white-space: nowrap; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--br); background: white; color: #666; font-size: 12px; cursor: pointer; }
-        .btn-filtro.active { background: var(--p); color: white; border-color: var(--p); }
-
-        /* GRID DE TARJETAS MEDIANAS */
-        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
-        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; }
-        
-        /* BOTONES FLOTANTES (Lápiz y X) */
-        .acciones-flotantes { position: absolute; top: 6px; right: 6px; display: flex; gap: 4px; z-index: 10; }
-        .btn-mini { background: rgba(255,255,255,0.95); border: 1px solid var(--br); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-
-        .foto-material { width: 100%; height: 110px; object-fit: cover; background: #fff0f3; }
-        .info-material { padding: 10px; text-align: center; }
-        .info-material h4 { margin: 0 0 8px 0; color: #444; font-size: 13px; font-weight: 600; }
-
-        /* BOTONES + / - INTEGRADOS */
-        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 5px; }
-        .btn-qty { background: var(--pc); color: var(--s); border: none; width: 30px; height: 28px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
-        .qty-num { font-weight: bold; font-size: 14px; color: #333; min-width: 15px; }
+        :root { --p: #007bff; /* AZUL TEMPORAL PARA NOTAR EL CAMBIO */ --pc: #e7f1ff; --s: #0056b3; --f: #f8f9fa; --b: #ffffff; }
+        body { font-family: sans-serif; background: var(--f); padding: 15px; }
+        .menu-secciones { display: flex; gap: 10px; background: white; padding: 10px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .btn-nav { flex: 1; padding: 12px; border: none; border-radius: 40px; font-weight: bold; cursor: pointer; }
+        .btn-nav.active { background: var(--p); color: white; }
+        .filtros { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding: 5px; }
+        .btn-f { padding: 8px 15px; border-radius: 20px; border: 1px solid #ddd; background: white; cursor: pointer; white-space: nowrap; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .card { background: white; border-radius: 15px; overflow: hidden; border: 1px solid #eee; position: relative; }
+        .foto { width: 100%; height: 100px; object-fit: cover; }
+        .info { padding: 10px; text-align: center; }
+        .btns-stock { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 5px; }
+        .b-qty { background: #eee; border: none; width: 30px; height: 30px; border-radius: 5px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="menu-secciones">
-        <button class="btn-nav" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
-        <button class="btn-nav active" id="nav-STOCK" onclick="cambiarVista('STOCK')">📦 STOCK</button>
-        <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
+        <button class="btn-nav" onclick="v('I')">🏠 INICIO</button>
+        <button class="btn-nav active" onclick="v('S')">📦 STOCK</button>
+        <button class="btn-nav" onclick="v('P')">🎨 PROYECTOS</button>
     </div>
 
-    <!-- SECCIÓN CON NOMBRE NUEVO PARA FORZAR CARGA -->
-    <div id="seccion-stock-v2">
-        <div class="filtros-container">
-            <button class="btn-filtro active" onclick="filtrar('Todo')">✨ Todo</button>
-            <button class="btn-filtro" onclick="filtrar('Lana')">🧶 Lana</button>
-            <button class="btn-filtro" onclick="filtrar('Telas')">👗 Telas</button>
-            <button class="btn-filtro" onclick="filtrar('Hilos')">🧵 Hilos</button>
-            <button class="btn-filtro" onclick="filtrar('Otros')">🧸 Otros</button>
+    <div id="S">
+        <div class="filtros">
+            <button class="btn-f" onclick="f('Todo')">✨ Todo</button>
+            <button class="btn-f" onclick="f('Lana')">🧶 Lana</button>
+            <button class="btn-f" onclick="f('Telas')">👗 Telas</button>
         </div>
-        <div id="lista-stock" class="grid-estudio"></div>
+        <div id="lista" class="grid"></div>
     </div>
 
-    <div id="seccion-inicio" style="display:none; padding:20px;">
-        <div style="background:white; padding:25px; border-radius:30px; border:1px solid var(--br); max-width:450px; margin:0 auto;">
-            <h2 style="color:var(--s); text-align:center;">✨ Nuevo Material</h2>
-            <input type="text" id="m-nombre" placeholder="Nombre (ej. Mega Ball)" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #eee; border-radius:12px;">
-            <button onclick="guardar()" style="width:100%; background:var(--p); color:white; border:none; padding:15px; border-radius:15px; font-weight:bold;">AÑADIR</button>
-        </div>
-    </div>
-
-    <div id="seccion-proyectos" style="display:none; padding:20px;">
-        <div style="background:white; padding:20px; border-radius:25px; border:1px solid var(--br); text-align:center;">
-            <h2 style="color:var(--s);">🎨 Zona de Diseño</h2>
-            <div style="border:1px dashed var(--p); height:300px; border-radius:15px; background-color: #fcf8f9;">
-                <canvas id="canvas-cuerpo" style="width:100%; height:100%;"></canvas>
-            </div>
-        </div>
-    </div>
+    <div id="I" style="display:none; text-align:center;"><h2>Formulario Nuevo</h2></div>
+    <div id="P" style="display:none; text-align:center;"><h2>Proyectos</h2></div>
 
 <script>
-    const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
-    const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
-    const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const client = window.supabase.createClient('https://etcdefyqqlmmdzroqilh.supabase.co', 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP');
+    let datos = [];
 
-    let lanasGlobal = [];
-
-    function cambiarVista(v) {
-        document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
-        document.getElementById('nav-' + v).classList.add('active');
-        
-        document.getElementById('seccion-stock-v2').style.display = (v === 'STOCK') ? 'block' : 'none';
-        document.getElementById('seccion-inicio').style.display = (v === 'INICIO') ? 'block' : 'none';
-        document.getElementById('seccion-proyectos').style.display = (v === 'PROYECTOS') ? 'block' : 'none';
-        
-        if(v === 'STOCK') cargarDatos();
+    async function cargar() {
+        const { data } = await client.from('estudio_data').select('*');
+        datos = data || [];
+        render(datos);
     }
 
-    async function cargarDatos() {
-        const { data } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
-        lanasGlobal = data || [];
-        renderizar(lanasGlobal);
-    }
-
-    function renderizar(lista) {
-        const contenedor = document.getElementById('lista-stock');
-        contenedor.innerHTML = lista.map(m => `
-            <div class="item-card">
-                <div class="acciones-flotantes">
-                    <button class="btn-mini" onclick="alert('editar')">✏️</button>
-                    <button class="btn-mini" onclick="borrar(${m.id})">❌</button>
-                </div>
-                <img src="${m.contenido || ''}" class="foto-material">
-                <div class="info-material">
-                    <h4>${m.tipo_material}</h4>
-                    <div class="controles-stock">
-                        <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
-                        <span class="qty-num">${m.cantidad}</span>
-                        <button class="btn-qty" onclick="cambiarStock(${m.id}, 1)">+</button>
+    function render(l) {
+        document.getElementById('lista').innerHTML = l.map(m => `
+            <div class="card">
+                <img src="${m.contenido}" class="foto">
+                <div class="info">
+                    <div style="font-weight:bold; font-size:12px;">${m.tipo_material}</div>
+                    <div class="btns-stock">
+                        <button class="b-qty" onclick="cambiar(${m.id},-1)">-</button>
+                        <span>${m.cantidad}</span>
+                        <button class="b-qty" onclick="cambiar(${m.id},1)">+</button>
                     </div>
                 </div>
             </div>
         `).join('');
     }
 
-    async function cambiarStock(id, cambio) {
-        const item = lanasGlobal.find(m => m.id === id);
-        const nuevaCant = Math.max(0, item.cantidad + cambio);
-        await client.from('estudio_data').update({ cantidad: nuevaCant }).eq('id', id);
-        cargarDatos();
+    function v(id) {
+        ['I','S','P'].forEach(x => document.getElementById(x).style.display = x==id ? 'block' : 'none');
     }
 
-    function filtrar(cat) {
-        document.querySelectorAll('.btn-filtro').forEach(b => b.classList.toggle('active', b.innerText.includes(cat)));
-        const filtrados = (cat === 'Todo') ? lanasGlobal : lanasGlobal.filter(m => m.categoria === cat);
-        renderizar(filtrados);
+    async function cambiar(id, n) {
+        const item = datos.find(d => d.id === id);
+        await client.from('estudio_data').update({ cantidad: Math.max(0, item.cantidad + n) }).eq('id', id);
+        cargar();
     }
 
-    window.onload = cargarDatos;
+    window.onload = cargar;
 </script>
 </body>
 </html>
