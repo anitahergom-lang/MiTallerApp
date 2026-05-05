@@ -17,14 +17,12 @@
         
         .theme-toggle { position: fixed; top: calc(env(safe-area-inset-top) + 10px); right: 20px; z-index: 1001; background: var(--primario); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
-        /* Menú Principal */
         .menu-secciones { text-align: center; margin-bottom: 15px; background: var(--blanco); padding: 12px; border-radius: 15px; display: flex; justify-content: center; gap: 8px; position: sticky; top: env(safe-area-inset-top); z-index: 100; border: 1px solid var(--borde); }
         .btn-nav { padding: 10px 15px; font-weight: bold; border-radius: 10px; border: 1px solid var(--borde); cursor: pointer; background: var(--blanco); font-size: 12px; color: var(--texto); transition: 0.2s; flex: 1; max-width: 120px; }
         .btn-nav.active { background: #fdf5ff; border-color: var(--primario); color: var(--primario); box-shadow: 0 0 10px rgba(156, 39, 176, 0.1); }
         
-        /* Submenú de Filtros de Materiales */
-        .filtros-materiales { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0 15px 0; justify-content: center; }
-        .btn-filtro { padding: 6px 12px; font-size: 11px; border-radius: 20px; border: 1px solid var(--borde); background: var(--blanco); color: var(--texto); cursor: pointer; white-space: nowrap; }
+        .filtros-materiales { display: flex; gap: 8px; overflow-x: auto; padding: 5px 10px 15px 10px; justify-content: flex-start; -webkit-overflow-scrolling: touch; }
+        .btn-filtro { padding: 8px 14px; font-size: 12px; border-radius: 20px; border: 1px solid var(--borde); background: var(--blanco); color: var(--texto); cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 5px; shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .btn-filtro.active { background: var(--primario); color: white; border-color: var(--primario); }
 
         .contenedor-seccion { max-width: 900px; margin: auto; }
@@ -53,18 +51,15 @@
 
     <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">☀️</button>
     
-    <!-- MENU PRINCIPAL -->
     <div class="menu-secciones">
         <button class="btn-nav" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
         <button class="btn-nav" id="nav-MATERIALES" onclick="cambiarVista('MATERIALES')">📦 MATERIALES</button>
         <button class="btn-nav" id="nav-PROYECTOS" style="background:var(--secundario);color:white" onclick="cambiarVista('PROYECTOS')">📂 PROYECTOS</button>
     </div>
 
-    <!-- SUBMENU FILTROS (Solo visible en Materiales) -->
     <div id="contenedor-filtros" class="filtros-materiales" style="display:none;"></div>
 
     <div class="contenedor-seccion">
-        <!-- SECCION STOCK / MATERIALES -->
         <div id="seccion-stock">
             <div id="formulario-registro" class="seccion-diseno" style="margin-bottom: 30px; display: none;">
                 <h3 style="margin-top:0">📦 Registrar en Inventario</h3>
@@ -79,7 +74,6 @@
             <div id="lista-stock" class="grid-estudio"></div>
         </div>
 
-        <!-- SECCION PROYECTOS -->
         <div id="seccion-proyectos" style="display:none;">
             <div class="seccion-diseno">
                 <h2 style="text-align:center; color:var(--primario)">✨ NUEVO DISEÑO</h2>
@@ -106,6 +100,16 @@
     const ctx = canvas.getContext('2d');
     let pintando = false;
 
+    function obtenerEmoji(nombreCat) {
+        const n = nombreCat.toLowerCase();
+        if (n.includes('lana')) return '🧶';
+        if (n.includes('tela')) return '👗';
+        if (n.includes('hilo')) return '🧵';
+        if (n.includes('accesorio')) return '🎀';
+        if (n.includes('otro')) return '🧸';
+        return '📦';
+    }
+
     function toggleTheme() {
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
@@ -128,9 +132,10 @@
     }
 
     function renderFiltros() {
-        let html = `<button class="btn-filtro ${filtroActual === 'TODOS' ? 'active' : ''}" onclick="filtrarMateriales('TODOS')">Todo</button>`;
+        let html = `<button class="btn-filtro ${filtroActual === 'TODOS' ? 'active' : ''}" onclick="filtrarMateriales('TODOS')">✨ Todo</button>`;
         secciones.forEach(s => {
-            html += `<button class="btn-filtro ${filtroActual === s ? 'active' : ''}" onclick="filtrarMateriales('${s}')">${s}</button>`;
+            const emoji = obtenerEmoji(s);
+            html += `<button class="btn-filtro ${filtroActual === s ? 'active' : ''}" onclick="filtrarMateriales('${s}')">${emoji} ${s}</button>`;
         });
         document.getElementById('contenedor-filtros').innerHTML = html;
     }
@@ -170,12 +175,9 @@
         const esProyectos = v === 'PROYECTOS';
         const esInicio = v === 'INICIO';
 
-        // Mostrar/Ocultar secciones
         document.getElementById('seccion-stock').style.display = esProyectos ? 'none' : 'block';
         document.getElementById('seccion-proyectos').style.display = esProyectos ? 'block' : 'none';
         document.getElementById('formulario-registro').style.display = esInicio ? 'block' : 'none';
-        
-        // Mostrar filtros solo en la vista de Materiales
         document.getElementById('contenedor-filtros').style.display = esMateriales ? 'flex' : 'none';
 
         if (esMateriales) {
