@@ -9,16 +9,19 @@
         :root { --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --t: #4a4a4a; --br: #f1e1e5; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--f); color: var(--t); margin: 0; padding: 15px; padding-bottom: 80px; }
         
+        /* Menú Principal */
         .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 20px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .btn-nav { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 15px; font-size: 10px; text-transform: uppercase; }
         .btn-nav.active { background: var(--pc); color: var(--s); border-bottom: 3px solid var(--s); }
 
+        /* Tarjetas y Formulario */
         .card-registro { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 600px; margin: auto; margin-bottom: 20px; }
         .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--br); border-radius: 12px; font-size: 14px; box-sizing: border-box; background: #fff; }
         
         .label-f { font-size: 11px; font-weight: bold; color: var(--s); margin-left: 5px; text-transform: uppercase; display: block; margin-bottom: 4px; }
 
+        /* Listado Stock */
         .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
         .item-card { background: var(--b); border-radius: 20px; border: 1px solid var(--br); overflow: hidden; display: flex; flex-direction: column; }
         .foto-material { width: 100%; height: 140px; object-fit: cover; background: #fff0f3; display: flex; align-items: center; justify-content: center; font-size: 40px; }
@@ -68,12 +71,14 @@
 
         <label class="label-f">Tienda / Origen</label>
         <input type="text" id="m-tienda">
-        <label class="label-f">URL Foto (Opcional)</label>
-        <input type="text" id="m-foto">
+
+        <label class="label-f">Foto (Opcional)</label>
+        <input type="file" id="m-foto-archivo" accept="image/*">
+
         <label class="label-f">Notas</label>
         <textarea id="m-notas" rows="2"></textarea>
 
-        <button class="btn-principal" id="btn-guardar" onclick="guardarMaterial()">AÑADIR AL TALLER</button>
+        <button class="btn-principal" id="btn-guardar" onclick="ejecutarGuardado()">AÑADIR AL TALLER</button>
         <button id="btn-cancelar" style="display:none; margin-top:10px; width:100%; border:none; background:none; color:grey; cursor:pointer;" onclick="cancelarEdicion()">Cancelar cambios</button>
     </div>
 
@@ -86,8 +91,7 @@
     <div id="seccion-proyectos" style="display:none;">
         <div class="card-registro">
             <h3 style="text-align:center; color:var(--s); margin-top:0;">🎨 Mis Proyectos</h3>
-            <p style="text-align:center; font-size:12px; color:grey;">Aquí recuperaremos tus bocetos y patrones.</p>
-            <!-- Aquí irá el bloque de dibujo cuando lo ajustemos -->
+            <p style="text-align:center; font-size:12px; color:grey;">Sección protegida.</p>
         </div>
     </div>
 
@@ -107,7 +111,43 @@
         if(v === 'MATERIALES') cargarStock();
     }
 
-    async function guardarMaterial() {
+    async function subirFoto(archivo) {
+        if (!archivo) return null;
+        const extension = archivo.name.split('.').pop();
+        const nombreArchivo = `${Date.now()}.${extension}`;
+        
+        const { data, error } = await client.storage
+            .from('fotos-lanas')
+            .upload(nombreArchivo, archivo);
+
+        if (error) return null;
+
+        const { data: publicUrl } = client.storage
+            .from('fotos-lanas')
+            .getPublicUrl(nombreArchivo);
+
+        return publicUrl.publicUrl;
+    }
+
+    async function ejecutarGuardado() {
+        const btn = document.getElementById('btn-guardar');
+        btn.disabled = true;
+        btn.innerText = "SUBIENDO...";
+
+        const archivo = document.getElementById('m-foto-archivo').files[0];
+        let urlFoto = null;
+
+        if (archivo) {
+            urlFoto = await subirFoto(archivo);
+        }
+
+        await guardarMaterial(urlFoto);
+        
+        btn.disabled = false;
+        btn.innerText = document.getElementById('m-id').value ? "GUARDAR CAMBIOS" : "AÑADIR AL TALLER";
+    }
+
+    async function guardarMaterial(urlFoto) {
         const id = document.getElementById('m-id').value;
         const material = {
             tipo_material: document.getElementById('m-nombre').value,
@@ -116,9 +156,11 @@
             composicion: document.getElementById('m-composicion').value,
             grosor: document.getElementById('m-grosor').value,
             tienda: document.getElementById('m-tienda').value,
-            contenido: document.getElementById('m-foto').value,
             notas: document.getElementById('m-notas').value
         };
+
+        // Solo actualizamos la foto si se ha subido una nueva
+        if (urlFoto) material.contenido = urlFoto;
 
         if(!material.tipo_material) return alert("Falta el nombre");
 
@@ -128,7 +170,7 @@
         else {
             alert(id ? "Actualizado" : "Guardado");
             cancelarEdicion();
-            if(!id) limpiarForm();
+            limpiarForm();
         }
     }
 
@@ -142,7 +184,6 @@
         document.getElementById('m-composicion').value = m.composicion || "";
         document.getElementById('m-grosor').value = m.grosor || "";
         document.getElementById('m-tienda').value = m.tienda || "";
-        document.getElementById('m-foto').value = m.contenido || "";
         document.getElementById('m-notas').value = m.notas || "";
 
         document.getElementById('titulo-form').innerText = "✍️ Modificar Material";
