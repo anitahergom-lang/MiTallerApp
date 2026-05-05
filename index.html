@@ -199,16 +199,19 @@
 
         let fotoUrl = "";
         if (fotoFile) {
-            // Ajustado a "media" en minúsculas y limpieza de nombre de archivo
+            // USANDO "MEDIA" en mayúsculas como indica tu panel de políticas
             const fileName = `${Date.now()}_${fotoFile.name.replace(/\s+/g, '_')}`;
-            const { error: upErr } = await client.storage.from('media').upload(fileName, fotoFile);
+            const { error: upErr } = await client.storage.from('MEDIA').upload(fileName, fotoFile, {
+                contentType: fotoFile.type,
+                upsert: true
+            });
             
             if (!upErr) {
-                const { data } = client.storage.from('media').getPublicUrl(fileName);
+                const { data } = client.storage.from('MEDIA').getPublicUrl(fileName);
                 if (data) fotoUrl = data.publicUrl;
             } else {
                 console.error("Error al subir:", upErr);
-                return alert("Error al subir la imagen. Revisa las políticas de Supabase.");
+                return alert("Error al subir imagen. Prueba con otra foto o nombre corto.");
             }
         }
 
