@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mi Taller Rosa - Diseño de Moda</title>
+    <title>Mi Taller Rosa</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -15,48 +15,36 @@
             --blanco: #ffffff; 
             --texto: #4a4a4a; 
             --borde: #f1e1e5; 
-            --input-bg: #ffffff; 
         }
         [data-theme="dark"] { 
-            --fondo: #1a1617; --blanco: #2d2426; --texto: #fce4ec; --borde: #3d3436; --input-bg: #3d3436; --primario-claro: #4a1e28;
+            --fondo: #1a1617; --blanco: #2d2426; --texto: #fce4ec; --borde: #3d3436;
         }
         
-        body { font-family: 'Segoe UI', sans-serif; background: var(--fondo); padding: 20px; color: var(--texto); margin: 0; padding-top: calc(env(safe-area-inset-top) + 20px); transition: 0.3s; }
-        
-        .theme-toggle { position: fixed; top: calc(env(safe-area-inset-top) + 10px); right: 20px; z-index: 1001; background: var(--primario); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(255, 133, 162, 0.3); }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--fondo); padding: 20px; color: var(--texto); margin: 0; padding-top: calc(env(safe-area-inset-top) + 20px); }
         
         .menu-secciones { text-align: center; margin-bottom: 20px; background: var(--blanco); padding: 8px; border-radius: 20px; display: flex; justify-content: center; gap: 5px; position: sticky; top: env(safe-area-inset-top); z-index: 100; border: 1px solid var(--borde); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .btn-nav { padding: 12px 10px; font-weight: 600; border-radius: 15px; border: 2px solid transparent; cursor: pointer; background: transparent; font-size: 11px; color: #888; transition: 0.3s; flex: 1; text-transform: uppercase; }
-        .btn-nav.active { background: var(--primario-claro); color: var(--secundario); border-bottom: 3px solid var(--secundario); transform: translateY(-2px); }
+        .btn-nav { padding: 12px 10px; font-weight: 600; border-radius: 15px; border: 2px solid transparent; cursor: pointer; background: transparent; font-size: 11px; color: #888; flex: 1; }
+        .btn-nav.active { background: var(--primario-claro); color: var(--secundario); border-bottom: 3px solid var(--secundario); }
         
-        .filtros-materiales { display: flex; gap: 10px; overflow-x: auto; padding: 5px 10px 20px 10px; justify-content: flex-start; scrollbar-width: none; }
-        .btn-filtro { padding: 8px 16px; font-size: 13px; border-radius: 25px; border: 1px solid var(--borde); background: var(--blanco); color: var(--texto); cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
-        .btn-filtro.active { background: var(--secundario); color: white; border-color: var(--secundario); transform: scale(1.05); }
+        .filtros-materiales { display: flex; gap: 10px; overflow-x: auto; padding: 5px 10px 20px 10px; }
+        .btn-filtro { padding: 8px 16px; font-size: 13px; border-radius: 25px; border: 1px solid var(--borde); background: var(--blanco); cursor: pointer; white-space: nowrap; }
+        .btn-filtro.active { background: var(--secundario); color: white; }
 
-        .contenedor-seccion { max-width: 900px; margin: auto; }
-        .seccion-diseno { background: var(--blanco); border-radius: 25px; padding: 25px; border: 1px solid var(--borde); }
-        
-        input, select, textarea { width: 100%; padding: 14px; border: 1px solid var(--borde); border-radius: 12px; background: var(--input-bg); color: var(--texto); font-size: 15px; margin-bottom: 10px; outline: none; box-sizing: border-box; }
-        
-        .btn-principal { background: var(--primario); color: white; padding: 16px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; }
-        
         .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 10px; }
         .item-card { background: var(--blanco); padding: 12px; border-radius: 20px; border: 1px solid var(--borde); text-align: center; position: relative; }
-        .item-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 15px; background: #fff5f7; }
+        .item-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 15px; }
         
-        .btn-eliminar { position: absolute; top: -5px; right: -5px; background: #ff5252; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; z-index: 10; }
-        .btn-editar { position: absolute; top: -5px; left: -5px; background: #FFC107; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; z-index: 10; }
+        .btn-eliminar { position: absolute; top: -5px; right: -5px; background: #ff5252; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; }
+        .btn-editar { position: absolute; top: -5px; left: -5px; background: #FFC107; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; }
 
-        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 12px; }
-        .btn-qty { width: 32px; height: 32px; border-radius: 10px; border: none; background: var(--primario-claro); color: var(--secundario); font-weight: bold; cursor: pointer; }
+        input, select, textarea { width: 100%; padding: 14px; border: 1px solid var(--borde); border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; }
+        .btn-principal { background: var(--primario); color: white; padding: 16px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
 
-    <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">☀️</button>
-    
     <div class="menu-secciones">
-        <button class="btn-nav" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 Inicio</button>
+        <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 Inicio</button>
         <button class="btn-nav" id="nav-MATERIALES" onclick="cambiarVista('MATERIALES')">📦 Materiales</button>
         <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 Proyectos</button>
     </div>
@@ -65,41 +53,22 @@
 
     <div class="contenedor-seccion">
         <div id="seccion-stock">
-            <!-- Formulario de Registro -->
-            <div id="formulario-registro" class="seccion-diseno" style="margin-bottom: 30px; display: none;">
-                <h3 id="form-titulo" style="margin-top:0; color: var(--secundario);">🌸 Registro de Material</h3>
-                <input type="text" id="m-nombre" placeholder="Nombre (ej: Lana Merino Soft)">
+            <div id="formulario-registro" style="background: var(--blanco); padding: 20px; border-radius: 25px; margin-bottom: 20px; border: 1px solid var(--borde); display: none;">
+                <h3 id="form-titulo">🌸 Nuevo Material</h3>
+                <input type="text" id="m-nombre" placeholder="Nombre">
+                <select id="m-categoria" onchange="mostrarCamposExtra(this.value)"></select>
+                <input type="number" id="m-cantidad" placeholder="Cantidad" value="1">
                 
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <select id="m-categoria" onchange="mostrarCamposExtra(this.value)" style="flex: 1;"></select>
-                    <input type="number" id="m-cantidad" placeholder="Cant." value="1" style="width: 80px;">
+                <div id="campos-lana" style="display:none; background: var(--primario-claro); padding: 10px; border-radius: 15px; margin-bottom: 10px;">
+                    <input type="text" id="m-composicion" placeholder="Composición">
+                    <input type="text" id="m-grosor" placeholder="Grosor">
+                    <input type="text" id="m-tienda" placeholder="Tienda">
                 </div>
-
-                <div id="campos-lana" style="display:none; background: var(--primario-claro); padding: 15px; border-radius: 18px; margin-bottom: 15px; border: 1px dashed var(--secundario);">
-                    <input type="text" id="m-composicion" placeholder="🧶 Composición">
-                    <input type="text" id="m-grosor" placeholder="📏 Grosor">
-                    <input type="text" id="m-tienda" placeholder="📍 Lugar de compra">
-                    <select id="m-estado-uso" style="margin-top:10px; border: 1px solid var(--secundario);">
-                        <option value="🏠 En espera">🏠 En espera</option>
-                        <option value="📋 Asignada">📋 Asignada</option>
-                        <option value="🥢 En proceso">🥢 En proceso</option>
-                    </select>
-                </div>
-
-                <p style="font-size: 12px; color: #888; margin-bottom: 5px;">📸 Foto (Opcional):</p>
+                
                 <input type="file" id="m-foto" accept="image/*">
-                <button id="btn-guardar" class="btn-principal" onclick="subirMaterial()">AÑADIR AL TALLER</button>
-                <button id="btn-cancelar" style="display:none; background: #999; margin-top:10px;" class="btn-principal" onclick="cancelarEdicion()">CANCELAR</button>
+                <button id="btn-guardar" class="btn-principal" onclick="subirMaterial()">GUARDAR</button>
             </div>
             <div id="lista-stock" class="grid-estudio"></div>
-        </div>
-
-        <div id="seccion-proyectos" style="display:none;">
-            <!-- Contenido Proyectos Simplificado -->
-            <div class="seccion-diseno">
-                <h2 style="text-align:center; color:var(--secundario)">✨ BOCETOS</h2>
-                <div id="historial-proyectos" class="grid-estudio"></div>
-            </div>
         </div>
     </div>
 
@@ -113,8 +82,8 @@
     let editandoId = null;
 
     async function init() {
-        const { data } = await client.from('Secciones').select('nombre');
-        secciones = data ? data.map(s => s.nombre.trim()) : [];
+        const { data: dataSec } = await client.from('Secciones').select('nombre');
+        secciones = dataSec ? dataSec.map(s => s.nombre.trim()) : [];
         renderFiltros();
         renderSelect();
         await cargarStock();
@@ -129,58 +98,40 @@
 
     function renderStock(items) {
         document.getElementById('lista-stock').innerHTML = items.map(m => {
-            let infoExtra = "";
             const esLana = m.categoria && m.categoria.toLowerCase().includes('lana');
-            
-            if (m.notas && esLana) {
-                const partes = m.notas.split(' | ');
-                infoExtra = `
-                    <div style="font-size: 11px; color: #777; margin-top: 8px; text-align: left; background: #fffafb; padding: 8px; border-radius: 10px; border: 1px solid #fce4ec;">
-                        <div>✨ <b>Comp:</b> ${partes[0] || '-'}</div>
-                        <div>📏 <b>Grosor:</b> ${partes[1] || '-'}</div>
-                        <div>🛍️ <b>Tienda:</b> ${partes[2] || '-'}</div>
-                        <div style="margin-top:5px; color:var(--secundario); font-weight:bold;">${partes[3] || '🏠 En espera'}</div>
-                    </div>`;
+            let info = "";
+            if(esLana && m.notas) {
+                const p = m.notas.split(' | ');
+                info = `<div style="font-size:10px; color:#666; text-align:left;">${p[0] || ''} - ${p[1] || ''}</div>`;
             }
-            const imagenSrc = m.contenido || 'https://via.placeholder.com/150/f0f0f0/888888?text=Sin+Foto';
-            
             return `
             <div class="item-card">
                 <button class="btn-eliminar" onclick="eliminarProducto(${m.id})">×</button>
                 <button class="btn-editar" onclick="editarMaterial(${m.id})">✏️</button>
-                <img src="${imagenSrc}">
-                <div style="padding: 10px 5px">
-                    <strong style="font-size: 14px">${m.tipo_material}</strong>
-                    <div style="color:var(--secundario); font-size:10px;">${m.categoria || ''}</div>
-                    ${infoExtra}
-                    <div class="controles-stock">
-                        <button class="btn-qty" onclick="actualizarCant(${m.id},-1)">-</button>
-                        <span>${m.cantidad || 0}</span>
-                        <button class="btn-qty" onclick="actualizarCant(${m.id},1)">+</button>
-                    </div>
-                </div>
+                <img src="${m.contenido || 'https://via.placeholder.com/150'}">
+                <strong>${m.tipo_material}</strong>
+                ${info}
+                <div style="color:var(--secundario); font-weight:bold;">Cant: ${m.cantidad}</div>
             </div>`;
         }).join('');
     }
 
-    // FILTRO ARREGLADO: Más flexible
-    function filtrarMateriales(cat) {
-        // Actualizar botones
+    // EL FILTRO "TODOTERRENO"
+    function filtrarMateriales(catBusqueda) {
+        // Marcamos el botón activo
         document.querySelectorAll('.btn-filtro').forEach(btn => {
-            btn.classList.remove('active');
-            if(btn.innerText.includes(cat) || (cat === 'TODOS' && btn.innerText.includes('Todo'))) {
-                btn.classList.add('active');
-            }
+            btn.classList.toggle('active', btn.innerText.includes(catBusqueda) || (catBusqueda === 'TODOS' && btn.innerText.includes('Todo')));
         });
 
-        if (cat === 'TODOS') {
+        if (catBusqueda === 'TODOS') {
             renderStock(stockLocal);
         } else {
-            // Filtramos si la categoría CONTIENE el texto (ej: "Lanas" contiene "Lana")
+            // Buscamos si la palabra existe dentro del nombre de la categoría
+            // Esto arregla el fallo de "Lana" vs "Lanas" o " Lana"
             const filtrados = stockLocal.filter(i => {
-                const catItem = (i.categoria || "").toLowerCase().trim();
-                const catBusqueda = cat.toLowerCase().trim();
-                return catItem.includes(catBusqueda);
+                const categoriaDelProducto = (i.categoria || "").toLowerCase().trim();
+                const palabraBuscada = catBusqueda.toLowerCase().trim();
+                return categoriaDelProducto.includes(palabraBuscada);
             });
             renderStock(filtrados);
         }
@@ -195,84 +146,55 @@
     }
 
     function renderSelect() {
-        const sel = document.getElementById('m-categoria');
-        sel.innerHTML = secciones.map(s => `<option value="${s}">${s}</option>`).join('');
-    }
-
-    function mostrarCamposExtra(cat) {
-        document.getElementById('campos-lana').style.display = (cat.toLowerCase().includes('lana')) ? 'block' : 'none';
-    }
-
-    async function subirMaterial() {
-        const nombre = document.getElementById('m-nombre').value;
-        const categoria = document.getElementById('m-categoria').value;
-        const fotoFile = document.getElementById('m-foto').files[0];
-        if (!nombre) return alert("Pon un nombre");
-
-        let notasFinales = "";
-        if(categoria.toLowerCase().includes('lana')) {
-            notasFinales = `${document.getElementById('m-composicion').value || '-'} | ${document.getElementById('m-grosor').value || '-'} | ${document.getElementById('m-tienda').value || '-'} | ${document.getElementById('m-estado-uso').value}`;
-        }
-
-        const payload = { tipo_material: nombre, cantidad: parseInt(document.getElementById('m-cantidad').value), categoria: categoria, notas: notasFinales };
-
-        if (fotoFile) {
-            const fileName = `img_${Date.now()}`;
-            let { data } = await client.storage.from('media').upload(fileName, fotoFile);
-            if (data) payload.contenido = client.storage.from('media').getPublicUrl(fileName).data.publicUrl;
-        }
-
-        if(editandoId) { await client.from('estudio_data').update(payload).eq('id', editandoId); } 
-        else { await client.from('estudio_data').insert([payload]); }
-        location.reload();
-    }
-
-    function editarMaterial(id) {
-        const m = stockLocal.find(x => x.id === id);
-        if (!m) return;
-        editandoId = id;
-        cambiarVista('INICIO');
-        document.getElementById('form-titulo').innerText = "✏️ Editando Material";
-        document.getElementById('btn-guardar').innerText = "GUARDAR CAMBIOS";
-        document.getElementById('btn-cancelar').style.display = "block";
-        document.getElementById('m-nombre').value = m.tipo_material || '';
-        document.getElementById('m-cantidad').value = m.cantidad || 1;
-        document.getElementById('m-categoria').value = m.categoria || '';
-        mostrarCamposExtra(m.categoria || '');
-        if(m.categoria && m.categoria.toLowerCase().includes('lana')) {
-            const partes = m.notas ? m.notas.split(' | ') : [];
-            document.getElementById('m-composicion').value = partes[0] || '';
-            document.getElementById('m-grosor').value = partes[1] || '';
-            document.getElementById('m-tienda').value = partes[2] || '';
-            document.getElementById('m-estado-uso').value = partes[3] || '🏠 En espera';
-        }
+        document.getElementById('m-categoria').innerHTML = secciones.map(s => `<option value="${s}">${s}</option>`).join('');
     }
 
     function cambiarVista(v) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
         document.getElementById(`nav-${v}`).classList.add('active');
-        document.getElementById('seccion-stock').style.display = (v === 'PROYECTOS') ? 'none' : 'block';
-        document.getElementById('seccion-proyectos').style.display = (v === 'PROYECTOS') ? 'block' : 'none';
-        document.getElementById('formulario-registro').style.display = (v === 'INICIO') ? 'block' : 'none';
-        document.getElementById('contenedor-filtros').style.display = (v === 'MATERIALES') ? 'flex' : 'none';
+        document.getElementById('formulario-registro').style.display = (v === 'INICIO' ? 'block' : 'none');
+        document.getElementById('contenedor-filtros').style.display = (v === 'MATERIALES' ? 'flex' : 'none');
         if (v === 'MATERIALES') filtrarMateriales('TODOS');
+        if (v === 'INICIO') renderStock(stockLocal);
     }
 
-    async function eliminarProducto(id) {
-        if(confirm("¿Eliminar?")) { await client.from('estudio_data').delete().eq('id', id); location.reload(); }
-    }
+    async function subirMaterial() {
+        const nombre = document.getElementById('m-nombre').value;
+        const cat = document.getElementById('m-categoria').value;
+        if(!nombre) return alert("Pon un nombre");
 
-    async function actualizarCant(id, d) {
-        const i = stockLocal.find(x => x.id === id);
-        const nc = Math.max(0, (i.cantidad || 0) + d);
-        await client.from('estudio_data').update({ cantidad: nc }).eq('id', id);
+        const notas = `${document.getElementById('m-composicion').value} | ${document.getElementById('m-grosor').value} | ${document.getElementById('m-tienda').value} | 🏠 En espera`;
+        const payload = { tipo_material: nombre, categoria: cat, cantidad: document.getElementById('m-cantidad').value, notas: notas };
+
+        const file = document.getElementById('m-foto').files[0];
+        if(file) {
+            const name = `img_${Date.now()}`;
+            await client.storage.from('media').upload(name, file);
+            payload.contenido = client.storage.from('media').getPublicUrl(name).data.publicUrl;
+        }
+
+        if(editandoId) await client.from('estudio_data').update(payload).eq('id', editandoId);
+        else await client.from('estudio_data').insert([payload]);
+        
         location.reload();
     }
 
-    function toggleTheme() {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-        document.getElementById('themeBtn').innerText = isDark ? '☀️' : '🌙';
+    function mostrarCamposExtra(cat) {
+        document.getElementById('campos-lana').style.display = (cat.toLowerCase().includes('lana') ? 'block' : 'none');
+    }
+
+    async function eliminarProducto(id) {
+        if(confirm("¿Borrar?")) { await client.from('estudio_data').delete().eq('id', id); location.reload(); }
+    }
+
+    function editarMaterial(id) {
+        const m = stockLocal.find(x => x.id === id);
+        editandoId = id;
+        cambiarVista('INICIO');
+        document.getElementById('m-nombre').value = m.tipo_material;
+        document.getElementById('m-categoria').value = m.categoria;
+        document.getElementById('m-cantidad').value = m.cantidad;
+        mostrarCamposExtra(m.categoria);
     }
 
     init();
