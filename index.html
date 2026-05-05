@@ -199,25 +199,30 @@
 
         let fotoUrl = "";
         if (fotoFile) {
-            // Generamos nombre simple sin caracteres raros
             const extension = fotoFile.name.split('.').pop();
             const fileName = `img_${Date.now()}.${extension}`;
             
-            // Intento de subida con configuración simplificada
-            const { data: upData, error: upErr } = await client.storage
-                .from('MEDIA')
-                .upload(fileName, fotoFile, {
-                    cacheControl: '3600',
-                    upsert: false
-                });
+            // INTENTO 1: "media" en minúsculas
+            let { data: upData, error: upErr } = await client.storage
+                .from('media') 
+                .upload(fileName, fotoFile, { cacheControl: '3600', upsert: false });
             
             if (upErr) {
-                console.error("Error detallado:", upErr);
-                return alert("Error Supabase: " + (upErr.message || "Archivo demasiado grande o formato no soportado"));
+                // INTENTO 2: "MEDIA" en mayúsculas (por si acaso)
+                const { data: retryData, error: retryErr } = await client.storage
+                    .from('MEDIA')
+                    .upload(fileName, fotoFile);
+                
+                if (retryErr) {
+                    console.error("Error definitivo:", retryErr);
+                    return alert("Error Supabase: " + (retryErr.message || "Bucket no encontrado"));
+                }
+                const { data } = client.storage.from('MEDIA').getPublicUrl(fileName);
+                fotoUrl = data.publicUrl;
+            } else {
+                const { data } = client.storage.from('media').getPublicUrl(fileName);
+                fotoUrl = data.publicUrl;
             }
-
-            const { data } = client.storage.from('MEDIA').getPublicUrl(fileName);
-            if (data) fotoUrl = data.publicUrl;
         }
 
         const { error } = await client.from('estudio_data').insert([{
