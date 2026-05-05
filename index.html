@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mi Taller Rosa - Tres Cuerpos</title>
+    <title>Mi Taller Rosa</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { 
@@ -14,138 +14,162 @@
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--f); color: var(--txt); margin: 0; padding: 15px; padding-bottom: 80px; transition: 0.3s; }
         
+        /* Menú y Navegación */
         .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 50px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .btn-nav { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 40px; font-size: 10px; text-transform: uppercase; }
         .btn-nav.active { background: var(--pc); color: var(--s); border: 1px solid var(--p); }
 
+        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
         .card-form { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 500px; margin: 0 auto; }
-        label { display: block; font-size: 11px; color: var(--s); font-weight: 700; margin: 10px 0 4px 4px; }
         
-        .canvas-container { background: white; border: 1px solid var(--br); border-radius: 15px; margin-top: 10px; position: relative; overflow: hidden; height: 350px; }
-        canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+        label { display: block; font-size: 11px; color: var(--s); font-weight: 700; margin: 10px 0 4px 4px; }
+        input, select, textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--br); box-sizing: border-box; font-size: 14px; background: var(--f); color: var(--txt); }
+        
+        /* Ajustes Canvas */
+        .canvas-container { background: white; border: 1px solid var(--br); border-radius: 15px; margin-top: 10px; position: relative; overflow: hidden; height: 350px; touch-action: none; }
+        canvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
         
         .canvas-tools { display: flex; gap: 5px; margin-top: 5px; margin-bottom: 15px; }
         .btn-tool { flex: 1; padding: 8px; font-size: 12px; border: 1px solid var(--br); border-radius: 8px; background: var(--b); cursor: pointer; color: var(--txt); }
         .btn-tool.active { background: var(--pc); border-color: var(--p); color: var(--s); }
-        
+
         .btn-grande { width: 100%; background: var(--p); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; }
+        #dark-mode-toggle { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
+<button id="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+
 <div class="menu-secciones">
-    <button class="btn-nav active">🎨 DISEÑO</button>
+    <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
+    <button class="btn-nav" id="nav-STOCK" onclick="cambiarVista('STOCK')">📦 STOCK</button>
+    <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
 </div>
 
-<div class="card-form">
-    <h2 style="color:var(--s); text-align:center; margin-top:0;">Diseño 3 Cuerpos</h2>
-
-    <label>BOCETO SOBRE SILUETA</label>
-    <div class="canvas-container">
-        <!-- El canvas donde dibujaremos -->
-        <canvas id="canvas-cuerpos"></canvas>
+<div id="vista-INICIO">
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">📦 Añadir Material</h2>
+        <label>NOMBRE DEL MATERIAL</label>
+        <input type="text" id="m-nombre">
+        <label>CATEGORÍA</label>
+        <select id="m-categoria">
+            <option value="Lana">🧶 Lana</option>
+            <option value="Telas">👗 Telas</option>
+        </select>
+        <button class="btn-grande" onclick="guardarNuevo('stock')">GUARDAR EN STOCK</button>
     </div>
-    
-    <div class="canvas-tools">
-        <button class="btn-tool active" id="btn-pincel" onclick="cambiarHerramienta('pincel')">🖌️ Pincel</button>
-        <button class="btn-tool" id="btn-goma" onclick="cambiarHerramienta('goma')">🧽 Goma</button>
-        <button class="btn-tool" onclick="limpiar()">🗑️ Limpiar</button>
-    </div>
+</div>
 
-    <button class="btn-grande">GUARDAR DISEÑO</button>
+<div id="vista-PROYECTOS" style="display:none;">
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">✨ Nuevo Proyecto</h2>
+        <label>DISEÑO SOBRE SILUETA</label>
+        <div class="canvas-container">
+            <canvas id="canvas-cuerpos"></canvas>
+        </div>
+        <div class="canvas-tools">
+            <button class="btn-tool active" id="btn-pincel" onclick="cambiarHerramienta('pincel')">🖌️ Pincel</button>
+            <button class="btn-tool" id="btn-goma" onclick="cambiarHerramienta('goma')">🧽 Goma</button>
+            <button class="btn-tool" onclick="limpiarCanvas()">🗑️ Limpiar</button>
+        </div>
+        <button class="btn-grande">GUARDAR PROYECTO</button>
+    </div>
 </div>
 
 <script>
+    // --- LÓGICA DE NAVEGACIÓN ---
+    function cambiarVista(vista) {
+        document.getElementById('vista-INICIO').style.display = vista === 'INICIO' ? 'block' : 'none';
+        document.getElementById('vista-PROYECTOS').style.display = vista === 'PROYECTOS' ? 'block' : 'none';
+        document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
+        document.getElementById('nav-' + vista).classList.add('active');
+        if(vista === 'PROYECTOS') ajustarCanvas();
+    }
+
+    function toggleDarkMode() {
+        const body = document.body;
+        const currentTheme = body.getAttribute('data-theme');
+        body.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
+        document.getElementById('dark-mode-toggle').innerText = currentTheme === 'dark' ? '🌙' : '☀️';
+    }
+
+    // --- LÓGICA DEL CANVAS (CORREGIDA) ---
     const canvas = document.getElementById('canvas-cuerpos');
     const ctx = canvas.getContext('2d');
     let dibujando = false;
-    let herramientaActual = 'pincel';
+    let herramienta = 'pincel';
 
-    // LA IMAGEN EN BASE64 (Sustituye esta cadena por la larga que genera el convertidor si deseas otra)
-    // He puesto una silueta esquemática de 3 figuras como ejemplo integrado
+    // Imagen Base64 integrada
     const imgFondo = new Image();
-    imgFondo.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQAQMAAAC6ca9vAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAC5JREFUGBntwTEBAAAAwiD7p7bGDmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAK8At6AAAd76Z4gAAAAASUVORK5CYII='; 
-    // ^ Nota: He usado un placeholder. DEBES PEGAR AQUÍ TU CADENA LARGA si tienes una específica.
+    imgFondo.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQAQMAAAC6ca9vAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAC5JREFUGBntwTEBAAAAwiD7p7bGDmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAK8At6AAAd76Z4gAAAAASUVORK5CYII=';
 
-    function ajustarResolucion() {
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.height;
+    function ajustarCanvas() {
+        const container = canvas.parentElement;
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
         dibujarFondo();
     }
 
     function dibujarFondo() {
-        // Dibujamos la imagen de los cuerpos al fondo
         ctx.drawImage(imgFondo, 0, 0, canvas.width, canvas.height);
     }
 
-    imgFondo.onload = ajustarResolucion;
-    window.addEventListener('resize', ajustarResolucion);
-
-    // Lógica de dibujo
-    function empezarDibujo(e) {
-        dibujando = true;
-        ctx.beginPath();
-        const { x, y } = obtenerCoordenadas(e);
-        ctx.moveTo(x, y);
-    }
-
-    function dibujar(e) {
-        if (!dibujando) return;
-        e.preventDefault();
-        const { x, y } = obtenerCoordenadas(e);
-
-        ctx.lineWidth = herramientaActual === 'pincel' ? 3 : 20;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = herramientaActual === 'pincel' ? '#f06292' : '#ffffff';
-        
-        // Si es goma, usamos 'destination-out' para borrar o pintamos de blanco si el fondo es sólido
-        if(herramientaActual === 'goma') {
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.lineWidth = 30;
-        } else {
-            ctx.globalCompositeOperation = 'source-over';
-        }
-
-        ctx.lineTo(x, y);
-        ctx.stroke();
-    }
-
-    function detenerDibujo() {
-        dibujando = false;
-        ctx.globalCompositeOperation = 'source-over'; // Resetear para que el fondo no se borre
-    }
-
-    function obtenerCoordenadas(e) {
+    function obtenerPos(e) {
         const rect = canvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return {
-            x: clientX - rect.left,
-            y: clientY - rect.top
-        };
+        return { x: clientX - rect.left, y: clientY - rect.top };
     }
 
-    function cambiarHerramienta(tool) {
-        herramientaActual = tool;
-        document.getElementById('btn-pincel').classList.toggle('active', tool === 'pincel');
-        document.getElementById('btn-goma').classList.toggle('active', tool === 'goma');
+    function empezar(e) {
+        dibujando = true;
+        const pos = obtenerPos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
     }
 
-    function limpiar() {
+    function mover(e) {
+        if (!dibujando) return;
+        e.preventDefault();
+        const pos = obtenerPos(e);
+        
+        ctx.lineWidth = herramienta === 'pincel' ? 3 : 25;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = herramienta === 'pincel' ? '#f06292' : '#ffffff';
+        
+        // Efecto goma transparente sobre la imagen
+        if(herramienta === 'goma') ctx.globalCompositeOperation = 'destination-out';
+        else ctx.globalCompositeOperation = 'source-over';
+
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+    }
+
+    function parar() { 
+        dibujando = false; 
+        ctx.globalCompositeOperation = 'source-over';
+    }
+
+    function cambiarHerramienta(h) {
+        herramienta = h;
+        document.getElementById('btn-pincel').classList.toggle('active', h === 'pincel');
+        document.getElementById('btn-goma').classList.toggle('active', h === 'goma');
+    }
+
+    function limpiarCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         dibujarFondo();
     }
 
-    // Eventos de ratón y táctiles
-    canvas.addEventListener('mousedown', empezarDibujo);
-    canvas.addEventListener('mousemove', dibujar);
-    window.addEventListener('mouseup', detenerDibujo);
+    canvas.addEventListener('mousedown', empezar);
+    canvas.addEventListener('mousemove', mover);
+    window.addEventListener('mouseup', parar);
+    canvas.addEventListener('touchstart', empezar);
+    canvas.addEventListener('touchmove', mover);
+    canvas.addEventListener('touchend', parar);
 
-    canvas.addEventListener('touchstart', empezarDibujo);
-    canvas.addEventListener('touchmove', dibujar);
-    canvas.addEventListener('touchend', detenerDibujo);
-
+    imgFondo.onload = ajustarCanvas;
 </script>
 
 </body>
