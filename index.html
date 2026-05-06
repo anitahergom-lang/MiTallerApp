@@ -80,6 +80,7 @@
     <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
     <button class="btn-nav" id="nav-PDFS" onclick="cambiarVista('PDFS')">📂 PDFs</button>
     <button class="btn-nav" id="nav-REGALOS" onclick="cambiarVista('REGALOS')">🎁 REGALOS</button>
+    <button class="btn-nav" id="nav-NOTAS" onclick="cambiarVista('NOTAS')">📝 NOTAS</button>
 </div>
 
 <div id="vista-INICIO">
@@ -197,6 +198,18 @@
     <div id="lista-regalos-entregados" style="opacity:0.6;"></div>
 </div>
 
+<div id="vista-NOTAS" style="display:none;">
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">📝 Notas y Recordatorios</h2>
+        <label>TÍTULO</label>
+        <input type="text" id="n-titulo" placeholder="Ej: Ideas para colcha">
+        <label>CONTENIDO</label>
+        <textarea id="n-contenido" style="height:120px;" placeholder="Escribe aquí tus ideas..."></textarea>
+        <button class="btn-grande" style="background:var(--s)" onclick="guardarNota()">GUARDAR NOTA</button>
+    </div>
+    <div id="lista-notas"></div>
+</div>
+
 <script>
     const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
     const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
@@ -217,10 +230,12 @@
         document.getElementById('vista-PROYECTOS').style.display = v === 'PROYECTOS' ? 'block' : 'none';
         document.getElementById('vista-PDFS').style.display = v === 'PDFS' ? 'block' : 'none';
         document.getElementById('vista-REGALOS').style.display = v === 'REGALOS' ? 'block' : 'none';
+        document.getElementById('vista-NOTAS').style.display = v === 'NOTAS' ? 'block' : 'none';
         if(v === 'STOCK') filtrar('Todo');
         if(v === 'PROYECTOS') setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
         if(v === 'REGALOS') cargarRegalos();
         if(v === 'PDFS') cargarPDFs();
+        if(v === 'NOTAS') cargarNotas();
     }
 
     function filtrar(cat) {
@@ -299,7 +314,6 @@
         document.getElementById('btn-cancelar-edit').style.display = "none";
     }
 
-    /* FUNCIÓN GUARDAR CORREGIDA CON NOMBRE DE BUCKET CORRECTO: fotos-lanas */
     async function guardarNuevo(tipo) {
         const idEdit = document.getElementById('m-id').value;
         const fileInput = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo');
@@ -309,7 +323,6 @@
             if(fileInput && fileInput.files[0]) {
                 const f = fileInput.files[0];
                 const name = `${Date.now()}_${f.name}`;
-                // Usamos el nombre que sale en tu captura: fotos-lanas
                 const { error: uploadError } = await client.storage.from('fotos-lanas').upload(name, f);
                 
                 if (uploadError) {
@@ -437,6 +450,33 @@
         await client.from('estudio_data').update({ cantidad: n }).eq('id', id);
         cargarDatos();
     }
+
+    async function guardarNota() {
+        const titulo = document.getElementById('n-titulo').value;
+        const contenido = document.getElementById('n-contenido').value;
+        if(!titulo || !contenido) return alert("Falta el título o el contenido 🌸");
+        const { error } = await client.from('notas_data').insert([{ titulo, contenido }]);
+        if(error) alert("Error al guardar nota");
+        else {
+            alert("Nota guardada 📝");
+            document.getElementById('n-titulo').value = "";
+            document.getElementById('n-contenido').value = "";
+            cargarNotas();
+        }
+    }
+
+    async function cargarNotas() {
+        const { data } = await client.from('notas_data').select('*').order('created_at', {ascending: false});
+        document.getElementById('lista-notas').innerHTML = (data || []).map(n => `
+            <div class="card-form" style="margin-bottom:10px; position:relative;">
+                <button class="btn-delete-float" style="top:10px; right:10px; left:auto;" onclick="eliminarNota(${n.id})">✖</button>
+                <h4 style="margin:0; color:var(--s);">${n.titulo}</h4>
+                <p style="font-size:14px; white-space:pre-wrap; margin-top:10px;">${n.contenido}</p>
+            </div>
+        `).join('');
+    }
+
+    async function eliminarNota(id) { if(confirm("¿Borrar esta nota?")) { await client.from('notas_data').delete().eq('id', id); cargarNotas(); } }
 
     function toggleDarkMode() {
         const body = document.body; const current = body.getAttribute('data-theme');
