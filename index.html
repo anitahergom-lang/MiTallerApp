@@ -233,7 +233,9 @@
             <button class="btn-editor" onclick="document.execCommand('bold', false, null)"><b>B</b></button>
             <button class="btn-editor" onclick="document.execCommand('italic', false, null)"><i>I</i></button>
             <button class="btn-editor" onclick="document.execCommand('insertUnorderedList', false, null)">• Lista</button>
-            <button class="btn-editor" onclick="insertarImagenEditor()">🖼️ Foto</button>
+            
+            <button class="btn-editor" onclick="document.getElementById('input-foto-editor').click()">🖼️ Subir Foto</button>
+            <input type="file" id="input-foto-editor" accept="image/*" style="display:none" onchange="insertarFotoEnEditor(this)">
         </div>
         
         <div id="borrador-contenido" class="editor-rich" contenteditable="true"></div>
@@ -601,9 +603,18 @@
         }
     }
 
-    function insertarImagenEditor() {
-        const url = prompt("Pega la URL de la imagen:");
-        if(url) document.execCommand('insertImage', false, url);
+    // CAMBIO AQUÍ: Función para insertar foto local al editor
+    function insertarFotoEnEditor(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgHtml = `<img src="${e.target.result}" style="max-width:100%; border-radius:10px; margin:10px 0;">`;
+                document.getElementById('borrador-contenido').focus();
+                document.execCommand('insertHTML', false, imgHtml);
+                input.value = ""; // Limpiar
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
     }
 
     function guardarBorradorLocal() {
@@ -639,12 +650,20 @@
         const temp = document.createElement('div');
         temp.innerHTML = `<div style="padding:40px; font-family:serif; color:#444;"><h1 style="color:#f06292; text-align:center; border-bottom:2px solid #fce4ec; padding-bottom:10px;">${titulo}</h1><div style="margin-top:20px; line-height:1.6;">${contenido}</div></div>`;
         
-        const opt = { margin: 10, filename: `${titulo}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+        const opt = { 
+            margin: 10, 
+            filename: `${titulo}.pdf`, 
+            image: { type: 'jpeg', quality: 0.98 }, 
+            html2canvas: { scale: 2 }, 
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+        };
 
         try {
             const pdfBlob = await html2pdf().set(opt).from(temp).output('blob');
             const link = document.createElement('a');
-            link.href = URL.createObjectURL(pdfBlob); link.download = `${titulo}.pdf`; link.click();
+            link.href = URL.createObjectURL(pdfBlob); 
+            link.download = `${titulo}.pdf`; 
+            link.click();
 
             const fileName = `${Date.now()}_${titulo.replace(/\s+/g, '_')}.pdf`;
             await client.storage.from('patrones_pdf').upload(fileName, pdfBlob, { contentType: 'application/pdf' });
@@ -653,7 +672,10 @@
 
             alert("¡PDF generado y guardado en tu biblioteca! 💖✨");
             cargarPDFs();
-        } catch (error) { console.error(error); alert("Se descargó el PDF pero hubo un error al guardarlo en la biblioteca."); }
+        } catch (error) { 
+            console.error(error); 
+            alert("Hubo un error al procesar el PDF."); 
+        }
     }
 
     async function cargarRegalos() {
@@ -698,7 +720,9 @@
             pdf_id: document.getElementById('reg-enlace-pdf').value || null,
             entregado: false
         }]);
-        document.getElementById('reg-persona').value = ""; document.getElementById('reg-detalle').value = ""; document.getElementById('reg-preferencias').value = "";
+        document.getElementById('reg-persona').value = ""; 
+        document.getElementById('reg-detalle').value = ""; 
+        document.getElementById('reg-preferencias').value = "";
         cargarRegalos();
     }
 
@@ -729,7 +753,8 @@
         const contenido = document.getElementById('n-contenido').value;
         if(!titulo || !contenido) return alert("Escribe un título y el contenido de tu nota 🎀");
         await client.from('notas_data').insert([{ titulo, contenido }]);
-        document.getElementById('n-titulo').value = ""; document.getElementById('n-contenido').value = "";
+        document.getElementById('n-titulo').value = ""; 
+        document.getElementById('n-contenido').value = "";
         cargarNotas();
     }
 
