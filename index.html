@@ -22,7 +22,6 @@
         .btn-filtro { white-space: nowrap; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--br); background: var(--b); color: var(--txt); font-size: 12px; cursor: pointer; font-weight: 600; }
         .btn-filtro.active { background: var(--p); color: white; border-color: var(--p); }
 
-        /* ESTILOS DE TARJETA CORREGIDOS */
         .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
         .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; display: flex; flex-direction: column; min-height: 300px; }
         .foto-material { width: 100%; height: 110px; object-fit: cover; background: #eee; }
@@ -83,7 +82,6 @@
     <button class="btn-nav" id="nav-REGALOS" onclick="cambiarVista('REGALOS')">🎁 REGALOS</button>
 </div>
 
-<!-- VISTA INICIO (FORMULARIO) -->
 <div id="vista-INICIO">
     <div class="card-form">
         <h2 id="titulo-formulario" style="color:var(--s); text-align:center; margin-top:0;">📦 Añadir Material</h2>
@@ -121,7 +119,6 @@
     </div>
 </div>
 
-<!-- VISTA STOCK -->
 <div id="vista-STOCK" style="display:none;">
     <div class="filtros-container">
         <button class="btn-filtro active" id="filtro-Todo" onclick="filtrar('Todo')">✨ Todo</button>
@@ -134,7 +131,6 @@
     <div id="lista-stock" class="grid-estudio"></div>
 </div>
 
-<!-- VISTA PROYECTOS -->
 <div id="vista-PROYECTOS" style="display:none;">
     <div class="card-form">
         <h2 style="color:var(--s); text-align:center; margin-top:0;">✨ Nuevo Proyecto</h2>
@@ -169,7 +165,6 @@
     <div id="lista-proyectos" class="grid-estudio"></div>
 </div>
 
-<!-- VISTA PDFS -->
 <div id="vista-PDFS" style="display:none;">
     <div class="card-form">
         <h2 style="color:var(--s); text-align:center; margin-top:0;">📂 Subir Patrón PDF</h2>
@@ -181,7 +176,6 @@
     <div id="lista-pdfs"></div>
 </div>
 
-<!-- VISTA REGALOS -->
 <div id="vista-REGALOS" style="display:none;">
     <div class="card-form">
         <h2 style="color:var(--s); text-align:center; margin-top:0;">🎁 Regalos y Encargos</h2>
@@ -248,7 +242,7 @@
         } catch (e) { console.error(e); }
     }
 
-    /* RENDERIZADO DE STOCK - CORREGIDO */
+    /* RENDERIZADO DE STOCK - ACTUALIZADO CON EMOJIS Y CAMPOS SOLICITADOS */
     function renderizarStock(lista) {
         document.getElementById('lista-stock').innerHTML = lista.map(m => `
             <div class="item-card">
@@ -258,11 +252,11 @@
                 <div class="info-material">
                     <span class="info-titulo">${m.tipo_material}</span>
                     
-                    <div class="info-detalle">${m.composicion ? `<span class="info-label">Comp:</span>${m.composicion}` : ''}</div>
-                    <div class="info-detalle">${m.grosor ? `<span class="info-label">Grosor:</span>${m.grosor}` : ''}</div>
-                    <div class="info-detalle">${m.tienda ? `<span class="info-label">Tienda:</span>${m.tienda}` : ''}</div>
+                    ${m.composicion ? `<div class="info-detalle">🧬 ${m.composicion}</div>` : ''}
+                    ${m.grosor ? `<div class="info-detalle">📐 ${m.grosor}</div>` : ''}
+                    ${m.tienda ? `<div class="info-detalle">🏪 ${m.tienda}</div>` : ''}
                     
-                    ${m.notas ? `<div class="info-notas">${m.notas}</div>` : ''}
+                    ${m.notas ? `<div class="info-notas">📝 ${m.notas}</div>` : ''}
 
                     <div class="controles-stock">
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
