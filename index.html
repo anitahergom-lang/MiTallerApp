@@ -22,19 +22,19 @@
         .btn-filtro { white-space: nowrap; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--br); background: var(--b); color: var(--txt); font-size: 12px; cursor: pointer; font-weight: 600; }
         .btn-filtro.active { background: var(--p); color: white; border-color: var(--p); }
 
-        /* AJUSTE DE TARJETAS PARA MOSTRAR INFO */
+        /* ESTILOS DE TARJETA CORREGIDOS */
         .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
-        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; padding-bottom: 10px; display: flex; flex-direction: column; }
-        .foto-material { width: 100%; height: 110px; object-fit: cover; }
+        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; display: flex; flex-direction: column; min-height: 280px; }
+        .foto-material { width: 100%; height: 110px; object-fit: cover; background: #eee; }
+        .info-material { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; gap: 4px; }
         
-        .info-material { padding: 10px; text-align: left; flex-grow: 1; }
-        .info-titulo { font-size: 13px; font-weight: 700; color: var(--s); margin: 0 0 5px 0; display: block; }
-        .info-detalle { font-size: 10px; color: var(--txt); margin: 2px 0; line-height: 1.2; }
-        .info-label { font-weight: 800; text-transform: uppercase; font-size: 8px; color: #999; margin-right: 3px; }
-        .info-notas { font-size: 10px; font-style: italic; background: var(--f); padding: 5px; border-radius: 8px; margin-top: 5px; border: 1px solid var(--br); }
+        .info-titulo { font-size: 13px; font-weight: 700; color: var(--s); margin: 0 0 4px 0; line-height: 1.2; display: block; }
+        .info-detalle { font-size: 10px; color: var(--txt); margin: 0; line-height: 1.3; }
+        .info-label { font-weight: 800; text-transform: uppercase; font-size: 8px; color: var(--s); opacity: 0.7; margin-right: 4px; }
+        .info-notas { font-size: 9px; font-style: italic; opacity: 0.8; margin-top: 5px; padding-top: 5px; border-top: 1px dashed var(--br); }
 
-        .btn-edit-float { position: absolute; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.7); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; z-index: 5; }
-        .btn-delete-float { position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.7); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; z-index: 5; }
+        .btn-edit-float { position: absolute; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.6); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 5; }
+        .btn-delete-float { position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.6); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 5; }
 
         .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-top: 5px; }
         .badge-idea { background: #e2e3e5; color: #383d41; }
@@ -55,7 +55,7 @@
         .btn-tool.active { background: var(--pc); border-color: var(--p); color: var(--s); }
 
         #dark-mode-toggle { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 8px; border-top: 1px solid var(--br); pt: 8px; }
+        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--br); }
         .btn-qty { background: var(--pc); border: none; width: 25px; height: 25px; border-radius: 50%; color: var(--s); font-weight: bold; cursor: pointer; }
 
         .pdf-item, .regalo-item {
@@ -83,7 +83,7 @@
     <button class="btn-nav" id="nav-REGALOS" onclick="cambiarVista('REGALOS')">🎁 REGALOS</button>
 </div>
 
-<!-- VISTA INICIO -->
+<!-- VISTA INICIO (FORMULARIO) -->
 <div id="vista-INICIO">
     <div class="card-form">
         <h2 id="titulo-formulario" style="color:var(--s); text-align:center; margin-top:0;">📦 Añadir Material</h2>
@@ -107,7 +107,7 @@
             </div>
         </div>
         <label>COMPOSICIÓN</label>
-        <input type="text" id="m-composicion" placeholder="Ej: 100% Algodón, 50% Lana 50% Acrílico">
+        <input type="text" id="m-composicion" placeholder="Ej: 100% Algodón">
         <label>TIENDA DONDE SE COMPRÓ</label>
         <input type="text" id="m-tienda" placeholder="Ej: Mercería del Barrio">
         <label>GROSOR / WPI</label>
@@ -190,7 +190,7 @@
         <label>¿QUÉ VAS A REGALAR/HACER?</label>
         <input type="text" id="reg-detalle" placeholder="Ej: Manta de apego">
         <label>GUSTOS Y PREFERENCIAS</label>
-        <textarea id="reg-preferencias" placeholder="Le gustan los colores pastel, odia la lana virgen..."></textarea>
+        <textarea id="reg-preferencias" placeholder="Le gustan los colores pastel..."></textarea>
         <label>ENLAZAR DISEÑO (PROYECTO)</label>
         <select id="reg-enlace-proyecto"><option value="">Ninguno</option></select>
         <label>ENLAZAR PATRÓN PDF</label>
@@ -214,18 +214,15 @@
     let regalosGlobal = [];
     let toolsState = { 'canvas-punto': 'pincel', 'canvas-cuerpos': 'pincel' };
 
-    // --- NAVEGACIÓN ---
     function cambiarVista(v) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
         const navBtn = document.getElementById('nav-' + v);
         if(navBtn) navBtn.classList.add('active');
-        
         document.getElementById('vista-INICIO').style.display = v === 'INICIO' ? 'block' : 'none';
         document.getElementById('vista-STOCK').style.display = v === 'STOCK' ? 'block' : 'none';
         document.getElementById('vista-PROYECTOS').style.display = v === 'PROYECTOS' ? 'block' : 'none';
         document.getElementById('vista-PDFS').style.display = v === 'PDFS' ? 'block' : 'none';
         document.getElementById('vista-REGALOS').style.display = v === 'REGALOS' ? 'block' : 'none';
-        
         if(v === 'STOCK') filtrar('Todo');
         if(v === 'PROYECTOS') setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
         if(v === 'REGALOS') cargarRegalos();
@@ -251,16 +248,17 @@
         } catch (e) { console.error(e); }
     }
 
+    /* RENDERIZADO DE STOCK CORREGIDO PARA MOSTRAR TODA LA INFO */
     function renderizarStock(lista) {
         document.getElementById('lista-stock').innerHTML = lista.map(m => `
             <div class="item-card">
                 <button class="btn-delete-float" onclick="eliminarStock(${m.id})">✖</button>
                 <button class="btn-edit-float" onclick="cargarEdicion(${m.id})">✏️</button>
-                <img src="${m.contenido || 'https://via.placeholder.com/150?text=Sin+Foto'}" class="foto-material">
+                <img src="${m.contenido || 'https://via.placeholder.com/150?text=Material'}" class="foto-material">
                 <div class="info-material">
                     <span class="info-titulo">${m.tipo_material}</span>
                     
-                    ${m.composicion ? `<p class="info-detalle"><span class="info-label">Compos:</span>${m.composicion}</p>` : ''}
+                    ${m.composicion ? `<p class="info-detalle"><span class="info-label">Comp:</span>${m.composicion}</p>` : ''}
                     ${m.grosor ? `<p class="info-detalle"><span class="info-label">Grosor:</span>${m.grosor}</p>` : ''}
                     ${m.tienda ? `<p class="info-detalle"><span class="info-label">Tienda:</span>${m.tienda}</p>` : ''}
                     
@@ -268,7 +266,7 @@
 
                     <div class="controles-stock">
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
-                        <span style="font-weight:bold">${m.cantidad}</span>
+                        <span style="font-weight:bold; font-size:14px;">${m.cantidad}</span>
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, 1)">+</button>
                     </div>
                 </div>
@@ -276,12 +274,9 @@
         `).join('');
     }
 
-    // --- FUNCIÓN DE MODIFICAR (CARGAR DATOS) ---
     function cargarEdicion(id) {
         const item = lanasGlobal.find(m => m.id === id);
         if(!item) return;
-
-        // Rellenar campos
         document.getElementById('m-id').value = item.id;
         document.getElementById('m-nombre').value = item.tipo_material;
         document.getElementById('m-categoria').value = item.categoria;
@@ -290,12 +285,9 @@
         document.getElementById('m-tienda').value = item.tienda || "";
         document.getElementById('m-grosor').value = item.grosor || "";
         document.getElementById('m-notas').value = item.notas || "";
-
-        // UI
         document.getElementById('titulo-formulario').innerText = "✏️ Editar Material";
         document.getElementById('btn-accion-stock').innerText = "ACTUALIZAR MATERIAL";
         document.getElementById('btn-cancelar-edit').style.display = "block";
-        
         cambiarVista('INICIO');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -351,12 +343,11 @@
         cambiarVista(tipo === 'stock' ? 'STOCK' : 'PROYECTOS');
     }
 
-    // --- RESTO DE FUNCIONES ---
     function renderizarProyectos(lista) {
         document.getElementById('lista-proyectos').innerHTML = lista.map(p => `
             <div class="item-card">
                 <img src="${p.foto || 'https://via.placeholder.com/150?text=Proyecto'}" class="foto-material">
-                <div class="info-material" style="text-align:center">
+                <div class="info-material" style="text-align:center;">
                     <h4 style="margin-bottom:5px; font-size:13px;">${p.nombre}</h4>
                     <span class="badge ${p.estado === 'Terminado' ? 'badge-listo' : (p.estado === 'Idea' ? 'badge-idea' : 'badge-proceso')}">${p.estado}</span>
                 </div>
