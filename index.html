@@ -242,7 +242,6 @@
         } catch (e) { console.error(e); }
     }
 
-    /* ÚNICA FUNCIÓN MODIFICADA PARA MOSTRAR SIEMPRE LOS DATOS */
     function renderizarStock(lista) {
         document.getElementById('lista-stock').innerHTML = lista.map(m => `
             <div class="item-card">
@@ -300,41 +299,65 @@
         document.getElementById('btn-cancelar-edit').style.display = "none";
     }
 
+    /* FUNCIÓN GUARDAR REVISADA PARA SOLUCIONAR EL ERROR DE REGISTRO */
     async function guardarNuevo(tipo) {
         const idEdit = document.getElementById('m-id').value;
         const fileInput = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo');
         let fotoUrl = "";
-        if(fileInput.files[0]) {
-            const f = fileInput.files[0];
-            const name = `${Date.now()}_${f.name}`;
-            await client.storage.from('fotos_estudio').upload(name, f);
-            fotoUrl = client.storage.from('fotos_estudio').getPublicUrl(name).data.publicUrl;
+        
+        try {
+            if(fileInput && fileInput.files[0]) {
+                const f = fileInput.files[0];
+                const name = `${Date.now()}_${f.name}`;
+                await client.storage.from('fotos_estudio').upload(name, f);
+                fotoUrl = client.storage.from('fotos_estudio').getPublicUrl(name).data.publicUrl;
+            }
+
+            if(tipo === 'stock') {
+                const nombreVal = document.getElementById('m-nombre').value;
+                if(!nombreVal) {
+                    alert("Por favor, ponle un nombre al material 🎀");
+                    return;
+                }
+
+                const datos = {
+                    tipo_material: nombreVal,
+                    categoria: document.getElementById('m-categoria').value,
+                    cantidad: parseInt(document.getElementById('m-cantidad').value) || 0,
+                    composicion: document.getElementById('m-composicion').value || "",
+                    tienda: document.getElementById('m-tienda').value || "",
+                    grosor: document.getElementById('m-grosor').value || "",
+                    notas: document.getElementById('m-notas').value || ""
+                };
+                
+                if(fotoUrl) datos.contenido = fotoUrl;
+
+                if(idEdit) {
+                    const { error } = await client.from('estudio_data').update(datos).eq('id', idEdit);
+                    if (error) throw error;
+                } else {
+                    const { error } = await client.from('estudio_data').insert([datos]);
+                    if (error) throw error;
+                }
+                limpiarFormulario();
+            } else {
+                const { error } = await client.from('proyectos_data').insert([{
+                    nombre: document.getElementById('p-nombre').value,
+                    estado: document.getElementById('p-estado').value,
+                    notas: document.getElementById('p-notas').value,
+                    foto: fotoUrl
+                }]);
+                if (error) throw error;
+            }
+            
+            alert("¡Guardado correctamente! 💖");
+            await cargarDatos();
+            cambiarVista(tipo === 'stock' ? 'STOCK' : 'PROYECTOS');
+
+        } catch (err) {
+            console.error("Error al guardar:", err);
+            alert("Hubo un error al guardar. Revisa la consola para detalles.");
         }
-        if(tipo === 'stock') {
-            const datos = {
-                tipo_material: document.getElementById('m-nombre').value,
-                categoria: document.getElementById('m-categoria').value,
-                cantidad: parseInt(document.getElementById('m-cantidad').value),
-                composicion: document.getElementById('m-composicion').value,
-                tienda: document.getElementById('m-tienda').value,
-                grosor: document.getElementById('m-grosor').value,
-                notas: document.getElementById('m-notas').value
-            };
-            if(fotoUrl) datos.contenido = fotoUrl;
-            if(idEdit) await client.from('estudio_data').update(datos).eq('id', idEdit);
-            else await client.from('estudio_data').insert([datos]);
-            limpiarFormulario();
-        } else {
-            await client.from('proyectos_data').insert([{
-                nombre: document.getElementById('p-nombre').value,
-                estado: document.getElementById('p-estado').value,
-                notas: document.getElementById('p-notas').value,
-                foto: fotoUrl
-            }]);
-        }
-        alert("¡Guardado! 💖");
-        cargarDatos();
-        cambiarVista(tipo === 'stock' ? 'STOCK' : 'PROYECTOS');
     }
 
     function renderizarProyectos(lista) {
