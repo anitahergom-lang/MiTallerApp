@@ -56,9 +56,9 @@
         .canvas-base { display: block; width: 100%; height: 250px; cursor: crosshair; }
         .canvas-grid { background-image: linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
         
-        /* ESTILOS MODIFICADOS PARA EL LIENZO DE CUERPOS */
+        /* CORRECCIÓN: Fondo con la imagen exacta proporcionada */
         .canvas-cuerpos {
-            background-image: url('image_5.png');
+            background-image: url('Silueta 3 cuerpos_7.jpg');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -99,6 +99,7 @@
     <button class="btn-nav" id="nav-NOTAS" onclick="cambiarVista('NOTAS')">📝 NOTAS</button>
 </div>
 
+<!-- El resto de las secciones INICIO, STOCK y COMPRAS se mantienen igual -->
 <div id="vista-INICIO">
     <div class="card-form">
         <h2 id="titulo-formulario" style="color:var(--s); text-align:center; margin-top:0;">📦 Añadir Material</h2>
@@ -206,6 +207,7 @@
     <div id="lista-proyectos" class="grid-estudio"></div>
 </div>
 
+<!-- Resto de las vistas: PDFS, REGALOS, NOTAS y el SCRIPT se mantienen intactos -->
 <div id="vista-PDFS" style="display:none;">
     <div class="card-form">
         <h2 style="color:var(--s); text-align:center; margin-top:0;">📂 Subir Patrón PDF</h2>
@@ -290,7 +292,6 @@
         else { const filtrados = lanasGlobal.filter(m => m.categoria === cat); renderizarStock(filtrados); }
     }
 
-    // --- LÓGICA DE COMPRAS 🛒 ---
     async function guardarCompra() {
         const nombre = document.getElementById('c-nombre').value;
         const tienda = document.getElementById('c-tienda').value || 'General';
@@ -339,8 +340,6 @@
         cargarCompras();
     }
 
-    // --- FIN LÓGICA COMPRAS ---
-
     async function cargarDatos() {
         try {
             const { data: stock } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
@@ -361,13 +360,10 @@
                 <img src="${m.contenido || 'https://via.placeholder.com/150?text=Material'}" class="foto-material">
                 <div class="info-material">
                     <span class="info-titulo">${m.tipo_material}</span>
-                    
                     <div class="info-detalle">🧬 ${m.composicion || 'n/a'}</div>
                     <div class="info-detalle">📐 ${m.grosor || 'n/a'}</div>
                     <div class="info-detalle">🏪 ${m.tienda || 'n/a'}</div>
-                    
                     ${m.notas ? `<div class="info-notas">📝 ${m.notas}</div>` : ''}
-
                     <div class="controles-stock">
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
                         <span style="font-weight:bold; font-size:14px;">${m.cantidad}</span>
@@ -414,24 +410,17 @@
         const idEdit = document.getElementById('m-id').value;
         const fileInput = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo');
         let fotoUrl = "";
-        
         try {
             if(fileInput && fileInput.files[0]) {
                 const f = fileInput.files[0];
                 const name = `${Date.now()}_${f.name}`;
                 const { error: uploadError } = await client.storage.from('fotos-lanas').upload(name, f);
-                
-                if (uploadError) {
-                    throw new Error("Error al subir foto: " + uploadError.message);
-                } else {
-                    fotoUrl = client.storage.from('fotos-lanas').getPublicUrl(name).data.publicUrl;
-                }
+                if (uploadError) throw new Error("Error al subir foto: " + uploadError.message);
+                else fotoUrl = client.storage.from('fotos-lanas').getPublicUrl(name).data.publicUrl;
             }
-
             if(tipo === 'stock') {
                 const nombreVal = document.getElementById('m-nombre').value;
                 if(!nombreVal) throw new Error("Debes poner un nombre al material");
-
                 const datos = {
                     tipo_material: nombreVal,
                     categoria: document.getElementById('m-categoria').value,
@@ -441,16 +430,10 @@
                     grosor: document.getElementById('m-grosor').value || "",
                     notas: document.getElementById('m-notas').value || ""
                 };
-                
                 if(fotoUrl) datos.contenido = fotoUrl;
-
                 let res;
-                if(idEdit) {
-                    res = await client.from('estudio_data').update(datos).eq('id', idEdit);
-                } else {
-                    res = await client.from('estudio_data').insert([datos]);
-                }
-                
+                if(idEdit) res = await client.from('estudio_data').update(datos).eq('id', idEdit);
+                else res = await client.from('estudio_data').insert([datos]);
                 if (res.error) throw res.error;
                 limpiarFormulario();
             } else {
@@ -462,11 +445,9 @@
                 }]);
                 if (pError) throw pError;
             }
-            
             alert("¡Guardado correctamente! 💖");
             await cargarDatos();
             cambiarVista(tipo === 'stock' ? 'STOCK' : 'PROYECTOS');
-
         } catch (err) {
             console.error("Error detectado:", err);
             alert("Error: " + (err.message || "Problema al conectar con la base de datos"));
