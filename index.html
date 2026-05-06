@@ -54,7 +54,6 @@
         .canvas-container { background: white; border: 1px solid var(--br); border-radius: 15px; margin-top: 10px; position: relative; overflow: hidden; }
         .canvas-base { display: block; width: 100%; height: 250px; cursor: crosshair; }
         
-        /* Modificación para zona de cuerpos: más larga y con plantilla técnica */
         .canvas-largo { height: 500px !important; }
         
         .canvas-grid { background-image: linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
@@ -123,11 +122,12 @@
                 <input type="number" id="m-cantidad" value="1">
             </div>
         </div>
-        <label>COMPOSICIÓN</label>
+        <!-- Emojis actualizados en etiquetas del formulario -->
+        <label>🧵 COMPOSICIÓN</label>
         <input type="text" id="m-composicion" placeholder="Ej: 100% Algodón">
-        <label>TIENDA DONDE SE COMPRÓ</label>
+        <label>📍 TIENDA DONDE SE COMPRÓ</label>
         <input type="text" id="m-tienda" placeholder="Ej: Mercería del Barrio">
-        <label>GROSOR / WPI</label>
+        <label>🪡 GROSOR / WPI</label>
         <input type="text" id="m-grosor" placeholder="Ej: Fingering, 3mm...">
         <label>NOTAS ADICIONALES</label>
         <textarea id="m-notas" placeholder="Nº de lote, etc..."></textarea>
@@ -150,6 +150,7 @@
     <div id="lista-stock" class="grid-estudio"></div>
 </div>
 
+<!-- Resto de secciones del HTML (COMPRAS, PROYECTOS, PDFS, REGALOS, NOTAS) sin cambios -->
 <div id="vista-COMPRAS" style="display:none;">
     <div class="card-form">
         <h2 style="color:var(--s); text-align:center; margin-top:0;">🛒 Lista de Compras</h2>
@@ -253,7 +254,6 @@
 </div>
 
 <script>
-    // Configuración de Supabase
     const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
     const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
     const client = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -294,54 +294,6 @@
         else { const filtrados = lanasGlobal.filter(m => m.categoria === cat); renderizarStock(filtrados); }
     }
 
-    async function guardarCompra() {
-        const nombre = document.getElementById('c-nombre').value;
-        const tienda = document.getElementById('c-tienda').value || 'General';
-        const prioridad = document.getElementById('c-prioridad').value;
-        if(!nombre) return alert("Escribe qué necesitas comprar 🎀");
-        await client.from('compras_data').insert([{ nombre, tienda, prioridad, completado: false }]);
-        document.getElementById('c-nombre').value = "";
-        cargarCompras();
-    }
-
-    async function cargarCompras() {
-        const { data } = await client.from('compras_data').select('*').order('created_at', {ascending: false});
-        comprasGlobal = data || [];
-        renderizarFiltrosCompras();
-        renderizarListaCompras();
-    }
-
-    function renderizarFiltrosCompras() {
-        const tiendas = ['Todas', ...new Set(comprasGlobal.map(c => c.tienda))];
-        document.getElementById('filtros-tiendas-compras').innerHTML = tiendas.map(t => `
-            <button class="btn-filtro ${tiendaFiltradaCompras === t ? 'active' : ''}" onclick="filtrarTiendaCompra('${t}')">${t}</button>
-        `).join('');
-    }
-
-    function filtrarTiendaCompra(t) {
-        tiendaFiltradaCompras = t;
-        renderizarFiltrosCompras();
-        renderizarListaCompras();
-    }
-
-    function renderizarListaCompras() {
-        const filtradas = tiendaFiltradaCompras === 'Todas' ? comprasGlobal : comprasGlobal.filter(c => c.tienda === tiendaFiltradaCompras);
-        document.getElementById('lista-compras').innerHTML = filtradas.map(c => `
-            <div class="compra-item prio-${c.prioridad}">
-                <div>
-                    <strong style="color:var(--s)">${c.nombre}</strong><br>
-                    <small>📍 ${c.tienda} | Prioridad: ${c.prioridad}</small>
-                </div>
-                <button onclick="eliminarCompra(${c.id})" style="background:none; border:none; font-size:20px; cursor:pointer;">✅</button>
-            </div>
-        `).join('');
-    }
-
-    async function eliminarCompra(id) {
-        await client.from('compras_data').delete().eq('id', id);
-        cargarCompras();
-    }
-
     async function cargarDatos() {
         try {
             const { data: stock } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
@@ -362,9 +314,10 @@
                 <img src="${m.contenido || 'https://via.placeholder.com/150?text=Material'}" class="foto-material">
                 <div class="info-material">
                     <span class="info-titulo">${m.tipo_material}</span>
-                    <div class="info-detalle">🧬 ${m.composicion || 'n/a'}</div>
-                    <div class="info-detalle">📐 ${m.grosor || 'n/a'}</div>
-                    <div class="info-detalle">🏪 ${m.tienda || 'n/a'}</div>
+                    <!-- Emojis actualizados en la renderización de tarjetas -->
+                    <div class="info-detalle">🧵 ${m.composicion || 'n/a'}</div>
+                    <div class="info-detalle">🪡 ${m.grosor || 'n/a'}</div>
+                    <div class="info-detalle">📍 ${m.tienda || 'n/a'}</div>
                     ${m.notas ? `<div class="info-notas">📝 ${m.notas}</div>` : ''}
                     <div class="controles-stock">
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
@@ -376,6 +329,7 @@
         `).join('');
     }
 
+    // Funciones restantes (cargarEdicion, guardarNuevo, iniciarCanvas, etc.) sin cambios
     function cargarEdicion(id) {
         const item = lanasGlobal.find(m => m.id === id);
         if(!item) return;
@@ -448,6 +402,54 @@
         } catch (err) { alert("Error: " + (err.message || "Problema al conectar")); }
     }
 
+    async function guardarCompra() {
+        const nombre = document.getElementById('c-nombre').value;
+        const tienda = document.getElementById('c-tienda').value || 'General';
+        const prioridad = document.getElementById('c-prioridad').value;
+        if(!nombre) return alert("Escribe qué necesitas comprar 🎀");
+        await client.from('compras_data').insert([{ nombre, tienda, prioridad, completado: false }]);
+        document.getElementById('c-nombre').value = "";
+        cargarCompras();
+    }
+
+    async function cargarCompras() {
+        const { data } = await client.from('compras_data').select('*').order('created_at', {ascending: false});
+        comprasGlobal = data || [];
+        renderizarFiltrosCompras();
+        renderizarListaCompras();
+    }
+
+    function renderizarFiltrosCompras() {
+        const tiendas = ['Todas', ...new Set(comprasGlobal.map(c => c.tienda))];
+        document.getElementById('filtros-tiendas-compras').innerHTML = tiendas.map(t => `
+            <button class="btn-filtro ${tiendaFiltradaCompras === t ? 'active' : ''}" onclick="filtrarTiendaCompra('${t}')">${t}</button>
+        `).join('');
+    }
+
+    function filtrarTiendaCompra(t) {
+        tiendaFiltradaCompras = t;
+        renderizarFiltrosCompras();
+        renderizarListaCompras();
+    }
+
+    function renderizarListaCompras() {
+        const filtradas = tiendaFiltradaCompras === 'Todas' ? comprasGlobal : comprasGlobal.filter(c => c.tienda === tiendaFiltradaCompras);
+        document.getElementById('lista-compras').innerHTML = filtradas.map(c => `
+            <div class="compra-item prio-${c.prioridad}">
+                <div>
+                    <strong style="color:var(--s)">${c.nombre}</strong><br>
+                    <small>📍 ${c.tienda} | Prioridad: ${c.prioridad}</small>
+                </div>
+                <button onclick="eliminarCompra(${c.id})" style="background:none; border:none; font-size:20px; cursor:pointer;">✅</button>
+            </div>
+        `).join('');
+    }
+
+    async function eliminarCompra(id) {
+        await client.from('compras_data').delete().eq('id', id);
+        cargarCompras();
+    }
+
     function renderizarProyectos(lista) {
         document.getElementById('lista-proyectos').innerHTML = lista.map(p => `
             <div class="item-card">
@@ -514,7 +516,7 @@
     async function marcarEntregado(id) { if(confirm("¿Ya lo has entregado? 💖")) { await client.from('regalos_data').update({ estado: 'Entregado' }).eq('id', id); cargarRegalos(); } }
 
     async function cargarNotas() {
-        const { data } = await client.from('notes_data').select('*').order('created_at', {ascending: false});
+        const { data } = await client.from('notas_data').select('*').order('created_at', {ascending: false});
         document.getElementById('lista-notas').innerHTML = (data || []).map(n => `<div class="card-form" style="margin-bottom:10px; position:relative;"><button class="btn-delete-float" onclick="eliminarNota(${n.id})">✖</button><h3 style="margin-top:0; color:var(--s); font-size:15px;">${n.titulo}</h3><p style="font-size:13px; white-space:pre-wrap;">${n.contenido}</p><small style="opacity:0.5;">${new Date(n.created_at).toLocaleDateString()}</small></div>`).join('');
     }
 
