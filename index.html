@@ -131,6 +131,7 @@
     <div id="lista-stock" class="grid-estudio"></div>
 </div>
 
+<!-- Resto de vistas (PROYECTOS, PDFS, REGALOS) se mantienen igual -->
 <div id="vista-PROYECTOS" style="display:none;">
     <div class="card-form">
         <h2 style="color:var(--s); text-align:center; margin-top:0;">✨ Nuevo Proyecto</h2>
@@ -242,7 +243,7 @@
         } catch (e) { console.error(e); }
     }
 
-    /* RENDERIZADO DE STOCK - ACTUALIZADO CON COLORES FORZADOS PARA MODO OSCURO */
+    /* RENDERIZADO DE STOCK - ACTUALIZADO PARA MOSTRAR n/a SI NO HAY DATOS */
     function renderizarStock(lista) {
         document.getElementById('lista-stock').innerHTML = lista.map(m => `
             <div class="item-card">
@@ -252,17 +253,15 @@
                 <div class="info-material">
                     <span class="info-titulo">${m.tipo_material}</span>
                     
-                    <div style="color: #eee; font-size: 11px; margin-top: 5px; display: flex; flex-direction: column; gap: 3px;">
-                        ${m.composicion ? `<span>🧬 ${m.composicion}</span>` : ''}
-                        ${m.grosor ? `<span>📐 ${m.grosor}</span>` : ''}
-                        ${m.tienda ? `<span>🏪 ${m.tienda}</span>` : ''}
-                    </div>
+                    <div class="info-detalle">🧬 ${m.composicion || 'n/a'}</div>
+                    <div class="info-detalle">📐 ${m.grosor || 'n/a'}</div>
+                    <div class="info-detalle">🏪 ${m.tienda || 'n/a'}</div>
                     
-                    ${m.notas ? `<div class="info-notas" style="color: #bbb; border-top: 1px solid #444; margin-top: 8px;">📝 ${m.notas}</div>` : ''}
+                    ${m.notas ? `<div class="info-notas">📝 ${m.notas}</div>` : ''}
 
                     <div class="controles-stock">
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
-                        <span style="font-weight:bold; font-size:14px; color: var(--txt);">${m.cantidad}</span>
+                        <span style="font-weight:bold; font-size:14px;">${m.cantidad}</span>
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, 1)">+</button>
                     </div>
                 </div>
@@ -270,6 +269,7 @@
         `).join('');
     }
 
+    // Funciones de lógica (cargarEdicion, guardarNuevo, etc.) se mantienen igual
     function cargarEdicion(id) {
         const item = lanasGlobal.find(m => m.id === id);
         if(!item) return;
