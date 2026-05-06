@@ -299,20 +299,24 @@
         document.getElementById('btn-cancelar-edit').style.display = "none";
     }
 
-    /* FUNCIÓN GUARDAR BLINDADA CON DETECTE DE ERROR EXACTO */
+    /* FUNCIÓN GUARDAR CORREGIDA CON NOMBRE DE BUCKET CORRECTO: fotos-lanas */
     async function guardarNuevo(tipo) {
         const idEdit = document.getElementById('m-id').value;
         const fileInput = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo');
         let fotoUrl = "";
         
         try {
-            // 1. Subida de imagen (solo si hay archivo)
             if(fileInput && fileInput.files[0]) {
                 const f = fileInput.files[0];
                 const name = `${Date.now()}_${f.name}`;
-                const { error: uploadError } = await client.storage.from('fotos_estudio').upload(name, f);
-                if (uploadError) throw new Error("Error al subir foto: " + uploadError.message);
-                fotoUrl = client.storage.from('fotos_estudio').getPublicUrl(name).data.publicUrl;
+                // Usamos el nombre que sale en tu captura: fotos-lanas
+                const { error: uploadError } = await client.storage.from('fotos-lanas').upload(name, f);
+                
+                if (uploadError) {
+                    throw new Error("Error al subir foto: " + uploadError.message);
+                } else {
+                    fotoUrl = client.storage.from('fotos-lanas').getPublicUrl(name).data.publicUrl;
+                }
             }
 
             if(tipo === 'stock') {
@@ -323,10 +327,10 @@
                     tipo_material: nombreVal,
                     categoria: document.getElementById('m-categoria').value,
                     cantidad: parseInt(document.getElementById('m-cantidad').value) || 0,
-                    composicion: document.getElementById('m-composicion').value || null,
-                    tienda: document.getElementById('m-tienda').value || null,
-                    grosor: document.getElementById('m-grosor').value || null,
-                    notas: document.getElementById('m-notas').value || null
+                    composicion: document.getElementById('m-composicion').value || "",
+                    tienda: document.getElementById('m-tienda').value || "",
+                    grosor: document.getElementById('m-grosor').value || "",
+                    notas: document.getElementById('m-notas').value || ""
                 };
                 
                 if(fotoUrl) datos.contenido = fotoUrl;
@@ -340,9 +344,7 @@
                 
                 if (res.error) throw res.error;
                 limpiarFormulario();
-
             } else {
-                // Proyecto
                 const { error: pError } = await client.from('proyectos_data').insert([{
                     nombre: document.getElementById('p-nombre').value,
                     estado: document.getElementById('p-estado').value,
@@ -358,8 +360,7 @@
 
         } catch (err) {
             console.error("Error detectado:", err);
-            // Esto nos dirá si es un problema de permisos (Policy) o de conexión
-            alert("Error: " + (err.message || err.details || "Problema de conexión con Supabase"));
+            alert("Error: " + (err.message || "Problema al conectar con la base de datos"));
         }
     }
 
