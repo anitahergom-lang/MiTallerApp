@@ -80,13 +80,13 @@
             </div>
         </div>
 
-        <div style="display:flex; gap:10px; background: var(--pc); padding: 10px; border-radius: 15px; margin-top:10px;">
+        <div style="display:flex; gap:10px; margin-top:10px;">
             <div style="flex:1;">
-                <label style="margin-top:0; color:var(--s)">PRECIO TOTAL (€)</label>
+                <label>PRECIO TOTAL (€)</label>
                 <input type="number" step="0.01" id="m-precio-total" placeholder="0.00">
             </div>
             <div style="flex:1;">
-                <label style="margin-top:0; color:var(--s)">UNIDADES PACK</label>
+                <label>UNIDADES PACK</label>
                 <input type="number" id="m-unidades-pack" value="1">
             </div>
         </div>
@@ -167,7 +167,6 @@
         if(v === 'NOTAS') cargarNotas();
     }
 
-    // FUNCIÓN GUARDAR ACTUALIZADA SOLO PARA RECOGER PRECIOS
     async function guardarNuevo(tipo) {
         const btn = tipo === 'stock' ? document.getElementById('btn-accion-stock') : event.target;
         btn.innerText = "Subiendo..."; btn.disabled = true;
@@ -198,6 +197,7 @@
                 ultimo_precio_unitario: precioUnitario
             }]).select();
 
+            // Si hay precio, se registra en finanzas
             if (precioTotal > 0 && data) {
                 await client.from('finanzas_data').insert([{
                     tipo: 'Material',
@@ -222,7 +222,6 @@
         btn.innerText = (tipo === 'stock' ? "GUARDAR EN STOCK" : "CREAR PROYECTO"); btn.disabled = false;
     }
 
-    // EL RESTO DEL SCRIPT ES IDÉNTICO AL TUYO (CARGAR DATOS, ELIMINAR, ETC)
     async function cargarDatos() {
         const { data, error } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
         if (data) {
@@ -277,12 +276,16 @@
         const input = document.getElementById('pdf-archivo');
         const nombre = document.getElementById('pdf-nombre').value;
         if (!input.files[0] || !nombre) return alert("Rellena el nombre y selecciona un PDF 🎀");
+        
         const f = input.files[0];
         const fileName = `${Date.now()}_${f.name}`;
-        const { data } = await client.storage.from('pdfs-patrones').upload(fileName, f);
+        const { data, error } = await client.storage.from('pdfs-patrones').upload(fileName, f);
+        
         if (data) {
             const { data: urlData } = client.storage.from('pdfs-patrones').getPublicUrl(fileName);
             await client.from('pdfs_data').insert([{ nombre: nombre, url: urlData.publicUrl }]);
+            alert("¡PDF subido! 📂");
+            document.getElementById('pdf-nombre').value = ""; input.value = "";
             cargarPDFs();
         }
     }
