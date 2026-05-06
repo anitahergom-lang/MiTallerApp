@@ -122,13 +122,21 @@
                 <input type="number" id="m-cantidad" value="1">
             </div>
         </div>
-        <!-- Emojis actualizados en etiquetas del formulario -->
         <label>🧵 COMPOSICIÓN</label>
         <input type="text" id="m-composicion" placeholder="Ej: 100% Algodón">
         <label>📍 TIENDA DONDE SE COMPRÓ</label>
         <input type="text" id="m-tienda" placeholder="Ej: Mercería del Barrio">
-        <label>🪡 GROSOR / WPI</label>
-        <input type="text" id="m-grosor" placeholder="Ej: Fingering, 3mm...">
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label>🪡 GROSOR / WPI</label>
+                <input type="text" id="m-grosor" placeholder="Ej: Fingering, 3mm...">
+            </div>
+            <div style="flex:1;">
+                <!-- NUEVO CAMPO LONGITUD -->
+                <label>📏 LONGITUD</label>
+                <input type="text" id="m-longitud" placeholder="Ej: 120m / 50g">
+            </div>
+        </div>
         <label>NOTAS ADICIONALES</label>
         <textarea id="m-notas" placeholder="Nº de lote, etc..."></textarea>
         <label>FOTO DEL MATERIAL</label>
@@ -150,7 +158,6 @@
     <div id="lista-stock" class="grid-estudio"></div>
 </div>
 
-<!-- Resto de secciones del HTML (COMPRAS, PROYECTOS, PDFS, REGALOS, NOTAS) sin cambios -->
 <div id="vista-COMPRAS" style="display:none;">
     <div class="card-form">
         <h2 style="color:var(--s); text-align:center; margin-top:0;">🛒 Lista de Compras</h2>
@@ -314,9 +321,10 @@
                 <img src="${m.contenido || 'https://via.placeholder.com/150?text=Material'}" class="foto-material">
                 <div class="info-material">
                     <span class="info-titulo">${m.tipo_material}</span>
-                    <!-- Emojis actualizados en la renderización de tarjetas -->
                     <div class="info-detalle">🧵 ${m.composicion || 'n/a'}</div>
                     <div class="info-detalle">🪡 ${m.grosor || 'n/a'}</div>
+                    <!-- RENDERIZADO DE LONGITUD -->
+                    <div class="info-detalle">📏 ${m.longitud || 'n/a'}</div>
                     <div class="info-detalle">📍 ${m.tienda || 'n/a'}</div>
                     ${m.notas ? `<div class="info-notas">📝 ${m.notas}</div>` : ''}
                     <div class="controles-stock">
@@ -329,7 +337,6 @@
         `).join('');
     }
 
-    // Funciones restantes (cargarEdicion, guardarNuevo, iniciarCanvas, etc.) sin cambios
     function cargarEdicion(id) {
         const item = lanasGlobal.find(m => m.id === id);
         if(!item) return;
@@ -340,6 +347,8 @@
         document.getElementById('m-composicion').value = item.composicion || "";
         document.getElementById('m-tienda').value = item.tienda || "";
         document.getElementById('m-grosor').value = item.grosor || "";
+        // CARGA DE LONGITUD PARA EDITAR
+        document.getElementById('m-longitud').value = item.longitud || "";
         document.getElementById('m-notas').value = item.notas || "";
         document.getElementById('titulo-formulario').innerText = "✏️ Editar Material";
         document.getElementById('btn-accion-stock').innerText = "ACTUALIZAR MATERIAL";
@@ -355,6 +364,7 @@
         document.getElementById('m-composicion').value = "";
         document.getElementById('m-tienda').value = "";
         document.getElementById('m-grosor').value = "";
+        document.getElementById('m-longitud').value = "";
         document.getElementById('m-notas').value = "";
         document.getElementById('m-archivo').value = "";
         document.getElementById('titulo-formulario').innerText = "📦 Añadir Material";
@@ -383,6 +393,8 @@
                     composicion: document.getElementById('m-composicion').value || "",
                     tienda: document.getElementById('m-tienda').value || "",
                     grosor: document.getElementById('m-grosor').value || "",
+                    // GUARDAR LONGITUD
+                    longitud: document.getElementById('m-longitud').value || "",
                     notas: document.getElementById('m-notas').value || ""
                 };
                 if(fotoUrl) datos.contenido = fotoUrl;
