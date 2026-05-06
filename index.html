@@ -22,46 +22,51 @@
         .btn-filtro { white-space: nowrap; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--br); background: var(--b); color: var(--txt); font-size: 12px; cursor: pointer; font-weight: 600; }
         .btn-filtro.active { background: var(--p); color: white; border-color: var(--p); }
 
-        /* MODIFICACIÓN EXCLUSIVA DE TARJETAS */
+        /* ESTILOS DE TARJETA CORREGIDOS - AJUSTE DE VISIBILIDAD */
         .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
-        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; display: flex; flex-direction: column; height: auto; min-height: 320px; }
-        .foto-material { width: 100%; height: 120px; object-fit: cover; background: #eee; }
+        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; display: flex; flex-direction: column; min-height: 280px; height: auto; }
+        .foto-material { width: 100%; height: 110px; object-fit: cover; background: #eee; }
+        .info-material { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; gap: 4px; background: inherit; }
         
-        .info-material { padding: 12px; flex: 1; display: flex; flex-direction: column; background: inherit; }
-        .info-titulo { font-size: 14px; font-weight: 800; color: var(--s); margin-bottom: 6px; display: block; line-height: 1.2; }
-        .info-detalle { font-size: 11px; color: var(--txt); margin: 3px 0; line-height: 1.2; display: block; }
-        .info-label { font-weight: 900; text-transform: uppercase; font-size: 8px; color: var(--s); opacity: 0.8; margin-right: 4px; }
-        .info-notas { font-size: 10px; font-style: italic; opacity: 0.8; margin-top: 8px; padding: 6px; background: rgba(0,0,0,0.05); border-radius: 8px; border-left: 3px solid var(--p); color: var(--txt); }
+        .info-titulo { font-size: 13px; font-weight: 700; color: var(--s); margin: 0 0 4px 0; line-height: 1.2; display: block; }
+        .info-detalle { font-size: 11px; color: var(--txt); margin: 2px 0; line-height: 1.3; display: block; }
+        .info-label { font-weight: 800; text-transform: uppercase; font-size: 9px; color: var(--s); opacity: 0.9; margin-right: 4px; }
+        .info-notas { font-size: 10px; font-style: italic; opacity: 0.9; margin-top: 5px; padding-top: 5px; border-top: 1px dashed var(--br); color: var(--txt); }
 
-        .btn-edit-float { position: absolute; top: 8px; right: 8px; background: rgba(0, 0, 0, 0.6); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; }
-        .btn-delete-float { position: absolute; top: 8px; left: 8px; background: rgba(220, 53, 69, 0.8); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; }
+        .btn-edit-float { position: absolute; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.6); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 5; }
+        .btn-delete-float { position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.6); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 5; }
 
-        .controles-stock { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding: 10px 0 0 0; border-top: 1px solid var(--br); }
-        .btn-qty { background: var(--pc); border: 1px solid var(--p); width: 28px; height: 28px; border-radius: 50%; color: var(--s); font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-        /* RESTO DEL CÓDIGO IGUAL */
         .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-top: 5px; }
         .badge-idea { background: #e2e3e5; color: #383d41; }
         .badge-proceso { background: #fff3cd; color: #856404; }
         .badge-listo { background: #d4edda; color: #155724; }
+
         .card-form { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 500px; margin: 0 auto; margin-bottom: 20px; }
         label { display: block; font-size: 11px; color: var(--s); font-weight: 700; margin: 10px 0 4px 4px; }
         input, select, textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--br); box-sizing: border-box; font-size: 14px; background: var(--f); color: var(--txt); }
         textarea { height: 80px; resize: none; }
         .btn-grande { width: 100%; background: var(--p); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; }
+
         .canvas-container { background: white; border: 1px solid var(--br); border-radius: 15px; margin-top: 10px; position: relative; overflow: hidden; }
         .canvas-base { display: block; width: 100%; height: 250px; cursor: crosshair; }
         .canvas-grid { background-image: linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
         .canvas-tools { display: flex; gap: 5px; margin-top: 5px; margin-bottom: 15px; }
         .btn-tool { flex: 1; padding: 8px; font-size: 12px; border: 1px solid var(--br); border-radius: 8px; background: var(--b); cursor: pointer; color: var(--txt); }
         .btn-tool.active { background: var(--pc); border-color: var(--p); color: var(--s); }
+
         #dark-mode-toggle { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .pdf-item, .regalo-item { background: var(--b); border: 1px solid var(--br); border-radius: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; text-decoration: none; color: var(--txt); transition: 0.2s; }
+        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--br); }
+        .btn-qty { background: var(--pc); border: none; width: 25px; height: 25px; border-radius: 50%; color: var(--s); font-weight: bold; cursor: pointer; }
+
+        .pdf-item, .regalo-item {
+            background: var(--b); border: 1px solid var(--br); border-radius: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; text-decoration: none; color: var(--txt); transition: 0.2s;
+        }
         .pdf-item:hover { border-color: var(--p); background: var(--pc); }
         .pdf-icon, .regalo-icon { font-size: 24px; color: var(--s); }
         .pdf-info, .regalo-info { flex: 1; }
         .pdf-nombre, .regalo-nombre { font-weight: 600; font-size: 14px; margin: 0; }
         .pdf-fecha, .regalo-meta { font-size: 11px; color: #888; margin: 0; }
+        
         .preferencias-box { font-size: 12px; font-style: italic; color: var(--s); margin-top: 5px; padding: 5px; background: var(--pc); border-radius: 8px; }
         .enlace-tag { display: inline-block; padding: 2px 8px; background: var(--p); color: white; border-radius: 10px; font-size: 10px; margin-right: 5px; margin-top: 5px; }
     </style>
@@ -78,7 +83,7 @@
     <button class="btn-nav" id="nav-REGALOS" onclick="cambiarVista('REGALOS')">🎁 REGALOS</button>
 </div>
 
-<!-- VISTA INICIO -->
+<!-- VISTA INICIO (FORMULARIO) -->
 <div id="vista-INICIO">
     <div class="card-form">
         <h2 id="titulo-formulario" style="color:var(--s); text-align:center; margin-top:0;">📦 Añadir Material</h2>
@@ -129,6 +134,75 @@
     <div id="lista-stock" class="grid-estudio"></div>
 </div>
 
+<!-- VISTA PROYECTOS -->
+<div id="vista-PROYECTOS" style="display:none;">
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">✨ Nuevo Proyecto</h2>
+        <label>NOMBRE DEL PROYECTO</label>
+        <input type="text" id="p-nombre" placeholder="Ej: Jersey de Invierno">
+        <label>ESTADO</label>
+        <select id="p-estado">
+            <option value="Idea">💡 Idea</option>
+            <option value="En proceso">⏳ En proceso</option>
+            <option value="Terminado">✅ Terminado</option>
+        </select>
+        <label>NOTAS DEL PROYECTO</label>
+        <textarea id="p-notas" placeholder="Patrón, agujas usadas..."></textarea>
+        <label>DIBUJO DEL PUNTO</label>
+        <div class="canvas-container"><canvas id="canvas-punto" class="canvas-base canvas-grid"></canvas></div>
+        <div class="canvas-tools">
+            <button class="btn-tool active" id="tool-pincel-punto" onclick="setTool('canvas-punto', 'pincel')">🖌️ Pincel</button>
+            <button class="btn-tool" id="tool-goma-punto" onclick="setTool('canvas-punto', 'goma')">🧽 Goma</button>
+            <button class="btn-tool" onclick="limpiarCanvas('canvas-punto')">🗑️</button>
+        </div>
+        <label>DISEÑO SOBRE CUERPOS</label>
+        <div class="canvas-container"><canvas id="canvas-cuerpos" class="canvas-base"></canvas></div>
+        <div class="canvas-tools">
+            <button class="btn-tool active" id="tool-pincel-cuerpos" onclick="setTool('canvas-cuerpos', 'pincel')">🖌️ Pincel</button>
+            <button class="btn-tool" id="tool-goma-cuerpos" onclick="setTool('canvas-cuerpos', 'goma')">🧽 Goma</button>
+            <button class="btn-tool" onclick="limpiarCanvas('canvas-cuerpos')">🗑️</button>
+        </div>
+        <label>FOTO FINAL</label>
+        <input type="file" id="p-archivo" accept="image/*">
+        <button class="btn-grande" style="background:var(--p)" onclick="guardarNuevo('proyecto')">CREAR PROYECTO</button>
+    </div>
+    <div id="lista-proyectos" class="grid-estudio"></div>
+</div>
+
+<!-- VISTA PDFS -->
+<div id="vista-PDFS" style="display:none;">
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">📂 Subir Patrón PDF</h2>
+        <label>NOMBRE DEL PATRÓN</label>
+        <input type="text" id="pdf-nombre" placeholder="Ej: Chal Susimiu">
+        <input type="file" id="pdf-archivo" accept=".pdf" style="margin-top:10px;">
+        <button class="btn-grande" style="background:var(--s)" onclick="subirPDF()">SUBIR A BIBLIOTECA</button>
+    </div>
+    <div id="lista-pdfs"></div>
+</div>
+
+<!-- VISTA REGALOS -->
+<div id="vista-REGALOS" style="display:none;">
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">🎁 Regalos y Encargos</h2>
+        <label>¿PARA QUIÉN ES?</label>
+        <input type="text" id="reg-persona" placeholder="Nombre de la persona">
+        <label>¿QUÉ VAS A REGALAR/HACER?</label>
+        <input type="text" id="reg-detalle" placeholder="Ej: Manta de apego">
+        <label>GUSTOS Y PREFERENCIAS</label>
+        <textarea id="reg-preferencias" placeholder="Le gustan los colores pastel..."></textarea>
+        <label>ENLAZAR DISEÑO (PROYECTO)</label>
+        <select id="reg-enlace-proyecto"><option value="">Ninguno</option></select>
+        <label>ENLAZAR PATRÓN PDF</label>
+        <select id="reg-enlace-pdf"><option value="">Ninguno</option></select>
+        <button class="btn-grande" style="background:var(--p)" onclick="guardarRegalo()">AÑADIR AL MAPA</button>
+    </div>
+    <h3 style="color:var(--s); padding-left:10px;">📍 Mapa de Regalos Pendientes</h3>
+    <div id="lista-regalos-pendientes"></div>
+    <h3 style="color:var(--txt); padding-left:10px; margin-top:30px; opacity:0.6;">✅ Entregados (Historial)</h3>
+    <div id="lista-regalos-entregados" style="opacity:0.6;"></div>
+</div>
+
 <script>
     const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
     const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
@@ -146,7 +220,13 @@
         if(navBtn) navBtn.classList.add('active');
         document.getElementById('vista-INICIO').style.display = v === 'INICIO' ? 'block' : 'none';
         document.getElementById('vista-STOCK').style.display = v === 'STOCK' ? 'block' : 'none';
+        document.getElementById('vista-PROYECTOS').style.display = v === 'PROYECTOS' ? 'block' : 'none';
+        document.getElementById('vista-PDFS').style.display = v === 'PDFS' ? 'block' : 'none';
+        document.getElementById('vista-REGALOS').style.display = v === 'REGALOS' ? 'block' : 'none';
         if(v === 'STOCK') filtrar('Todo');
+        if(v === 'PROYECTOS') setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
+        if(v === 'REGALOS') cargarRegalos();
+        if(v === 'PDFS') cargarPDFs();
     }
 
     function filtrar(cat) {
@@ -161,10 +241,14 @@
             const { data: stock } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
             lanasGlobal = stock || [];
             renderizarStock(lanasGlobal);
+            const { data: proy } = await client.from('proyectos_data').select('*').order('created_at', {ascending: false});
+            proyectosGlobal = proy || [];
+            renderizarProyectos(proyectosGlobal);
+            cargarPDFs();
         } catch (e) { console.error(e); }
     }
 
-    /* RENDERIZADO CORREGIDO PARA MOSTRAR LA INFO EN MODO OSCURO Y CLARO */
+    /* RENDERIZADO DE STOCK CORREGIDO PARA MOSTRAR TODA LA INFO */
     function renderizarStock(lista) {
         document.getElementById('lista-stock').innerHTML = lista.map(m => `
             <div class="item-card">
@@ -182,13 +266,149 @@
 
                     <div class="controles-stock">
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
-                        <span style="font-weight:bold; font-size:16px; color:var(--txt)">${m.cantidad}</span>
+                        <span style="font-weight:bold; font-size:14px; color:var(--txt);">${m.cantidad}</span>
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, 1)">+</button>
                     </div>
                 </div>
             </div>
         `).join('');
     }
+
+    function cargarEdicion(id) {
+        const item = lanasGlobal.find(m => m.id === id);
+        if(!item) return;
+        document.getElementById('m-id').value = item.id;
+        document.getElementById('m-nombre').value = item.tipo_material;
+        document.getElementById('m-categoria').value = item.categoria;
+        document.getElementById('m-cantidad').value = item.cantidad;
+        document.getElementById('m-composicion').value = item.composicion || "";
+        document.getElementById('m-tienda').value = item.tienda || "";
+        document.getElementById('m-grosor').value = item.grosor || "";
+        document.getElementById('m-notas').value = item.notas || "";
+        document.getElementById('titulo-formulario').innerText = "✏️ Editar Material";
+        document.getElementById('btn-accion-stock').innerText = "ACTUALIZAR MATERIAL";
+        document.getElementById('btn-cancelar-edit').style.display = "block";
+        cambiarVista('INICIO');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function limpiarFormulario() {
+        document.getElementById('m-id').value = "";
+        document.getElementById('m-nombre').value = "";
+        document.getElementById('m-cantidad').value = "1";
+        document.getElementById('m-composicion').value = "";
+        document.getElementById('m-tienda').value = "";
+        document.getElementById('m-grosor').value = "";
+        document.getElementById('m-notas').value = "";
+        document.getElementById('m-archivo').value = "";
+        document.getElementById('titulo-formulario').innerText = "📦 Añadir Material";
+        document.getElementById('btn-accion-stock').innerText = "GUARDAR EN STOCK";
+        document.getElementById('btn-cancelar-edit').style.display = "none";
+    }
+
+    async function guardarNuevo(tipo) {
+        const idEdit = document.getElementById('m-id').value;
+        const fileInput = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo');
+        let fotoUrl = "";
+        if(fileInput.files[0]) {
+            const f = fileInput.files[0];
+            const name = `${Date.now()}_${f.name}`;
+            await client.storage.from('fotos_estudio').upload(name, f);
+            fotoUrl = client.storage.from('fotos_estudio').getPublicUrl(name).data.publicUrl;
+        }
+        if(tipo === 'stock') {
+            const datos = {
+                tipo_material: document.getElementById('m-nombre').value,
+                categoria: document.getElementById('m-categoria').value,
+                cantidad: parseInt(document.getElementById('m-cantidad').value),
+                composicion: document.getElementById('m-composicion').value,
+                tienda: document.getElementById('m-tienda').value,
+                grosor: document.getElementById('m-grosor').value,
+                notas: document.getElementById('m-notas').value
+            };
+            if(fotoUrl) datos.contenido = fotoUrl;
+            if(idEdit) await client.from('estudio_data').update(datos).eq('id', idEdit);
+            else await client.from('estudio_data').insert([datos]);
+            limpiarFormulario();
+        } else {
+            await client.from('proyectos_data').insert([{
+                nombre: document.getElementById('p-nombre').value,
+                estado: document.getElementById('p-estado').value,
+                notas: document.getElementById('p-notas').value,
+                foto: fotoUrl
+            }]);
+        }
+        alert("¡Guardado! 💖");
+        cargarDatos();
+        cambiarVista(tipo === 'stock' ? 'STOCK' : 'PROYECTOS');
+    }
+
+    function renderizarProyectos(lista) {
+        document.getElementById('lista-proyectos').innerHTML = lista.map(p => `
+            <div class="item-card">
+                <img src="${p.foto || 'https://via.placeholder.com/150?text=Proyecto'}" class="foto-material">
+                <div class="info-material" style="text-align:center;">
+                    <h4 style="margin-bottom:5px; font-size:13px;">${p.nombre}</h4>
+                    <span class="badge ${p.estado === 'Terminado' ? 'badge-listo' : (p.estado === 'Idea' ? 'badge-idea' : 'badge-proceso')}">${p.estado}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function cargarPDFs() {
+        const { data } = await client.from('pdfs_data').select('*').order('created_at', {ascending: false});
+        pdfsGlobal = data || [];
+        document.getElementById('lista-pdfs').innerHTML = pdfsGlobal.map(pdf => `
+            <div class="pdf-item-container" style="position:relative;">
+                <button class="btn-delete-float" style="top:5px; left:5px; width:22px; height:22px; font-size:10px;" onclick="eliminarPDF(${pdf.id})">✖</button>
+                <a href="${pdf.url}" target="_blank" class="pdf-item">
+                    <div class="pdf-icon">📄</div>
+                    <div class="pdf-info"><p class="pdf-nombre">${pdf.nombre}</p><p class="pdf-fecha">Subido: ${new Date(pdf.created_at).toLocaleDateString()}</p></div>
+                </a>
+            </div>
+        `).join('');
+    }
+
+    async function subirPDF() {
+        const nombre = document.getElementById('pdf-nombre').value;
+        const file = document.getElementById('pdf-archivo').files[0];
+        if(!nombre || !file) return alert("Faltan datos 🎀");
+        const fileName = `${Date.now()}_${file.name}`;
+        await client.storage.from('patrones_pdf').upload(fileName, file);
+        const { data: urlData } = client.storage.from('patrones_pdf').getPublicUrl(fileName);
+        await client.from('pdfs_data').insert([{ nombre, url: urlData.publicUrl }]);
+        alert("¡Patrón guardado!");
+        cargarPDFs();
+    }
+
+    async function cargarRegalos() {
+        const { data } = await client.from('regalos_data').select('*').order('created_at', {ascending: false});
+        regalosGlobal = data || [];
+        document.getElementById('reg-enlace-proyecto').innerHTML = '<option value="">Ninguno</option>' + proyectosGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+        document.getElementById('reg-enlace-pdf').innerHTML = '<option value="">Ninguno</option>' + pdfsGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+        renderizarRegalos();
+    }
+
+    function renderizarRegalos() {
+        const htmlRegalo = (r) => {
+            const proy = proyectosGlobal.find(p => p.id == r.diseno_id);
+            const pdf = pdfsGlobal.find(p => p.id == r.pdf_id);
+            return `<div class="regalo-item"><div class="regalo-icon">🎁</div><div class="regalo-info"><p class="regalo-nombre">Para: ${r.persona}</p><p style="font-size:13px; margin:2px 0;">Regalo: ${r.detalle_regalo}</p><div class="preferencias-box">Gustos: ${r.preferencias}</div>${proy ? `<span class="enlace-tag">🎨 Proyecto: ${proy.nombre}</span>` : ''}${pdf ? `<span class="enlace-tag">📄 PDF: ${pdf.nombre}</span>` : ''}</div>${r.estado === 'Pendiente' ? `<button onclick="marcarEntregado(${r.id})" style="border:none; background:var(--p); color:white; border-radius:10px; padding:8px; cursor:pointer;">✨</button>` : ''}</div>`;
+        };
+        document.getElementById('lista-regalos-pendientes').innerHTML = regalosGlobal.filter(r => r.estado === 'Pendiente').map(htmlRegalo).join('');
+        document.getElementById('lista-regalos-entregados').innerHTML = regalosGlobal.filter(r => r.estado === 'Entregado').map(htmlRegalo).join('');
+    }
+
+    async function guardarRegalo() {
+        const p = document.getElementById('reg-persona').value; const d = document.getElementById('reg-detalle').value;
+        if(!p || !d) return alert("Faltan datos 🎀");
+        await client.from('regalos_data').insert([{ persona: p, detalle_regalo: d, preferencias: document.getElementById('reg-preferencias').value, diseno_id: document.getElementById('reg-enlace-proyecto').value || null, pdf_id: document.getElementById('reg-enlace-pdf').value || null, estado: 'Pendiente' }]);
+        alert("¡Regalo añadido! 💖"); cargarRegalos();
+    }
+
+    async function marcarEntregado(id) { if(confirm("¿Ya lo has entregado? ✨")) { await client.from('regalos_data').update({ estado: 'Entregado' }).eq('id', id); cargarRegalos(); } }
+
+    async function eliminarStock(id) { if(confirm("¿Borrar material?")) { await client.from('estudio_data').delete().eq('id', id); cargarDatos(); } }
 
     async function cambiarStock(id, cambio) {
         const item = lanasGlobal.find(l => l.id === id);
@@ -198,15 +418,25 @@
     }
 
     function toggleDarkMode() {
-        const body = document.body;
-        if(body.getAttribute('data-theme') === 'dark') { body.removeAttribute('data-theme'); localStorage.setItem('theme', 'light'); }
+        const body = document.body; const current = body.getAttribute('data-theme');
+        if(current === 'dark') { body.removeAttribute('data-theme'); localStorage.setItem('theme', 'light'); }
         else { body.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); }
     }
 
-    window.onload = () => { 
-        if(localStorage.getItem('theme') === 'dark') document.body.setAttribute('data-theme', 'dark'); 
-        cargarDatos(); 
-    };
+    function iniciarCanvas(id) {
+        const canvas = document.getElementById(id); const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+        let paint = false;
+        const getPos = (e) => { const rect = canvas.getBoundingClientRect(); return { x: (e.clientX || e.touches[0].clientX) - rect.left, y: (e.clientY || e.touches[0].clientY) - rect.top }; };
+        const start = (e) => { paint = true; draw(e); }; const end = () => { paint = false; ctx.beginPath(); };
+        const draw = (e) => { if(!paint) return; const pos = getPos(e); ctx.lineWidth = toolsState[id] === 'goma' ? 15 : 2; ctx.lineCap = 'round'; ctx.globalCompositeOperation = toolsState[id] === 'goma' ? 'destination-out' : 'source-over'; ctx.strokeStyle = '#f06292'; ctx.lineTo(pos.x, pos.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); };
+        canvas.onmousedown = start; canvas.onmousemove = draw; canvas.onmouseup = end; canvas.ontouchstart = start; canvas.ontouchmove = draw; canvas.ontouchend = end;
+    }
+    
+    function setTool(id, t) { toolsState[id] = t; document.querySelectorAll(`#tool-pincel-${id.split('-')[1]}, #tool-goma-${id.split('-')[1]}`).forEach(b => b.classList.remove('active')); document.getElementById(`tool-${t}-${id.split('-')[1]}`).classList.add('active'); }
+    function limpiarCanvas(id) { const c = document.getElementById(id); c.getContext('2d').clearRect(0,0,c.width,c.height); }
+
+    window.onload = () => { if(localStorage.getItem('theme') === 'dark') document.body.setAttribute('data-theme', 'dark'); cargarDatos(); };
 </script>
 </body>
 </html>
