@@ -46,7 +46,6 @@
         textarea { height: 80px; resize: none; }
         .btn-grande { width: 100%; background: var(--p); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; }
 
-        /* ESTILOS ESPECÍFICOS COMPRAS */
         .compra-item { background: var(--b); padding: 15px; border-radius: 18px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--br); }
         .prio-Alta { border-left: 6px solid #ff4d4d !important; }
         .prio-Media { border-left: 6px solid #ffcc00 !important; }
@@ -56,9 +55,9 @@
         .canvas-base { display: block; width: 100%; height: 250px; cursor: crosshair; }
         .canvas-grid { background-image: linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
         
-        /* ESTILOS MODIFICADOS PARA EL LIENZO DE CUERPOS - IMAGEN INCRUSTADA DIRECTAMENTE */
+        /* IMAGEN DE FIGURINES CORREGIDA */
         .canvas-cuerpos {
-            background-image: url('https://img.freepik.com/free-vector/hand-drawn-fashion-model-template_23-2148197771.jpg');
+            background-image: url('https://i.pinimg.com/originals/9e/7b/9e/9e7b9e078516089b09333902f37e40b3.jpg');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -290,7 +289,6 @@
         else { const filtrados = lanasGlobal.filter(m => m.categoria === cat); renderizarStock(filtrados); }
     }
 
-    // --- LÓGICA DE COMPRAS 🛒 ---
     async function guardarCompra() {
         const nombre = document.getElementById('c-nombre').value;
         const tienda = document.getElementById('c-tienda').value || 'General';
@@ -339,8 +337,6 @@
         cargarCompras();
     }
 
-    // --- FIN LÓGICA COMPRAS ---
-
     async function cargarDatos() {
         try {
             const { data: stock } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
@@ -361,13 +357,10 @@
                 <img src="${m.contenido || 'https://via.placeholder.com/150?text=Material'}" class="foto-material">
                 <div class="info-material">
                     <span class="info-titulo">${m.tipo_material}</span>
-                    
                     <div class="info-detalle">🧬 ${m.composicion || 'n/a'}</div>
                     <div class="info-detalle">📐 ${m.grosor || 'n/a'}</div>
                     <div class="info-detalle">🏪 ${m.tienda || 'n/a'}</div>
-                    
                     ${m.notas ? `<div class="info-notas">📝 ${m.notas}</div>` : ''}
-
                     <div class="controles-stock">
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
                         <span style="font-weight:bold; font-size:14px;">${m.cantidad}</span>
@@ -414,63 +407,43 @@
         const idEdit = document.getElementById('m-id').value;
         const fileInput = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo');
         let fotoUrl = "";
-        
         try {
             if(fileInput && fileInput.files[0]) {
                 const f = fileInput.files[0];
                 const name = `${Date.now()}_${f.name}`;
                 const { error: uploadError } = await client.storage.from('fotos-lanas').upload(name, f);
-                
-                if (uploadError) {
-                    throw new Error("Error al subir foto: " + uploadError.message);
-                } else {
-                    fotoUrl = client.storage.from('fotos-lanas').getPublicUrl(name).data.publicUrl;
-                }
+                if (uploadError) throw new Error("Error al subir foto: " + uploadError.message);
+                else fotoUrl = client.storage.from('fotos-lanas').getPublicUrl(name).data.publicUrl;
             }
-
             if(tipo === 'stock') {
                 const nombreVal = document.getElementById('m-nombre').value;
                 if(!nombreVal) throw new Error("Debes poner un nombre al material");
-
                 const datos = {
-                    tipo_material: nombreVal,
-                    categoria: document.getElementById('m-categoria').value,
+                    tipo_material: nombreVal, categoria: document.getElementById('m-categoria').value,
                     cantidad: parseInt(document.getElementById('m-cantidad').value) || 0,
                     composicion: document.getElementById('m-composicion').value || "",
                     tienda: document.getElementById('m-tienda').value || "",
                     grosor: document.getElementById('m-grosor').value || "",
                     notas: document.getElementById('m-notas').value || ""
                 };
-                
                 if(fotoUrl) datos.contenido = fotoUrl;
-
                 let res;
-                if(idEdit) {
-                    res = await client.from('estudio_data').update(datos).eq('id', idEdit);
-                } else {
-                    res = await client.from('estudio_data').insert([datos]);
-                }
-                
+                if(idEdit) res = await client.from('estudio_data').update(datos).eq('id', idEdit);
+                else res = await client.from('estudio_data').insert([datos]);
                 if (res.error) throw res.error;
                 limpiarFormulario();
             } else {
                 const { error: pError } = await client.from('proyectos_data').insert([{
                     nombre: document.getElementById('p-nombre').value,
                     estado: document.getElementById('p-estado').value,
-                    notas: document.getElementById('p-notas').value,
-                    foto: fotoUrl || null
+                    notas: document.getElementById('p-notas').value, foto: fotoUrl || null
                 }]);
                 if (pError) throw pError;
             }
-            
             alert("¡Guardado correctamente! 💖");
             await cargarDatos();
             cambiarVista(tipo === 'stock' ? 'STOCK' : 'PROYECTOS');
-
-        } catch (err) {
-            console.error("Error detectado:", err);
-            alert("Error: " + (err.message || "Problema al conectar con la base de datos"));
-        }
+        } catch (err) { alert("Error: " + (err.message || "Problema al conectar")); }
     }
 
     function renderizarProyectos(lista) {
@@ -553,13 +526,7 @@
 
     async function eliminarNota(id) { if(confirm("¿Borrar nota?")) { await client.from('notas_data').delete().eq('id', id); cargarNotas(); } }
     async function eliminarPDF(id) { if(confirm("¿Borrar PDF de la biblioteca?")) { await client.from('pdfs_data').delete().eq('id', id); cargarPDFs(); } }
-
-    async function eliminarStock(id) {
-        if(confirm("¿Seguro que quieres borrar este material? 🧶")) {
-            await client.from('estudio_data').delete().eq('id', id);
-            cargarDatos();
-        }
-    }
+    async function eliminarStock(id) { if(confirm("¿Borrar este material? 🧶")) { await client.from('estudio_data').delete().eq('id', id); cargarDatos(); } }
 
     async function cambiarStock(id, cambio) {
         const item = lanasGlobal.find(m => m.id === id);
@@ -570,8 +537,7 @@
 
     function toggleDarkMode() {
         const body = document.body;
-        const current = body.getAttribute('data-theme');
-        const next = current === 'dark' ? 'light' : 'dark';
+        const next = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         body.setAttribute('data-theme', next);
         document.getElementById('dark-mode-toggle').innerText = next === 'dark' ? '☀️' : '🌙';
     }
@@ -593,9 +559,18 @@
         function draw(e) {
             if(!painting) return;
             const pos = getPos(e);
-            ctx.lineWidth = 3; ctx.lineCap = 'round';
-            ctx.strokeStyle = toolsState[id] === 'pincel' ? '#f06292' : '#ffffff';
-            if(toolsState[id] === 'goma') ctx.lineWidth = 15;
+            
+            // LÓGICA DE HERRAMIENTA CORREGIDA
+            if (toolsState[id] === 'goma') {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = 20;
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = '#f06292';
+            }
+            
+            ctx.lineCap = 'round';
             ctx.lineTo(pos.x, pos.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
             e.preventDefault();
         }
@@ -608,8 +583,9 @@
 
     function setTool(canvasId, tool) {
         toolsState[canvasId] = tool;
-        document.getElementById(`tool-pincel-${canvasId.split('-')[1]}`).classList.toggle('active', tool === 'pincel');
-        document.getElementById(`tool-goma-${canvasId.split('-')[1]}`).classList.toggle('active', tool === 'goma');
+        const suffix = canvasId.split('-')[1];
+        document.getElementById(`tool-pincel-${suffix}`).classList.toggle('active', tool === 'pincel');
+        document.getElementById(`tool-goma-${suffix}`).classList.toggle('active', tool === 'goma');
     }
 
     function limpiarCanvas(id) {
