@@ -242,6 +242,7 @@
         } catch (e) { console.error(e); }
     }
 
+    /* RENDERIZADO DE STOCK - ACTUALIZADO CON COLORES FORZADOS PARA MODO OSCURO */
     function renderizarStock(lista) {
         document.getElementById('lista-stock').innerHTML = lista.map(m => `
             <div class="item-card">
@@ -251,15 +252,17 @@
                 <div class="info-material">
                     <span class="info-titulo">${m.tipo_material}</span>
                     
-                    ${m.composicion ? `<div class="info-detalle">🧬 ${m.composicion}</div>` : ''}
-                    ${m.grosor ? `<div class="info-detalle">📐 ${m.grosor}</div>` : ''}
-                    ${m.tienda ? `<div class="info-detalle">🏪 ${m.tienda}</div>` : ''}
+                    <div style="color: #eee; font-size: 11px; margin-top: 5px; display: flex; flex-direction: column; gap: 3px;">
+                        ${m.composicion ? `<span>🧬 ${m.composicion}</span>` : ''}
+                        ${m.grosor ? `<span>📐 ${m.grosor}</span>` : ''}
+                        ${m.tienda ? `<span>🏪 ${m.tienda}</span>` : ''}
+                    </div>
                     
-                    ${m.notas ? `<div class="info-notas">📝 ${m.notas}</div>` : ''}
+                    ${m.notas ? `<div class="info-notas" style="color: #bbb; border-top: 1px solid #444; margin-top: 8px;">📝 ${m.notas}</div>` : ''}
 
                     <div class="controles-stock">
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
-                        <span style="font-weight:bold; font-size:14px;">${m.cantidad}</span>
+                        <span style="font-weight:bold; font-size:14px; color: var(--txt);">${m.cantidad}</span>
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, 1)">+</button>
                     </div>
                 </div>
