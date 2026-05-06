@@ -46,6 +46,12 @@
         textarea { height: 80px; resize: none; }
         .btn-grande { width: 100%; background: var(--p); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; }
 
+        /* ESTILOS ESPECÍFICOS COMPRAS */
+        .compra-item { background: var(--b); padding: 15px; border-radius: 18px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--br); }
+        .prio-Alta { border-left: 6px solid #ff4d4d !important; }
+        .prio-Media { border-left: 6px solid #ffcc00 !important; }
+        .prio-Baja { border-left: 6px solid #2ecc71 !important; }
+
         .canvas-container { background: white; border: 1px solid var(--br); border-radius: 15px; margin-top: 10px; position: relative; overflow: hidden; }
         .canvas-base { display: block; width: 100%; height: 250px; cursor: crosshair; }
         .canvas-grid { background-image: linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
@@ -77,6 +83,7 @@
 <div class="menu-secciones">
     <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
     <button class="btn-nav" id="nav-STOCK" onclick="cambiarVista('STOCK')">📦 STOCK</button>
+    <button class="btn-nav" id="nav-COMPRAS" onclick="cambiarVista('COMPRAS')">🛒 COMPRAS</button>
     <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
     <button class="btn-nav" id="nav-PDFS" onclick="cambiarVista('PDFS')">📂 PDFs</button>
     <button class="btn-nav" id="nav-REGALOS" onclick="cambiarVista('REGALOS')">🎁 REGALOS</button>
@@ -130,6 +137,30 @@
         <button class="btn-filtro" id="filtro-Otros" onclick="filtrar('Otros')">🧸 Otros</button>
     </div>
     <div id="lista-stock" class="grid-estudio"></div>
+</div>
+
+<div id="vista-COMPRAS" style="display:none;">
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">🛒 Lista de Compras</h2>
+        <input type="text" id="c-nombre" placeholder="¿Qué necesitas comprar?">
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label>TIENDA</label>
+                <input type="text" id="c-tienda" placeholder="Ej: Mercería Ana">
+            </div>
+            <div style="flex:1;">
+                <label>PRIORIDAD</label>
+                <select id="c-prioridad">
+                    <option value="Alta">🔴 Alta</option>
+                    <option value="Media">🟡 Media</option>
+                    <option value="Baja">🟢 Baja</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-grande" style="background:var(--s)" onclick="guardarCompra()">AÑADIR A LA LISTA</button>
+    </div>
+    <div class="filtros-container" id="filtros-tiendas-compras"></div>
+    <div id="lista-compras"></div>
 </div>
 
 <div id="vista-PROYECTOS" style="display:none;">
@@ -219,6 +250,8 @@
     let proyectosGlobal = [];
     let pdfsGlobal = [];
     let regalosGlobal = [];
+    let comprasGlobal = [];
+    let tiendaFiltradaCompras = 'Todas';
     let toolsState = { 'canvas-punto': 'pincel', 'canvas-cuerpos': 'pincel' };
 
     function cambiarVista(v) {
@@ -227,11 +260,14 @@
         if(navBtn) navBtn.classList.add('active');
         document.getElementById('vista-INICIO').style.display = v === 'INICIO' ? 'block' : 'none';
         document.getElementById('vista-STOCK').style.display = v === 'STOCK' ? 'block' : 'none';
+        document.getElementById('vista-COMPRAS').style.display = v === 'COMPRAS' ? 'block' : 'none';
         document.getElementById('vista-PROYECTOS').style.display = v === 'PROYECTOS' ? 'block' : 'none';
         document.getElementById('vista-PDFS').style.display = v === 'PDFS' ? 'block' : 'none';
         document.getElementById('vista-REGALOS').style.display = v === 'REGALOS' ? 'block' : 'none';
         document.getElementById('vista-NOTAS').style.display = v === 'NOTAS' ? 'block' : 'none';
+        
         if(v === 'STOCK') filtrar('Todo');
+        if(v === 'COMPRAS') cargarCompras();
         if(v === 'PROYECTOS') setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
         if(v === 'REGALOS') cargarRegalos();
         if(v === 'PDFS') cargarPDFs();
@@ -244,6 +280,57 @@
         if (cat === 'Todo') { renderizarStock(lanasGlobal); } 
         else { const filtrados = lanasGlobal.filter(m => m.categoria === cat); renderizarStock(filtrados); }
     }
+
+    // --- LÓGICA DE COMPRAS 🛒 ---
+    async function guardarCompra() {
+        const nombre = document.getElementById('c-nombre').value;
+        const tienda = document.getElementById('c-tienda').value || 'General';
+        const prioridad = document.getElementById('c-prioridad').value;
+        if(!nombre) return alert("Escribe qué necesitas comprar 🎀");
+        await client.from('compras_data').insert([{ nombre, tienda, prioridad, completado: false }]);
+        document.getElementById('c-nombre').value = "";
+        cargarCompras();
+    }
+
+    async function cargarCompras() {
+        const { data } = await client.from('compras_data').select('*').order('created_at', {ascending: false});
+        comprasGlobal = data || [];
+        renderizarFiltrosCompras();
+        renderizarListaCompras();
+    }
+
+    function renderizarFiltrosCompras() {
+        const tiendas = ['Todas', ...new Set(comprasGlobal.map(c => c.tienda))];
+        document.getElementById('filtros-tiendas-compras').innerHTML = tiendas.map(t => `
+            <button class="btn-filtro ${tiendaFiltradaCompras === t ? 'active' : ''}" onclick="filtrarTiendaCompra('${t}')">${t}</button>
+        `).join('');
+    }
+
+    function filtrarTiendaCompra(t) {
+        tiendaFiltradaCompras = t;
+        renderizarFiltrosCompras();
+        renderizarListaCompras();
+    }
+
+    function renderizarListaCompras() {
+        const filtradas = tiendaFiltradaCompras === 'Todas' ? comprasGlobal : comprasGlobal.filter(c => c.tienda === tiendaFiltradaCompras);
+        document.getElementById('lista-compras').innerHTML = filtradas.map(c => `
+            <div class="compra-item prio-${c.prioridad}">
+                <div>
+                    <strong style="color:var(--s)">${c.nombre}</strong><br>
+                    <small>📍 ${c.tienda} | Prioridad: ${c.prioridad}</small>
+                </div>
+                <button onclick="eliminarCompra(${c.id})" style="background:none; border:none; font-size:20px; cursor:pointer;">✅</button>
+            </div>
+        `).join('');
+    }
+
+    async function eliminarCompra(id) {
+        await client.from('compras_data').delete().eq('id', id);
+        cargarCompras();
+    }
+
+    // --- FIN LÓGICA COMPRAS ---
 
     async function cargarDatos() {
         try {
