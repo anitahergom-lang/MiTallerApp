@@ -88,7 +88,6 @@
         .preferencias-box { font-size: 12px; font-style: italic; color: var(--s); margin-top: 5px; padding: 5px; background: var(--pc); border-radius: 8px; }
         .enlace-tag { display: inline-block; padding: 2px 8px; background: var(--p); color: white; border-radius: 10px; font-size: 10px; margin-right: 5px; margin-top: 5px; }
 
-        /* NUEVOS ESTILOS PASO 2 */
         .editor-rich { background: var(--f); border: 1px solid var(--br); border-radius: 10px; min-height: 150px; padding: 12px; outline: none; margin-top: 5px; color: var(--txt); }
         .editor-toolbar { display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; }
         .btn-editor { background: var(--b); border: 1px solid var(--br); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; color: var(--txt); }
@@ -237,7 +236,11 @@
             <button class="btn-editor" onclick="document.execCommand('insertUnorderedList', false, null)">• Lista</button>
         </div>
         <div id="borrador-contenido" class="editor-rich" contenteditable="true"></div>
-        <p style="font-size:10px; color:#888; text-align:center; margin-top:10px;">(En el siguiente paso activaremos el guardado)</p>
+        
+        <div style="display:flex; gap:10px;">
+            <button class="btn-grande" style="background:#888; font-size:12px;" onclick="guardarBorradorLocal()">💾 GUARDAR BORRADOR</button>
+            <button class="btn-grande" style="background:var(--p); font-size:12px;" onclick="generarPDF()">📥 DESCARGAR PDF</button>
+        </div>
     </div>
 
     <div class="card-form">
@@ -280,7 +283,7 @@
         <textarea id="n-contenido" style="height:120px;" placeholder="Escribe aquí tus ideas..."></textarea>
         <button class="btn-grande" style="background:var(--s)" onclick="guardarNota()">GUARDAR NOTA</button>
     </div>
-    <div id="lista-notes"></div>
+    <div id="lista-notas"></div>
 </div>
 
 <script>
@@ -312,7 +315,7 @@
         if(v === 'COMPRAS') cargarCompras();
         if(v === 'PROYECTOS') setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
         if(v === 'REGALOS') cargarRegalos();
-        if(v === 'PDFS') cargarPDFs();
+        if(v === 'PDFS') { cargarPDFs(); cargarBorradorLocal(); }
         if(v === 'NOTAS') cargarNotas();
     }
 
@@ -634,6 +637,48 @@
     function limpiarCanvas(id) {
         const canvas = document.getElementById(id);
         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    /* NUEVAS FUNCIONES PASO 3 */
+    function guardarBorradorLocal() {
+        const titulo = document.getElementById('borrador-titulo').value;
+        const contenido = document.getElementById('borrador-contenido').innerHTML;
+        localStorage.setItem('borrador_patron_titulo', titulo);
+        localStorage.setItem('borrador_patron_cuerpo', contenido);
+        alert("¡Borrador guardado en tu móvil! 💾");
+    }
+
+    function cargarBorradorLocal() {
+        const t = localStorage.getItem('borrador_patron_titulo');
+        const c = localStorage.getItem('borrador_patron_cuerpo');
+        if(t) document.getElementById('borrador-titulo').value = t;
+        if(c) document.getElementById('borrador-contenido').innerHTML = c;
+    }
+
+    function generarPDF() {
+        const titulo = document.getElementById('borrador-titulo').value || 'Sin titulo';
+        const contenido = document.getElementById('borrador-contenido').innerHTML;
+        
+        if(!contenido) return alert("¡Escribe algo en el patrón! 🧶");
+
+        const tempContainer = document.createElement('div');
+        tempContainer.innerHTML = `
+            <div style="padding:40px; font-family:serif; color:#444;">
+                <h1 style="color:#f06292; text-align:center; border-bottom:2px solid #fce4ec; padding-bottom:10px;">${titulo}</h1>
+                <div style="margin-top:20px; line-height:1.6; font-size:14px;">${contenido}</div>
+                <p style="margin-top:50px; text-align:center; color:#ff85a2; font-style:italic; font-size:12px;">Creado con Mi Taller Rosa 💖</p>
+            </div>
+        `;
+        
+        const opt = {
+          margin: 10,
+          filename: `${titulo}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(tempContainer).save();
     }
 
     window.onload = cargarDatos;
