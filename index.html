@@ -22,16 +22,16 @@
         .btn-filtro { white-space: nowrap; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--br); background: var(--b); color: var(--txt); font-size: 12px; cursor: pointer; font-weight: 600; }
         .btn-filtro.active { background: var(--p); color: white; border-color: var(--p); }
 
-        /* ESTILOS DE TARJETA CORREGIDOS - AJUSTE DE VISIBILIDAD */
+        /* ESTILOS DE TARJETA CORREGIDOS */
         .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
-        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; display: flex; flex-direction: column; min-height: 280px; height: auto; }
+        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; display: flex; flex-direction: column; min-height: 300px; }
         .foto-material { width: 100%; height: 110px; object-fit: cover; background: #eee; }
-        .info-material { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; gap: 4px; background: inherit; }
+        .info-material { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; gap: 4px; color: var(--txt); }
         
         .info-titulo { font-size: 13px; font-weight: 700; color: var(--s); margin: 0 0 4px 0; line-height: 1.2; display: block; }
-        .info-detalle { font-size: 11px; color: var(--txt); margin: 2px 0; line-height: 1.3; display: block; }
-        .info-label { font-weight: 800; text-transform: uppercase; font-size: 9px; color: var(--s); opacity: 0.9; margin-right: 4px; }
-        .info-notas { font-size: 10px; font-style: italic; opacity: 0.9; margin-top: 5px; padding-top: 5px; border-top: 1px dashed var(--br); color: var(--txt); }
+        .info-detalle { font-size: 10px; color: var(--txt) !important; margin: 0; line-height: 1.3; display: block; }
+        .info-label { font-weight: 800; text-transform: uppercase; font-size: 8px; color: var(--s); opacity: 0.8; margin-right: 4px; }
+        .info-notas { font-size: 9px; font-style: italic; color: var(--txt); opacity: 0.8; margin-top: 5px; padding-top: 5px; border-top: 1px dashed var(--br); width: 100%; }
 
         .btn-edit-float { position: absolute; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.6); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 5; }
         .btn-delete-float { position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.6); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 5; }
@@ -248,7 +248,7 @@
         } catch (e) { console.error(e); }
     }
 
-    /* RENDERIZADO DE STOCK CORREGIDO PARA MOSTRAR TODA LA INFO */
+    /* RENDERIZADO DE STOCK - CORREGIDO */
     function renderizarStock(lista) {
         document.getElementById('lista-stock').innerHTML = lista.map(m => `
             <div class="item-card">
@@ -258,15 +258,15 @@
                 <div class="info-material">
                     <span class="info-titulo">${m.tipo_material}</span>
                     
-                    ${m.composicion ? `<span class="info-detalle"><span class="info-label">Comp:</span>${m.composicion}</span>` : ''}
-                    ${m.grosor ? `<span class="info-detalle"><span class="info-label">Grosor:</span>${m.grosor}</span>` : ''}
-                    ${m.tienda ? `<span class="info-detalle"><span class="info-label">Tienda:</span>${m.tienda}</span>` : ''}
+                    <div class="info-detalle">${m.composicion ? `<span class="info-label">Comp:</span>${m.composicion}` : ''}</div>
+                    <div class="info-detalle">${m.grosor ? `<span class="info-label">Grosor:</span>${m.grosor}` : ''}</div>
+                    <div class="info-detalle">${m.tienda ? `<span class="info-label">Tienda:</span>${m.tienda}` : ''}</div>
                     
                     ${m.notas ? `<div class="info-notas">${m.notas}</div>` : ''}
 
                     <div class="controles-stock">
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
-                        <span style="font-weight:bold; font-size:14px; color:var(--txt);">${m.cantidad}</span>
+                        <span style="font-weight:bold; font-size:14px;">${m.cantidad}</span>
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, 1)">+</button>
                     </div>
                 </div>
