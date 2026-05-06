@@ -22,13 +22,14 @@
         .btn-filtro { white-space: nowrap; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--br); background: var(--b); color: var(--txt); font-size: 12px; cursor: pointer; font-weight: 600; }
         .btn-filtro.active { background: var(--p); color: white; border-color: var(--p); }
 
-        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
-        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; padding-bottom: 10px; }
+        /* AJUSTE PARA TARJETAS MÁS ALTAS Y FLEXIBLES */
+        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; display: flex; flex-direction: column; height: auto; min-height: 280px; }
         .foto-material { width: 100%; height: 110px; object-fit: cover; }
-        .info-material { padding: 10px; text-align: left; }
+        .info-material { padding: 10px; text-align: left; flex-grow: 1; display: flex; flex-direction: column; }
         
-        .btn-edit-float { position: absolute; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.7); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; z-index: 5; }
-        .btn-delete-float { position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.7); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; z-index: 5; }
+        .btn-edit-float { position: absolute; top: 8px; right: 8px; background: rgba(0, 0, 0, 0.6); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 5; }
+        .btn-delete-float { position: absolute; top: 8px; left: 8px; background: rgba(255, 0, 0, 0.6); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 5; }
 
         .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-top: 5px; }
         .badge-idea { background: #e2e3e5; color: #383d41; }
@@ -49,7 +50,7 @@
         .btn-tool.active { background: var(--pc); border-color: var(--p); color: var(--s); }
 
         #dark-mode-toggle { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; border-top: 1px solid var(--br); padding-top: 10px; }
+        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--br); }
         .btn-qty { background: var(--pc); border: none; width: 25px; height: 25px; border-radius: 50%; color: var(--s); font-weight: bold; cursor: pointer; }
 
         .pdf-item, .regalo-item {
@@ -61,11 +62,10 @@
         .pdf-nombre, .regalo-nombre { font-weight: 600; font-size: 14px; margin: 0; }
         .pdf-fecha, .regalo-meta { font-size: 11px; color: #888; margin: 0; }
         
-        .preferencias-box { font-size: 12px; font-style: italic; color: var(--s); margin-top: 5px; padding: 5px; background: var(--pc); border-radius: 8px; }
+        /* ESTILOS PARA LOS DETALLES */
+        .detalle-stock { font-size: 10px; color: var(--txt); margin: 3px 0; line-height: 1.1; opacity: 0.9; }
+        .detalle-label { font-weight: bold; color: var(--s); text-transform: uppercase; font-size: 8px; margin-right: 3px; }
         .enlace-tag { display: inline-block; padding: 2px 8px; background: var(--p); color: white; border-radius: 10px; font-size: 10px; margin-right: 5px; margin-top: 5px; }
-
-        .detalle-stock { font-size: 10px; color: #777; margin: 2px 0; line-height: 1.2; }
-        .detalle-label { font-weight: bold; color: var(--s); text-transform: uppercase; font-size: 9px; }
     </style>
 </head>
 <body>
@@ -104,7 +104,7 @@
             </div>
         </div>
         <label>COMPOSICIÓN</label>
-        <input type="text" id="m-composicion" placeholder="Ej: 100% Algodón, 50% Lana 50% Acrílico">
+        <input type="text" id="m-composicion" placeholder="Ej: 100% Algodón">
         <label>TIENDA DONDE SE COMPRÓ</label>
         <input type="text" id="m-tienda" placeholder="Ej: Mercería del Barrio">
         <label>GROSOR / WPI</label>
@@ -135,6 +135,7 @@
 <div id="vista-PROYECTOS" style="display:none;">
     <div class="card-form">
         <h2 style="color:var(--s); text-align:center; margin-top:0;">✨ Nuevo Proyecto</h2>
+        <!-- (Resto del formulario de proyectos igual...) -->
         <label>NOMBRE DEL PROYECTO</label>
         <input type="text" id="p-nombre" placeholder="Ej: Jersey de Invierno">
         <label>ESTADO</label>
@@ -166,40 +167,6 @@
     <div id="lista-proyectos" class="grid-estudio"></div>
 </div>
 
-<!-- VISTA PDFS -->
-<div id="vista-PDFS" style="display:none;">
-    <div class="card-form">
-        <h2 style="color:var(--s); text-align:center; margin-top:0;">📂 Subir Patrón PDF</h2>
-        <label>NOMBRE DEL PATRÓN</label>
-        <input type="text" id="pdf-nombre" placeholder="Ej: Chal Susimiu">
-        <input type="file" id="pdf-archivo" accept=".pdf" style="margin-top:10px;">
-        <button class="btn-grande" style="background:var(--s)" onclick="subirPDF()">SUBIR A BIBLIOTECA</button>
-    </div>
-    <div id="lista-pdfs"></div>
-</div>
-
-<!-- VISTA REGALOS -->
-<div id="vista-REGALOS" style="display:none;">
-    <div class="card-form">
-        <h2 style="color:var(--s); text-align:center; margin-top:0;">🎁 Regalos y Encargos</h2>
-        <label>¿PARA QUIÉN ES?</label>
-        <input type="text" id="reg-persona" placeholder="Nombre de la persona">
-        <label>¿QUÉ VAS A REGALAR/HACER?</label>
-        <input type="text" id="reg-detalle" placeholder="Ej: Manta de apego">
-        <label>GUSTOS Y PREFERENCIAS</label>
-        <textarea id="reg-preferencias" placeholder="Le gustan los colores pastel, odia la lana virgen..."></textarea>
-        <label>ENLAZAR DISEÑO (PROYECTO)</label>
-        <select id="reg-enlace-proyecto"><option value="">Ninguno</option></select>
-        <label>ENLAZAR PATRÓN PDF</label>
-        <select id="reg-enlace-pdf"><option value="">Ninguno</option></select>
-        <button class="btn-grande" style="background:var(--p)" onclick="guardarRegalo()">AÑADIR AL MAPA</button>
-    </div>
-    <h3 style="color:var(--s); padding-left:10px;">📍 Mapa de Regalos Pendientes</h3>
-    <div id="lista-regalos-pendientes"></div>
-    <h3 style="color:var(--txt); padding-left:10px; margin-top:30px; opacity:0.6;">✅ Entregados (Historial)</h3>
-    <div id="lista-regalos-entregados" style="opacity:0.6;"></div>
-</div>
-
 <script>
     const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
     const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
@@ -211,18 +178,15 @@
     let regalosGlobal = [];
     let toolsState = { 'canvas-punto': 'pincel', 'canvas-cuerpos': 'pincel' };
 
-    // --- NAVEGACIÓN ---
     function cambiarVista(v) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
         const navBtn = document.getElementById('nav-' + v);
         if(navBtn) navBtn.classList.add('active');
-        
         document.getElementById('vista-INICIO').style.display = v === 'INICIO' ? 'block' : 'none';
         document.getElementById('vista-STOCK').style.display = v === 'STOCK' ? 'block' : 'none';
         document.getElementById('vista-PROYECTOS').style.display = v === 'PROYECTOS' ? 'block' : 'none';
         document.getElementById('vista-PDFS').style.display = v === 'PDFS' ? 'block' : 'none';
         document.getElementById('vista-REGALOS').style.display = v === 'REGALOS' ? 'block' : 'none';
-        
         if(v === 'STOCK') filtrar('Todo');
         if(v === 'PROYECTOS') setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
         if(v === 'REGALOS') cargarRegalos();
@@ -232,8 +196,8 @@
     function filtrar(cat) {
         document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('active'));
         document.getElementById('filtro-' + cat).classList.add('active');
-        if (cat === 'Todo') { renderizarStock(lanasGlobal); } 
-        else { const filtrados = lanasGlobal.filter(m => m.categoria === cat); renderizarStock(filtrados); }
+        if (cat === 'Todo') renderizarStock(lanasGlobal);
+        else renderizarStock(lanasGlobal.filter(m => m.categoria === cat));
     }
 
     async function cargarDatos() {
@@ -244,10 +208,10 @@
             const { data: proy } = await client.from('proyectos_data').select('*').order('created_at', {ascending: false});
             proyectosGlobal = proy || [];
             renderizarProyectos(proyectosGlobal);
-            cargarPDFs();
         } catch (e) { console.error(e); }
     }
 
+    /* RENDERIZAR STOCK ACTUALIZADO CON MÁS DETALLES */
     function renderizarStock(lista) {
         document.getElementById('lista-stock').innerHTML = lista.map(m => `
             <div class="item-card">
@@ -255,16 +219,16 @@
                 <button class="btn-edit-float" onclick="cargarEdicion(${m.id})">✏️</button>
                 <img src="${m.contenido || 'https://via.placeholder.com/150?text=Sin+Foto'}" class="foto-material">
                 <div class="info-material">
-                    <h4 style="font-size:13px; margin:0 0 8px 0; color:var(--s); text-align:center; border-bottom: 1px solid var(--br); padding-bottom:5px;">${m.tipo_material}</h4>
+                    <h4 style="font-size:12px; margin:0 0 5px 0; color:var(--s); line-height:1.2;">${m.tipo_material}</h4>
                     
-                    ${m.composicion ? `<p class="detalle-stock"><span class="detalle-label">Comp:</span> ${m.composicion}</p>` : ''}
-                    ${m.grosor ? `<p class="detalle-stock"><span class="detalle-label">WPI/G:</span> ${m.grosor}</p>` : ''}
-                    ${m.tienda ? `<p class="detalle-stock"><span class="detalle-label">Tienda:</span> ${m.tienda}</p>` : ''}
-                    ${m.notas ? `<p class="detalle-stock" style="font-style:italic; margin-top:5px; background:var(--f); padding:3px; border-radius:4px;">"${m.notas}"</p>` : ''}
+                    ${m.composicion ? `<p class="detalle-stock"><span class="detalle-label">Comp:</span>${m.composicion}</p>` : ''}
+                    ${m.grosor ? `<p class="detalle-stock"><span class="detalle-label">Grosor:</span>${m.grosor}</p>` : ''}
+                    ${m.tienda ? `<p class="detalle-stock"><span class="detalle-label">Tienda:</span>${m.tienda}</p>` : ''}
+                    ${m.notas ? `<p class="detalle-stock" style="margin-top:5px; font-style:italic; border-left:2px solid var(--p); padding-left:4px;">${m.notas}</p>` : ''}
 
                     <div class="controles-stock">
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
-                        <span style="font-weight:bold; font-size:14px;">${m.cantidad}</span>
+                        <span style="font-weight:bold; font-size:13px;">${m.cantidad}</span>
                         <button class="btn-qty" onclick="cambiarStock(${m.id}, 1)">+</button>
                     </div>
                 </div>
@@ -352,59 +316,6 @@
             </div>
         `).join('');
     }
-
-    async function cargarPDFs() {
-        const { data } = await client.from('pdfs_data').select('*').order('created_at', {ascending: false});
-        pdfsGlobal = data || [];
-        document.getElementById('lista-pdfs').innerHTML = pdfsGlobal.map(pdf => `
-            <div class="pdf-item-container" style="position:relative;">
-                <button class="btn-delete-float" style="top:5px; left:5px; width:22px; height:22px; font-size:10px;" onclick="eliminarPDF(${pdf.id})">✖</button>
-                <a href="${pdf.url}" target="_blank" class="pdf-item">
-                    <div class="pdf-icon">📄</div>
-                    <div class="pdf-info"><p class="pdf-nombre">${pdf.nombre}</p><p class="pdf-fecha">Subido: ${new Date(pdf.created_at).toLocaleDateString()}</p></div>
-                </a>
-            </div>
-        `).join('');
-    }
-
-    async function subirPDF() {
-        const nombre = document.getElementById('pdf-nombre').value;
-        const file = document.getElementById('pdf-archivo').files[0];
-        if(!nombre || !file) return alert("Faltan datos 🎀");
-        const fileName = `${Date.now()}_${file.name}`;
-        await client.storage.from('patrones_pdf').upload(fileName, file);
-        const { data: urlData } = client.storage.from('patrones_pdf').getPublicUrl(fileName);
-        await client.from('pdfs_data').insert([{ nombre, url: urlData.publicUrl }]);
-        alert("¡Patrón guardado!");
-        cargarPDFs();
-    }
-
-    async function cargarRegalos() {
-        const { data } = await client.from('regalos_data').select('*').order('created_at', {ascending: false});
-        regalosGlobal = data || [];
-        document.getElementById('reg-enlace-proyecto').innerHTML = '<option value="">Ninguno</option>' + proyectosGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
-        document.getElementById('reg-enlace-pdf').innerHTML = '<option value="">Ninguno</option>' + pdfsGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
-        renderizarRegalos();
-    }
-
-    function renderizarRegalos() {
-        const htmlRegalo = (r) => {
-            const proy = proyectosGlobal.find(p => p.id == r.diseno_id);
-            const pdf = pdfsGlobal.find(p => p.id == r.pdf_id);
-            return `<div class="regalo-item"><div class="regalo-icon">🎁</div><div class="regalo-info"><p class="regalo-nombre">Para: ${r.persona}</p><p style="font-size:13px; margin:2px 0;">Regalo: ${r.detalle_regalo}</p><div class="preferencias-box">Gustos: ${r.preferencias}</div>${proy ? `<span class="enlace-tag">🎨 Proyecto: ${proy.nombre}</span>` : ''}${pdf ? `<span class="enlace-tag">📄 PDF: ${pdf.nombre}</span>` : ''}</div>${r.estado === 'Pendiente' ? `<button onclick="marcarEntregado(${r.id})" style="border:none; background:var(--p); color:white; border-radius:10px; padding:8px; cursor:pointer;">✨</button>` : ''}</div>`;
-        };
-        document.getElementById('lista-regalos-pendientes').innerHTML = regalosGlobal.filter(r => r.estado === 'Pendiente').map(htmlRegalo).join('');
-        document.getElementById('lista-regalos-entregados').innerHTML = regalosGlobal.filter(r => r.estado === 'Entregado').map(htmlRegalo).join('');
-    }
-
-    async function guardarRegalo() {
-        const p = document.getElementById('reg-persona').value; const d = document.getElementById('reg-detalle').value;
-        if(!p || !d) return alert("Faltan datos 🎀");
-        await client.from('regalos_data').insert([{ persona: p, detalle_regalo: d, preferencias: document.getElementById('reg-preferencias').value, diseno_id: document.getElementById('reg-enlace-proyecto').value || null, pdf_id: document.getElementById('reg-enlace-pdf').value || null, estado: 'Pendiente' }]);
-        alert("¡Regalo añadido! 💖"); cargarRegalos();
-    }
-
-    async function marcarEntregado(id) { if(confirm("¿Ya lo has entregado? ✨")) { await client.from('regalos_data').update({ estado: 'Entregado' }).eq('id', id); cargarRegalos(); } }
 
     async function eliminarStock(id) { if(confirm("¿Borrar material?")) { await client.from('estudio_data').delete().eq('id', id); cargarDatos(); } }
 
