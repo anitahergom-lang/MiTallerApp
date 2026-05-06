@@ -299,55 +299,57 @@
         document.getElementById('btn-cancelar-edit').style.display = "none";
     }
 
-    /* FUNCIÓN GUARDAR REVISADA PARA SOLUCIONAR EL ERROR DE REGISTRO */
+    /* FUNCIÓN GUARDAR BLINDADA CON DETECTE DE ERROR EXACTO */
     async function guardarNuevo(tipo) {
         const idEdit = document.getElementById('m-id').value;
         const fileInput = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo');
         let fotoUrl = "";
         
         try {
+            // 1. Subida de imagen (solo si hay archivo)
             if(fileInput && fileInput.files[0]) {
                 const f = fileInput.files[0];
                 const name = `${Date.now()}_${f.name}`;
-                await client.storage.from('fotos_estudio').upload(name, f);
+                const { error: uploadError } = await client.storage.from('fotos_estudio').upload(name, f);
+                if (uploadError) throw new Error("Error al subir foto: " + uploadError.message);
                 fotoUrl = client.storage.from('fotos_estudio').getPublicUrl(name).data.publicUrl;
             }
 
             if(tipo === 'stock') {
                 const nombreVal = document.getElementById('m-nombre').value;
-                if(!nombreVal) {
-                    alert("Por favor, ponle un nombre al material 🎀");
-                    return;
-                }
+                if(!nombreVal) throw new Error("Debes poner un nombre al material");
 
                 const datos = {
                     tipo_material: nombreVal,
                     categoria: document.getElementById('m-categoria').value,
                     cantidad: parseInt(document.getElementById('m-cantidad').value) || 0,
-                    composicion: document.getElementById('m-composicion').value || "",
-                    tienda: document.getElementById('m-tienda').value || "",
-                    grosor: document.getElementById('m-grosor').value || "",
-                    notas: document.getElementById('m-notas').value || ""
+                    composicion: document.getElementById('m-composicion').value || null,
+                    tienda: document.getElementById('m-tienda').value || null,
+                    grosor: document.getElementById('m-grosor').value || null,
+                    notas: document.getElementById('m-notas').value || null
                 };
                 
                 if(fotoUrl) datos.contenido = fotoUrl;
 
+                let res;
                 if(idEdit) {
-                    const { error } = await client.from('estudio_data').update(datos).eq('id', idEdit);
-                    if (error) throw error;
+                    res = await client.from('estudio_data').update(datos).eq('id', idEdit);
                 } else {
-                    const { error } = await client.from('estudio_data').insert([datos]);
-                    if (error) throw error;
+                    res = await client.from('estudio_data').insert([datos]);
                 }
+                
+                if (res.error) throw res.error;
                 limpiarFormulario();
+
             } else {
-                const { error } = await client.from('proyectos_data').insert([{
+                // Proyecto
+                const { error: pError } = await client.from('proyectos_data').insert([{
                     nombre: document.getElementById('p-nombre').value,
                     estado: document.getElementById('p-estado').value,
                     notas: document.getElementById('p-notas').value,
-                    foto: fotoUrl
+                    foto: fotoUrl || null
                 }]);
-                if (error) throw error;
+                if (pError) throw pError;
             }
             
             alert("¡Guardado correctamente! 💖");
@@ -355,8 +357,9 @@
             cambiarVista(tipo === 'stock' ? 'STOCK' : 'PROYECTOS');
 
         } catch (err) {
-            console.error("Error al guardar:", err);
-            alert("Hubo un error al guardar. Revisa la consola para detalles.");
+            console.error("Error detectado:", err);
+            // Esto nos dirá si es un problema de permisos (Policy) o de conexión
+            alert("Error: " + (err.message || err.details || "Problema de conexión con Supabase"));
         }
     }
 
