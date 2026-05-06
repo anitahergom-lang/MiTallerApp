@@ -88,6 +88,11 @@
         .preferencias-box { font-size: 12px; font-style: italic; color: var(--s); margin-top: 5px; padding: 5px; background: var(--pc); border-radius: 8px; }
         .enlace-tag { display: inline-block; padding: 2px 8px; background: var(--p); color: white; border-radius: 10px; font-size: 10px; margin-right: 5px; margin-top: 5px; }
 
+        /* NUEVOS ESTILOS PASO 2 */
+        .editor-rich { background: var(--f); border: 1px solid var(--br); border-radius: 10px; min-height: 150px; padding: 12px; outline: none; margin-top: 5px; color: var(--txt); }
+        .editor-toolbar { display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; }
+        .btn-editor { background: var(--b); border: 1px solid var(--br); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; color: var(--txt); }
+
     </style>
 </head>
 <body>
@@ -220,6 +225,21 @@
 </div>
 
 <div id="vista-PDFS" style="display:none;">
+    
+    <div class="card-form" style="border: 2px solid var(--p);">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">📝 Diseñador de Patrones</h2>
+        <label>TÍTULO DEL PATRÓN</label>
+        <input type="text" id="borrador-titulo" placeholder="Ej: Mi primera manta">
+        <label>ESCRIBE TU PATRÓN</label>
+        <div class="editor-toolbar">
+            <button class="btn-editor" onclick="document.execCommand('bold', false, null)"><b>B</b></button>
+            <button class="btn-editor" onclick="document.execCommand('italic', false, null)"><i>I</i></button>
+            <button class="btn-editor" onclick="document.execCommand('insertUnorderedList', false, null)">• Lista</button>
+        </div>
+        <div id="borrador-contenido" class="editor-rich" contenteditable="true"></div>
+        <p style="font-size:10px; color:#888; text-align:center; margin-top:10px;">(En el siguiente paso activaremos el guardado)</p>
+    </div>
+
     <div class="card-form">
         <h2 style="color:var(--s); text-align:center; margin-top:0;">📂 Subir Patrón PDF</h2>
         <label>NOMBRE DEL PATRÓN</label>
@@ -260,7 +280,7 @@
         <textarea id="n-contenido" style="height:120px;" placeholder="Escribe aquí tus ideas..."></textarea>
         <button class="btn-grande" style="background:var(--s)" onclick="guardarNota()">GUARDAR NOTA</button>
     </div>
-    <div id="lista-notas"></div>
+    <div id="lista-notes"></div>
 </div>
 
 <script>
@@ -378,245 +398,4 @@
         const fileInput = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo');
         let fotoUrl = "";
         try {
-            if(fileInput && fileInput.files[0]) {
-                const f = fileInput.files[0];
-                const name = `${Date.now()}_${f.name}`;
-                const { error: uploadError } = await client.storage.from('fotos-lanas').upload(name, f);
-                if (uploadError) throw new Error("Error al subir foto: " + uploadError.message);
-                else fotoUrl = client.storage.from('fotos-lanas').getPublicUrl(name).data.publicUrl;
-            }
-            if(tipo === 'stock') {
-                const nombreVal = document.getElementById('m-nombre').value;
-                if(!nombreVal) throw new Error("Debes poner un nombre al material");
-                
-                const datos = {
-                    tipo_material: nombreVal, 
-                    categoria: document.getElementById('m-categoria').value,
-                    cantidad: parseInt(document.getElementById('m-cantidad').value) || 0,
-                    composicion: document.getElementById('m-composicion').value || "",
-                    tienda: document.getElementById('m-tienda').value || "",
-                    grosor: document.getElementById('m-grosor').value || "",
-                    longitud: document.getElementById('m-longitud').value || "",
-                    notas: document.getElementById('m-notas').value || ""
-                };
-                
-                if(fotoUrl) datos.contenido = fotoUrl;
-                
-                if(idEdit) {
-                    const { error: updateError } = await client.from('estudio_data').update(datos).eq('id', idEdit);
-                    if(updateError) throw updateError;
-                } else {
-                    const { error: insertError } = await client.from('estudio_data').insert([datos]);
-                    if(insertError) throw insertError;
-                }
-                limpiarFormulario();
-            } else {
-                await client.from('proyectos_data').insert([{
-                    nombre: document.getElementById('p-nombre').value,
-                    estado: document.getElementById('p-estado').value,
-                    notas: document.getElementById('p-notas').value, foto: fotoUrl || null
-                }]);
-            }
-            alert("¡Guardado correctamente! 💖");
-            await cargarDatos();
-            cambiarVista(tipo === 'stock' ? 'STOCK' : 'PROYECTOS');
-        } catch (err) { 
-            console.error(err);
-            alert("Error al guardar: " + (err.message || "Error")); 
-        }
-    }
-
-    async function guardarCompra() {
-        const nombre = document.getElementById('c-nombre').value;
-        const tienda = document.getElementById('c-tienda').value || 'General';
-        const prioridad = document.getElementById('c-prioridad').value;
-        if(!nombre) return alert("Escribe qué necesitas comprar 🎀");
-        await client.from('compras_data').insert([{ nombre, tienda, prioridad, completado: false }]);
-        document.getElementById('c-nombre').value = "";
-        cargarCompras();
-    }
-
-    async function cargarCompras() {
-        const { data } = await client.from('compras_data').select('*').order('created_at', {ascending: false});
-        comprasGlobal = data || [];
-        renderizarFiltrosCompras();
-        renderizarListaCompras();
-    }
-
-    function renderizarFiltrosCompras() {
-        const tiendas = ['Todas', ...new Set(comprasGlobal.map(c => c.tienda))];
-        document.getElementById('filtros-tiendas-compras').innerHTML = tiendas.map(t => `
-            <button class="btn-filtro ${tiendaFiltradaCompras === t ? 'active' : ''}" onclick="filtrarTiendaCompra('${t}')">${t}</button>
-        `).join('');
-    }
-
-    function filtrarTiendaCompra(t) {
-        tiendaFiltradaCompras = t;
-        renderizarFiltrosCompras();
-        renderizarListaCompras();
-    }
-
-    function renderizarListaCompras() {
-        const filtradas = tiendaFiltradaCompras === 'Todas' ? comprasGlobal : comprasGlobal.filter(c => c.tienda === tiendaFiltradaCompras);
-        document.getElementById('lista-compras').innerHTML = filtradas.map(c => `
-            <div class="compra-item prio-${c.prioridad}">
-                <div>
-                    <strong style="color:var(--s)">${c.nombre}</strong><br>
-                    <small>📍 ${c.tienda} | Prioridad: ${c.prioridad}</small>
-                </div>
-                <button onclick="eliminarCompra(${c.id})" style="background:none; border:none; font-size:20px; cursor:pointer;">✅</button>
-            </div>
-        `).join('');
-    }
-
-    async function eliminarCompra(id) {
-        await client.from('compras_data').delete().eq('id', id);
-        cargarCompras();
-    }
-
-    function renderizarProyectos(lista) {
-        document.getElementById('lista-proyectos').innerHTML = lista.map(p => `
-            <div class="item-card">
-                <img src="${p.foto || 'https://via.placeholder.com/150?text=Proyecto'}" class="foto-material">
-                <div class="info-material" style="text-align:center;">
-                    <h4 style="margin-bottom:5px; font-size:13px;">${p.nombre}</h4>
-                    <span class="badge ${p.estado === 'Terminado' ? 'badge-listo' : (p.estado === 'Idea' ? 'badge-idea' : 'badge-proceso')}">${p.estado}</span>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    async function cargarPDFs() {
-        const { data } = await client.from('pdfs_data').select('*').order('created_at', {ascending: false});
-        pdfsGlobal = data || [];
-        document.getElementById('lista-pdfs').innerHTML = pdfsGlobal.map(pdf => `
-            <a href="${pdf.url}" target="_blank" class="pdf-item">
-                <div class="pdf-icon">📄</div>
-                <div class="pdf-info"><p class="pdf-nombre">${pdf.nombre}</p><p class="pdf-fecha">Subido: ${new Date(pdf.created_at).toLocaleDateString()}</p></div>
-            </a>
-        `).join('');
-    }
-
-    async function subirPDF() {
-        const nombre = document.getElementById('pdf-nombre').value;
-        const file = document.getElementById('pdf-archivo').files[0];
-        if(!nombre || !file) return alert("Faltan datos 🎀");
-        const fileName = `${Date.now()}_${file.name}`;
-        await client.storage.from('patrones_pdf').upload(fileName, file);
-        const { data: urlData } = client.storage.from('patrones_pdf').getPublicUrl(fileName);
-        await client.from('pdfs_data').insert([{ nombre, url: urlData.publicUrl }]);
-        alert("¡Patrón guardado!");
-        cargarPDFs();
-    }
-
-    async function cargarRegalos() {
-        const { data } = await client.from('regalos_data').select('*').order('created_at', {ascending: false});
-        regalosGlobal = data || [];
-        document.getElementById('reg-enlace-proyecto').innerHTML = '<option value="">Ninguno</option>' + proyectosGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
-        document.getElementById('reg-enlace-pdf').innerHTML = '<option value="">Ninguno</option>' + pdfsGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
-        renderizarRegalos();
-    }
-
-    function renderizarRegalos() {
-        const htmlRegalo = (r) => {
-            const proy = proyectosGlobal.find(p => p.id == r.diseno_id);
-            const pdf = pdfsGlobal.find(p => p.id == r.pdf_id);
-            return `<div class="regalo-item"><div class="regalo-icon">🎁</div><div class="regalo-info"><p class="regalo-nombre">Para: ${r.persona}</p><p style="font-size:13px; margin:2px 0;">Regalo: ${r.detalle_regalo}</p><div class="preferencias-box">Gustos: ${r.preferencias}</div>${proy ? `<span class="enlace-tag">🎨 Proyecto: ${proy.nombre}</span>` : ''}${pdf ? `<span class="enlace-tag">📄 PDF: ${pdf.nombre}</span>` : ''}</div>${r.estado === 'Pendiente' ? `<button onclick="marcarEntregado(${r.id})" style="border:none; background:var(--p); color:white; border-radius:10px; padding:8px; cursor:pointer;">✨</button>` : ''}</div>`;
-        };
-        document.getElementById('lista-regalos-pendientes').innerHTML = regalosGlobal.filter(r => r.estado === 'Pendiente').map(htmlRegalo).join('');
-        document.getElementById('lista-regalos-entregados').innerHTML = regalosGlobal.filter(r => r.estado === 'Entregado').map(htmlRegalo).join('');
-    }
-
-    async function guardarRegalo() {
-        const p = document.getElementById('reg-persona').value; const d = document.getElementById('reg-detalle').value;
-        if(!p || !d) return alert("Faltan datos 🎀");
-        await client.from('regalos_data').insert([{ persona: p, detalle_regalo: d, preferencias: document.getElementById('reg-preferencias').value, diseno_id: document.getElementById('reg-enlace-proyecto').value || null, pdf_id: document.getElementById('reg-enlace-pdf').value || null, estado: 'Pendiente' }]);
-        alert("¡Regalo añadido! 💖"); cargarRegalos();
-    }
-
-    async function marcarEntregado(id) { if(confirm("¿Ya lo has entregado? 💖")) { await client.from('regalos_data').update({ estado: 'Entregado' }).eq('id', id); cargarRegalos(); } }
-
-    async function cargarNotas() {
-        const { data } = await client.from('notas_data').select('*').order('created_at', {ascending: false});
-        document.getElementById('lista-notas').innerHTML = (data || []).map(n => `<div class="card-form" style="margin-bottom:10px; position:relative;"><button class="btn-delete-float" onclick="eliminarNota(${n.id})">✖</button><h3 style="margin-top:0; color:var(--s); font-size:15px;">${n.titulo}</h3><p style="font-size:13px; white-space:pre-wrap;">${n.contenido}</p><small style="opacity:0.5;">${new Date(n.created_at).toLocaleDateString()}</small></div>`).join('');
-    }
-
-    async function guardarNota() {
-        const t = document.getElementById('n-titulo').value; const c = document.getElementById('n-contenido').value;
-        if(!t || !c) return alert("Escribe algo en la nota 🎀");
-        await client.from('notas_data').insert([{ titulo: t, contenido: c }]);
-        document.getElementById('n-titulo').value = ""; document.getElementById('n-contenido').value = "";
-        cargarNotas();
-    }
-
-    async function eliminarNota(id) { if(confirm("¿Borrar nota?")) { await client.from('notas_data').delete().eq('id', id); cargarNotas(); } }
-    async function eliminarStock(id) { if(confirm("¿Borrar este material? 🧶")) { await client.from('estudio_data').delete().eq('id', id); cargarDatos(); } }
-
-    async function cambiarStock(id, cambio) {
-        const item = lanasGlobal.find(m => m.id === id);
-        const nuevaCant = Math.max(0, item.cantidad + cambio);
-        await client.from('estudio_data').update({ cantidad: nuevaCant }).eq('id', id);
-        cargarDatos();
-    }
-
-    function toggleDarkMode() {
-        const body = document.body;
-        const next = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        body.setAttribute('data-theme', next);
-        document.getElementById('dark-mode-toggle').innerText = next === 'dark' ? '☀️' : '🌙';
-    }
-
-    function iniciarCanvas(id) {
-        const canvas = document.getElementById(id);
-        const ctx = canvas.getContext('2d');
-        let painting = false;
-
-        function getPos(e) {
-            const rect = canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return { x: (clientX - rect.left) * (canvas.width / rect.width), y: (clientY - rect.top) * (canvas.height / rect.height) };
-        }
-
-        function start(e) { painting = true; draw(e); }
-        function end() { painting = false; ctx.beginPath(); }
-        function draw(e) {
-            if(!painting) return;
-            const pos = getPos(e);
-            
-            if (toolsState[id] === 'goma') {
-                ctx.globalCompositeOperation = 'destination-out';
-                ctx.lineWidth = 20;
-            } else {
-                ctx.globalCompositeOperation = 'source-over';
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = '#f06292';
-            }
-            
-            ctx.lineCap = 'round';
-            ctx.lineTo(pos.x, pos.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
-            e.preventDefault();
-        }
-
-        canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
-        canvas.addEventListener('mousedown', start); canvas.addEventListener('touchstart', start);
-        canvas.addEventListener('mouseup', end); canvas.addEventListener('touchend', end);
-        canvas.addEventListener('mousemove', draw); canvas.addEventListener('touchmove', draw);
-    }
-
-    function setTool(canvasId, tool) {
-        toolsState[canvasId] = tool;
-        const suffix = canvasId.split('-')[1];
-        document.getElementById(`tool-pincel-${suffix}`).classList.toggle('active', tool === 'pincel');
-        document.getElementById(`tool-goma-${suffix}`).classList.toggle('active', tool === 'goma');
-    }
-
-    function limpiarCanvas(id) {
-        const canvas = document.getElementById(id);
-        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-    }
-
-    window.onload = cargarDatos;
-</script>
-</body>
-</html>
+            if(file
