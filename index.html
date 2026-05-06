@@ -55,9 +55,9 @@
         .canvas-base { display: block; width: 100%; height: 250px; cursor: crosshair; }
         .canvas-grid { background-image: linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
         
-        /* IMAGEN DE FIGURINES USANDO EL ARCHIVO PROPORCIONADO */
+        /* AQUÍ ESTÁ EL CAMBIO: USANDO EL NOMBRE EXACTO DEL ARCHIVO */
         .canvas-cuerpos {
-            background-image: url('image_78c233.png');
+            background-image: url('Silueta 3 cuerpos_8.jpg');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -250,6 +250,7 @@
 </div>
 
 <script>
+    // Configuración de Supabase
     const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
     const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
     const client = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -284,7 +285,8 @@
 
     function filtrar(cat) {
         document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('filtro-' + cat).classList.add('active');
+        const fBtn = document.getElementById('filtro-' + cat);
+        if(fBtn) fBtn.classList.add('active');
         if (cat === 'Todo') { renderizarStock(lanasGlobal); } 
         else { const filtrados = lanasGlobal.filter(m => m.categoria === cat); renderizarStock(filtrados); }
     }
@@ -427,18 +429,15 @@
                     notas: document.getElementById('m-notas').value || ""
                 };
                 if(fotoUrl) datos.contenido = fotoUrl;
-                let res;
-                if(idEdit) res = await client.from('estudio_data').update(datos).eq('id', idEdit);
-                else res = await client.from('estudio_data').insert([datos]);
-                if (res.error) throw res.error;
+                if(idEdit) await client.from('estudio_data').update(datos).eq('id', idEdit);
+                else await client.from('estudio_data').insert([datos]);
                 limpiarFormulario();
             } else {
-                const { error: pError } = await client.from('proyectos_data').insert([{
+                await client.from('proyectos_data').insert([{
                     nombre: document.getElementById('p-nombre').value,
                     estado: document.getElementById('p-estado').value,
                     notas: document.getElementById('p-notas').value, foto: fotoUrl || null
                 }]);
-                if (pError) throw pError;
             }
             alert("¡Guardado correctamente! 💖");
             await cargarDatos();
