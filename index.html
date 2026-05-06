@@ -53,11 +53,14 @@
 
         .canvas-container { background: white; border: 1px solid var(--br); border-radius: 15px; margin-top: 10px; position: relative; overflow: hidden; }
         .canvas-base { display: block; width: 100%; height: 250px; cursor: crosshair; }
+        
+        /* Modificación para zona de cuerpos: más larga y con plantilla técnica */
+        .canvas-largo { height: 500px !important; }
+        
         .canvas-grid { background-image: linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
         
-        /* AQUÍ ESTÁ EL CAMBIO: USANDO EL NOMBRE EXACTO DEL ARCHIVO */
         .canvas-cuerpos {
-            background-image: url('Silueta 3 cuerpos_8.jpg');
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 600' opacity='0.3'><g fill='none' stroke='%23f06292' stroke-width='1.5'><path d='M100,100 Q100,50 125,50 Q150,50 150,100 L150,150 L180,180 L180,250 L160,400 L170,550 M100,150 L70,180 L70,250 L90,400 L80,550'/><path d='M300,100 Q300,50 325,50 Q350,50 350,100 L350,150 L380,180 L380,250 L360,400 L370,550 M300,150 L270,180 L270,250 L290,400 L280,550'/><path d='M200,80 Q200,40 225,40 Q250,40 250,80 L250,130 L280,160 L280,230 L260,380 L270,530 M200,130 L170,160 L170,230 L190,380 L180,530'/></g></svg>");
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -191,8 +194,8 @@
             <button class="btn-tool" id="tool-goma-punto" onclick="setTool('canvas-punto', 'goma')">🧽 Goma</button>
             <button class="btn-tool" onclick="limpiarCanvas('canvas-punto')">🗑️</button>
         </div>
-        <label>DISEÑO SOBRE CUERPOS</label>
-        <div class="canvas-container"><canvas id="canvas-cuerpos" class="canvas-base canvas-cuerpos"></canvas></div>
+        <label>DISEÑO SOBRE CUERPOS (PLANTILLA TÉCNICA)</label>
+        <div class="canvas-container"><canvas id="canvas-cuerpos" class="canvas-base canvas-cuerpos canvas-largo"></canvas></div>
         <div class="canvas-tools">
             <button class="btn-tool active" id="tool-pincel-cuerpos" onclick="setTool('canvas-cuerpos', 'pincel')">🖌️ Pincel</button>
             <button class="btn-tool" id="tool-goma-cuerpos" onclick="setTool('canvas-cuerpos', 'goma')">🧽 Goma</button>
@@ -511,7 +514,7 @@
     async function marcarEntregado(id) { if(confirm("¿Ya lo has entregado? 💖")) { await client.from('regalos_data').update({ estado: 'Entregado' }).eq('id', id); cargarRegalos(); } }
 
     async function cargarNotas() {
-        const { data } = await client.from('notas_data').select('*').order('created_at', {ascending: false});
+        const { data } = await client.from('notes_data').select('*').order('created_at', {ascending: false});
         document.getElementById('lista-notas').innerHTML = (data || []).map(n => `<div class="card-form" style="margin-bottom:10px; position:relative;"><button class="btn-delete-float" onclick="eliminarNota(${n.id})">✖</button><h3 style="margin-top:0; color:var(--s); font-size:15px;">${n.titulo}</h3><p style="font-size:13px; white-space:pre-wrap;">${n.contenido}</p><small style="opacity:0.5;">${new Date(n.created_at).toLocaleDateString()}</small></div>`).join('');
     }
 
