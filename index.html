@@ -56,16 +56,11 @@
 
         .canvas-container { background: white; border: 1px solid var(--br); border-radius: 15px; margin-top: 10px; position: relative; overflow: hidden; }
         .canvas-base { display: block; width: 100%; height: 250px; cursor: crosshair; }
-        
         .canvas-largo { height: 500px !important; }
-        
         .canvas-grid { background-image: linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
-        
         .canvas-cuerpos {
             background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 600' opacity='0.3'><g fill='none' stroke='%23f06292' stroke-width='1.5'><path d='M100,100 Q100,50 125,50 Q150,50 150,100 L150,150 L180,180 L180,250 L160,400 L170,550 M100,150 L70,180 L70,250 L90,400 L80,550'/><path d='M300,100 Q300,50 325,50 Q350,50 350,100 L350,150 L380,180 L380,250 L360,400 L370,550 M300,150 L270,180 L270,250 L290,400 L280,550'/><path d='M200,80 Q200,40 225,40 Q250,40 250,80 L250,130 L280,160 L280,230 L260,380 L270,530 M200,130 L170,160 L170,230 L190,380 L180,530'/></g></svg>");
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
+            background-size: contain; background-repeat: no-repeat; background-position: center;
         }
 
         .canvas-tools { display: flex; gap: 5px; margin-top: 5px; margin-bottom: 15px; }
@@ -88,9 +83,12 @@
         .preferencias-box { font-size: 12px; font-style: italic; color: var(--s); margin-top: 5px; padding: 5px; background: var(--pc); border-radius: 8px; }
         .enlace-tag { display: inline-block; padding: 2px 8px; background: var(--p); color: white; border-radius: 10px; font-size: 10px; margin-right: 5px; margin-top: 5px; }
 
-        .editor-rich { background: var(--f); border: 1px solid var(--br); border-radius: 10px; min-height: 150px; padding: 12px; outline: none; margin-top: 5px; color: var(--txt); }
-        .editor-toolbar { display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; }
+        .editor-rich { background: var(--f); border: 1px solid var(--br); border-radius: 10px; min-height: 200px; padding: 12px; outline: none; margin-top: 5px; color: var(--txt); overflow-y: auto; }
+        .editor-rich img { max-width: 100%; border-radius: 10px; margin: 10px 0; }
+        .editor-toolbar { display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; background: var(--pc); padding: 5px; border-radius: 10px; }
         .btn-editor { background: var(--b); border: 1px solid var(--br); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; color: var(--txt); }
+        
+        .contador-vueltas-mini { display: flex; align-items: center; gap: 10px; background: var(--s); color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
 
     </style>
 </head>
@@ -224,31 +222,41 @@
 </div>
 
 <div id="vista-PDFS" style="display:none;">
-    
     <div class="card-form" style="border: 2px solid var(--p);">
         <h2 style="color:var(--s); text-align:center; margin-top:0;">📝 Diseñador de Patrones</h2>
+        
+        <div class="contador-vueltas-mini">
+            <span>🔢 Vuelta: <span id="vueltas-editor">0</span></span>
+            <button onclick="cambiarVueltaEditor(-1)" style="border:none; background:white; border-radius:50%; width:20px; height:20px; cursor:pointer;">-</button>
+            <button onclick="cambiarVueltaEditor(1)" style="border:none; background:white; border-radius:50%; width:20px; height:20px; cursor:pointer;">+</button>
+        </div>
+
         <label>TÍTULO DEL PATRÓN</label>
         <input type="text" id="borrador-titulo" placeholder="Ej: Mi primera manta">
-        <label>ESCRIBE TU PATRÓN</label>
+        
+        <label>HERRAMIENTAS</label>
         <div class="editor-toolbar">
             <button class="btn-editor" onclick="document.execCommand('bold', false, null)"><b>B</b></button>
             <button class="btn-editor" onclick="document.execCommand('italic', false, null)"><i>I</i></button>
             <button class="btn-editor" onclick="document.execCommand('insertUnorderedList', false, null)">• Lista</button>
+            <button class="btn-editor" onclick="insertarImagenEditor()">🖼️ Foto</button>
         </div>
+        
         <div id="borrador-contenido" class="editor-rich" contenteditable="true"></div>
         
-        <div style="display:flex; gap:10px;">
-            <button class="btn-grande" style="background:#888; font-size:12px;" onclick="guardarBorradorLocal()">💾 GUARDAR BORRADOR</button>
-            <button class="btn-grande" style="background:var(--p); font-size:12px;" onclick="generarPDF()">📥 DESCARGAR PDF</button>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
+            <button class="btn-grande" style="background:#888; font-size:12px; margin-top:0;" onclick="guardarBorradorLocal()">💾 GUARDAR</button>
+            <button class="btn-grande" style="background:var(--p); font-size:12px; margin-top:0;" onclick="generarPDF()">📥 PDF</button>
         </div>
+        <button class="btn-grande" style="background:#e74c3c; font-size:12px; margin-top:10px;" onclick="eliminarBorradorTotal()">🗑️ ELIMINAR TODO EL BORRADOR</button>
     </div>
 
     <div class="card-form">
-        <h2 style="color:var(--s); text-align:center; margin-top:0;">📂 Subir Patrón PDF</h2>
-        <label>NOMBRE DEL PATRÓN</label>
-        <input type="text" id="pdf-nombre" placeholder="Ej: Chal Susimiu">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">📂 Biblioteca de PDFs</h2>
+        <label>SUBIR ARCHIVO EXISTENTE</label>
+        <input type="text" id="pdf-nombre" placeholder="Nombre del patrón">
         <input type="file" id="pdf-archivo" accept=".pdf" style="margin-top:10px;">
-        <button class="btn-grande" style="background:var(--s)" onclick="subirPDF()">SUBIR A BIBLIOTECA</button>
+        <button class="btn-grande" style="background:var(--s)" onclick="subirPDF()">SUBIR PDF</button>
     </div>
     <div id="lista-pdfs"></div>
 </div>
@@ -298,6 +306,7 @@
     let comprasGlobal = [];
     let tiendaFiltradaCompras = 'Todas';
     let toolsState = { 'canvas-punto': 'pincel', 'canvas-cuerpos': 'pincel' };
+    let vueltasContador = 0;
 
     function cambiarVista(v) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
@@ -422,16 +431,9 @@
                     longitud: document.getElementById('m-longitud').value || "",
                     notas: document.getElementById('m-notas').value || ""
                 };
-                
                 if(fotoUrl) datos.contenido = fotoUrl;
-                
-                if(idEdit) {
-                    const { error: updateError } = await client.from('estudio_data').update(datos).eq('id', idEdit);
-                    if(updateError) throw updateError;
-                } else {
-                    const { error: insertError } = await client.from('estudio_data').insert([datos]);
-                    if(insertError) throw insertError;
-                }
+                if(idEdit) { await client.from('estudio_data').update(datos).eq('id', idEdit); } 
+                else { await client.from('estudio_data').insert([datos]); }
                 limpiarFormulario();
             } else {
                 await client.from('proyectos_data').insert([{
@@ -443,10 +445,7 @@
             alert("¡Guardado correctamente! 💖");
             await cargarDatos();
             cambiarVista(tipo === 'stock' ? 'STOCK' : 'PROYECTOS');
-        } catch (err) { 
-            console.error(err);
-            alert("Error al guardar: " + (err.message || "Error")); 
-        }
+        } catch (err) { alert("Error al guardar: " + err.message); }
     }
 
     async function guardarCompra() {
@@ -473,29 +472,19 @@
         `).join('');
     }
 
-    function filtrarTiendaCompra(t) {
-        tiendaFiltradaCompras = t;
-        renderizarFiltrosCompras();
-        renderizarListaCompras();
-    }
+    function filtrarTiendaCompra(t) { tiendaFiltradaCompras = t; renderizarFiltrosCompras(); renderizarListaCompras(); }
 
     function renderizarListaCompras() {
         const filtradas = tiendaFiltradaCompras === 'Todas' ? comprasGlobal : comprasGlobal.filter(c => c.tienda === tiendaFiltradaCompras);
         document.getElementById('lista-compras').innerHTML = filtradas.map(c => `
             <div class="compra-item prio-${c.prioridad}">
-                <div>
-                    <strong style="color:var(--s)">${c.nombre}</strong><br>
-                    <small>📍 ${c.tienda} | Prioridad: ${c.prioridad}</small>
-                </div>
+                <div><strong style="color:var(--s)">${c.nombre}</strong><br><small>📍 ${c.tienda} | Prioridad: ${c.prioridad}</small></div>
                 <button onclick="eliminarCompra(${c.id})" style="background:none; border:none; font-size:20px; cursor:pointer;">✅</button>
             </div>
         `).join('');
     }
 
-    async function eliminarCompra(id) {
-        await client.from('compras_data').delete().eq('id', id);
-        cargarCompras();
-    }
+    async function eliminarCompra(id) { await client.from('compras_data').delete().eq('id', id); cargarCompras(); }
 
     function renderizarProyectos(lista) {
         document.getElementById('lista-proyectos').innerHTML = lista.map(p => `
@@ -528,8 +517,7 @@
         await client.storage.from('patrones_pdf').upload(fileName, file);
         const { data: urlData } = client.storage.from('patrones_pdf').getPublicUrl(fileName);
         await client.from('pdfs_data').insert([{ nombre, url: urlData.publicUrl }]);
-        alert("¡Patrón guardado!");
-        cargarPDFs();
+        alert("¡Patrón guardado!"); cargarPDFs();
     }
 
     async function cargarRegalos() {
@@ -593,34 +581,22 @@
         const canvas = document.getElementById(id);
         const ctx = canvas.getContext('2d');
         let painting = false;
-
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             return { x: (clientX - rect.left) * (canvas.width / rect.width), y: (clientY - rect.top) * (canvas.height / rect.height) };
         }
-
         function start(e) { painting = true; draw(e); }
         function end() { painting = false; ctx.beginPath(); }
         function draw(e) {
             if(!painting) return;
             const pos = getPos(e);
-            
-            if (toolsState[id] === 'goma') {
-                ctx.globalCompositeOperation = 'destination-out';
-                ctx.lineWidth = 20;
-            } else {
-                ctx.globalCompositeOperation = 'source-over';
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = '#f06292';
-            }
-            
-            ctx.lineCap = 'round';
-            ctx.lineTo(pos.x, pos.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
+            if (toolsState[id] === 'goma') { ctx.globalCompositeOperation = 'destination-out'; ctx.lineWidth = 20; } 
+            else { ctx.globalCompositeOperation = 'source-over'; ctx.lineWidth = 3; ctx.strokeStyle = '#f06292'; }
+            ctx.lineCap = 'round'; ctx.lineTo(pos.x, pos.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
             e.preventDefault();
         }
-
         canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
         canvas.addEventListener('mousedown', start); canvas.addEventListener('touchstart', start);
         canvas.addEventListener('mouseup', end); canvas.addEventListener('touchend', end);
@@ -634,18 +610,47 @@
         document.getElementById(`tool-goma-${suffix}`).classList.toggle('active', tool === 'goma');
     }
 
-    function limpiarCanvas(id) {
-        const canvas = document.getElementById(id);
-        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+    function limpiarCanvas(id) { const canvas = document.getElementById(id); canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height); }
+
+    /* FUNCIONES DEL EDITOR */
+    function cambiarVueltaEditor(n) {
+        vueltasContador = Math.max(0, vueltasContador + n);
+        document.getElementById('vueltas-editor').innerText = vueltasContador;
     }
 
-    /* NUEVAS FUNCIONES PASO 3 */
+    function insertarImagenEditor() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = e => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = event => {
+                const img = `<img src="${event.target.result}">`;
+                document.getElementById('borrador-contenido').focus();
+                document.execCommand('insertHTML', false, img);
+            };
+            reader.readAsDataURL(file);
+        };
+        input.click();
+    }
+
+    function eliminarBorradorTotal() {
+        if(confirm("⚠ ¿ESTÁS SEGURA? Se borrará permanentemente el título, el contenido y el contador de vueltas del borrador actual.")) {
+            document.getElementById('borrador-titulo').value = "";
+            document.getElementById('borrador-contenido').innerHTML = "";
+            vueltasContador = 0;
+            document.getElementById('vueltas-editor').innerText = "0";
+            localStorage.removeItem('borrador_patron_titulo');
+            localStorage.removeItem('borrador_patron_cuerpo');
+            alert("Borrador eliminado correctamente. ✨");
+        }
+    }
+
     function guardarBorradorLocal() {
-        const titulo = document.getElementById('borrador-titulo').value;
-        const contenido = document.getElementById('borrador-contenido').innerHTML;
-        localStorage.setItem('borrador_patron_titulo', titulo);
-        localStorage.setItem('borrador_patron_cuerpo', contenido);
-        alert("¡Borrador guardado en tu móvil! 💾");
+        localStorage.setItem('borrador_patron_titulo', document.getElementById('borrador-titulo').value);
+        localStorage.setItem('borrador_patron_cuerpo', document.getElementById('borrador-contenido').innerHTML);
+        alert("¡Progreso guardado! 💾");
     }
 
     function cargarBorradorLocal() {
@@ -658,27 +663,10 @@
     function generarPDF() {
         const titulo = document.getElementById('borrador-titulo').value || 'Sin titulo';
         const contenido = document.getElementById('borrador-contenido').innerHTML;
-        
-        if(!contenido) return alert("¡Escribe algo en el patrón! 🧶");
-
-        const tempContainer = document.createElement('div');
-        tempContainer.innerHTML = `
-            <div style="padding:40px; font-family:serif; color:#444;">
-                <h1 style="color:#f06292; text-align:center; border-bottom:2px solid #fce4ec; padding-bottom:10px;">${titulo}</h1>
-                <div style="margin-top:20px; line-height:1.6; font-size:14px;">${contenido}</div>
-                <p style="margin-top:50px; text-align:center; color:#ff85a2; font-style:italic; font-size:12px;">Creado con Mi Taller Rosa 💖</p>
-            </div>
-        `;
-        
-        const opt = {
-          margin: 10,
-          filename: `${titulo}.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2 },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        html2pdf().set(opt).from(tempContainer).save();
+        if(!contenido) return alert("¡Escribe algo primero! 🧶");
+        const temp = document.createElement('div');
+        temp.innerHTML = `<div style="padding:40px; font-family:serif; color:#444;"><h1 style="color:#f06292; text-align:center; border-bottom:2px solid #fce4ec; padding-bottom:10px;">${titulo}</h1><div style="margin-top:20px; line-height:1.6;">${contenido}</div></div>`;
+        html2pdf().set({ margin: 10, filename: `${titulo}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(temp).save();
     }
 
     window.onload = cargarDatos;
