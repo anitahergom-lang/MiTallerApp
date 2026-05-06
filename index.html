@@ -131,7 +131,6 @@
     <div id="lista-stock" class="grid-estudio"></div>
 </div>
 
-<!-- Resto de vistas (PROYECTOS, PDFS, REGALOS) se mantienen igual -->
 <div id="vista-PROYECTOS" style="display:none;">
     <div class="card-form">
         <h2 style="color:var(--s); text-align:center; margin-top:0;">✨ Nuevo Proyecto</h2>
@@ -243,7 +242,7 @@
         } catch (e) { console.error(e); }
     }
 
-    /* RENDERIZADO DE STOCK - ACTUALIZADO PARA MOSTRAR n/a SI NO HAY DATOS */
+    /* ÚNICA FUNCIÓN MODIFICADA PARA MOSTRAR SIEMPRE LOS DATOS */
     function renderizarStock(lista) {
         document.getElementById('lista-stock').innerHTML = lista.map(m => `
             <div class="item-card">
@@ -269,7 +268,6 @@
         `).join('');
     }
 
-    // Funciones de lógica (cargarEdicion, guardarNuevo, etc.) se mantienen igual
     function cargarEdicion(id) {
         const item = lanasGlobal.find(m => m.id === id);
         if(!item) return;
