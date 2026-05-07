@@ -195,25 +195,70 @@
     <div class="card">
         <h2 style="color:var(--p); text-align:center;">🛍️ Registrar Compra</h2>
         
+        <div style="margin-bottom:15px; text-align:center;">
+            <div onclick="document.getElementById('capricho-foto').click()" style="width:100%; height:150px; border:2px dashed var(--p); border-radius:15px; display:flex; align-items:center; justify-content:center; cursor:pointer; background:var(--pc); overflow:hidden;">
+                <img id="capricho-img-preview" style="max-width:100%; max-height:100%; display:none;">
+                <span id="capricho-placeholder">Pulsa para añadir foto 📸</span>
+            </div>
+            <input type="file" id="capricho-foto" accept="image/*" style="display:none;" onchange="previsualizarImagenCapricho(event)">
+        </div>
+
         <div style="margin-bottom:15px;">
-            <label style="display:block; margin-bottom:5px; font-weight:bold; color:var(--s);">¿Qué has comprado? ✨</label>
-            <select id="capricho-tipo-general" onchange="mostrarSubcategorias(this.value)" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:10px; background:var(--pc); color:var(--txt);">
-                <option value="">Selecciona una categoría...</option>
+            <label style="display:block; margin-bottom:5px; font-weight:bold;">Categoría ✨</label>
+            <select id="capricho-tipo-general" onchange="mostrarSubcategorias(this.value)" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:10px; background:var(--pc);">
+                <option value="">Selecciona...</option>
                 <option value="Material">🧶 Material</option>
                 <option value="Herramienta">🛠️ Herramientas</option>
                 <option value="Formacion">📚 Formación</option>
             </select>
         </div>
 
-        <div style="margin-bottom:15px;">
-            <label style="display:block; margin-bottom:5px; font-weight:bold;">Nombre / Concepto ✏️</label>
-            <input type="text" id="capricho-nombre" placeholder="Ej: Lana Merino Soft" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box;">
+        <div id="div-subcategoria" style="margin-bottom:15px; display:none;">
+            <label style="display:block; margin-bottom:5px; font-weight:bold;">Tipo de Material 🏷️</label>
+            <select id="capricho-subtipo" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:10px;">
+                <option value="Lanas">🧶 Lanas</option>
+                <option value="Telas">👗 Telas</option>
+                <option value="Hilos">🧵 Hilos</option>
+                <option value="Accesorios">🎀 Accesorios</option>
+                <option value="Otros">🧸 Otros</option>
+            </select>
         </div>
 
-        <div id="contenedor-dinamico-caprichos">
+        <div style="margin-bottom:10px;">
+            <input type="text" id="capricho-nombre" placeholder="Nombre del material ✏️" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box; margin-bottom:10px;">
+            
+            <div style="display: flex; gap: 10px; margin-bottom:10px;">
+                <input type="text" id="capricho-grosor" placeholder="Grosor (Ej: DK)" style="flex:1; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box;">
+                <input type="text" id="capricho-longitud" placeholder="Longitud (m)" style="flex:1; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box;">
             </div>
 
-        <hr style="border:0; border-top:1px solid var(--pc); margin:20px 0;">
+            <div style="display: flex; gap: 10px; margin-bottom:10px;">
+                <input type="text" id="capricho-tienda" placeholder="Tienda 🏪" style="flex:1; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box;">
+                <input type="text" id="capricho-composicion" placeholder="Composición 🔬" style="flex:1; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box;">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom:10px; background: var(--pc); padding: 10px; border-radius: 10px;">
+            <div style="flex: 1;">
+                <label style="font-size:0.8em; font-weight:bold;">Precio Total €</label>
+                <input type="number" id="capricho-precio" step="0.01" placeholder="0.00" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:8px;">
+            </div>
+            <div style="flex: 1;">
+                <label style="font-size:0.8em; font-weight:bold;">Cantidad</label>
+                <input type="number" id="capricho-cantidad" value="1" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:8px;">
+            </div>
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label style="display:block; margin-bottom:5px; font-weight:bold;">Día de la compra 📅</label>
+            <input type="date" id="capricho-fecha" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box;">
+        </div>
+
+        <textarea id="capricho-notas" placeholder="Notas adicionales 📝" rows="2" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box; margin-bottom:15px;"></textarea>
+
+        <button class="btn-api" onclick="procesarGuardadoCapricho()" style="width:100%; background:#4CAF50; color:white; margin-bottom:10px; border:none; padding:15px; border-radius:10px; font-weight:bold; cursor:pointer;">
+            ✅ Registrar y enviar al Armario
+        </button>
 
         <button class="btn-nav" onclick="volverMenuCaprichos()" style="width:100%; background:var(--s); color:white; border:none; padding:12px; border-radius:10px; cursor:pointer;">
             ⬅️ Volver a Mis Caprichos
@@ -1023,27 +1068,47 @@ async function guardarNuevaLlave() {
         }
     }
   // Función para navegar DENTRO de la sección de Caprichos
-// Función para navegar a las sub-secciones de Caprichos
+// Función para navegar a las sub-secciones
 function cambiarVistaInterna(subSeccion) {
-    // 1. Escondemos el menú de Caprichos
     document.getElementById('vista-CAPRICHOS').style.display = 'none';
-    
-    // 2. Intentamos mostrar la sub-sección pulsada
     const vistaDestino = document.getElementById('vista-' + subSeccion);
+    
     if (vistaDestino) {
         vistaDestino.style.display = 'block';
+        // Si es la vista de añadir, ponemos la fecha de hoy por defecto
+        if(subSeccion === 'AÑADIR_CAPRICHO') {
+            document.getElementById('capricho-fecha').valueAsDate = new Date();
+        }
     } else {
-        // Si la sección no existe todavía (como Historial), avisamos
-        alert("¡Próximamente! Estamos preparando la sección de " + subSeccion + " 🌸");
+        alert("¡Próximamente! Estamos preparando " + subSeccion + " 🌸");
         document.getElementById('vista-CAPRICHOS').style.display = 'block';
     }
 }
 
-// Función para volver atrás al menú de Caprichos
 function volverMenuCaprichos() {
     document.getElementById('vista-AÑADIR_CAPRICHO').style.display = 'none';
-    // Cuando hagamos las otras secciones, las añadiremos aquí para esconderlas
     document.getElementById('vista-CAPRICHOS').style.display = 'block';
+}
+
+function mostrarSubcategorias(valor) {
+    document.getElementById('div-subcategoria').style.display = (valor === 'Material') ? 'block' : 'none';
+}
+
+function previsualizarImagenCapricho(event) {
+    const reader = new FileReader();
+    reader.onload = function() {
+        const output = document.getElementById('capricho-img-preview');
+        const placeholder = document.getElementById('capricho-placeholder');
+        output.src = reader.result;
+        output.style.display = 'block';
+        placeholder.style.display = 'none';
+    }
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+// Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
+async function procesarGuardadoCapricho() {
+    alert("¡Todo listo! En el próximo paso conectaremos esto con Supabase para que cree la tarjeta en Stock automáticamente con sus botones y emojis. 🚀🌸");
 }
     // ONLOAD ACTUALIZADO PARA RECUPERAR TEMA
     window.onload = function() {
