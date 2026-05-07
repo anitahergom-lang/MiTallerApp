@@ -887,8 +887,7 @@ async function eliminarNota(id) { if(confirm("¿Borrar nota?")) { await client.f
 
     // --- AQUÍ EMPIEZA LA QUE YA TENÍAS ---
 
-    async function guardarNuevaLlave() {
-        // ... (el resto del código que ya tienes)
+async function guardarNuevaLlave() {
         const nombre = document.getElementById('llave-nombre').value;
         const usuario = document.getElementById('llave-usuario').value;
         const clave = document.getElementById('llave-pass').value;
@@ -898,16 +897,40 @@ async function eliminarNota(id) { if(confirm("¿Borrar nota?")) { await client.f
             return;
         }
 
-        const { error } = await client
-            .from('llaves_data')
-            .insert([{ nombre, usuario, clave }]);
+        let error;
+
+        // Aquí es donde el código decide qué hacer:
+        if (window.editandoLlaveId) {
+            // MODO EDICIÓN: Si hay un ID guardado, actualiza la existente
+            const { error: err } = await client
+                .from('llaves_data')
+                .update({ nombre, usuario, clave })
+                .eq('id', window.editandoLlaveId);
+            error = err;
+        } else {
+            // MODO NUEVO: Si no hay ID, crea una nueva (como hacía antes)
+            const { error: err } = await client
+                .from('llaves_data')
+                .insert([{ nombre, usuario, clave }]);
+            error = err;
+        }
 
         if (error) {
             alert("Error al guardar: " + error.message);
         } else {
+            // Limpiamos las cajitas de texto
             document.getElementById('llave-nombre').value = '';
             document.getElementById('llave-usuario').value = '';
             document.getElementById('llave-pass').value = '';
+
+            // IMPORTANTE: Quitamos el modo edición y devolvemos el botón a su estado original
+            window.editandoLlaveId = null;
+            const btn = document.querySelector('button[onclick="guardarNuevaLlave()"]');
+            if (btn) {
+                btn.innerText = "Guardar Llave 🔑";
+                btn.style.background = "var(--p)"; // Vuelve al rosa
+            }
+
             cargarLlaves(); 
         }
     }
