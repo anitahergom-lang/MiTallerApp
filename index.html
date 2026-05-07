@@ -961,23 +961,32 @@
     }
 // --- BLOQUE DE NOTAS CORREGIDO ---
 
+// --- BLOQUE DE NOTAS CORREGIDO Y COMPLETO ---
+
 function editarNota(id, titulo, contenido) {
     cambiarVista('NOTAS');
     document.getElementById('n-titulo').value = titulo;
     document.getElementById('n-contenido').value = contenido;
     
-    // Ocultamos el botón de guardar normal
+    // Ocultamos el botón de guardar normal para que no haya confusión
     const btnGuardar = document.querySelector('#vista-NOTAS .btn-grande');
     if (btnGuardar) btnGuardar.style.display = 'none';
     
-    // Si ya existe un botón de actualizar de antes, lo borramos para no repetir
+    // Si ya existe un botón de actualizar de un clic previo, lo eliminamos
     const btnPrevio = document.getElementById('btn-actualizar-nota');
     if (btnPrevio) btnPrevio.remove();
 
-    // Añadimos el nuevo botón rosa con el margen y el emoji
-    document.querySelector('#vista-NOTAS .card-form').innerHTML += `
-        <button id="btn-actualizar-nota" class="btn-grande" style="background: var(--s); margin-bottom: 10px;" onclick="actualizarNota('${id}')">💖 ACTUALIZAR NOTA</button>
-    `;
+    // Creamos el botón rosa de actualizar
+    const btnUpdate = document.createElement('button');
+    btnUpdate.id = 'btn-actualizar-nota';
+    btnUpdate.className = 'btn-grande';
+    btnUpdate.style.background = 'var(--s)';
+    btnUpdate.style.marginBottom = '10px';
+    btnUpdate.innerHTML = '💖 ACTUALIZAR NOTA';
+    btnUpdate.onclick = function() { actualizarNota(id); };
+
+    // Lo añadimos al formulario
+    document.querySelector('#vista-NOTAS .card-form').appendChild(btnUpdate);
 }
 
 async function actualizarNota(id) {
@@ -985,36 +994,34 @@ async function actualizarNota(id) {
     const contenido = document.getElementById('n-contenido').value;
 
     if (!titulo || !contenido) {
-        alert('Por favor, completa todos los campos');
+        alert('Por favor, rellena todos los campos para actualizar.');
         return;
     }
 
     try {
         const { error } = await _supabase
             .from('notas')
-            .update({ titulo, contenido })
+            .update({ titulo: titulo, contenido: contenido })
             .eq('id', id);
 
         if (error) throw error;
 
-        alert('✅ Nota actualizada correctamente');
+        alert('✅ ¡Nota actualizada con éxito!');
         
-        // Limpiamos los campos
+        // Limpiamos y restauramos la vista
         document.getElementById('n-titulo').value = '';
         document.getElementById('n-contenido').value = '';
         
-        // Quitamos el botón rosa y volvemos a mostrar el de guardar
         const btnAct = document.getElementById('btn-actualizar-nota');
         if (btnAct) btnAct.remove();
         
         const btnGuardar = document.querySelector('#vista-NOTAS .btn-grande');
         if (btnGuardar) btnGuardar.style.display = 'block';
         
-        // Refrescamos la lista
-        cargarNotas();
+        cargarNotas(); // Refrescamos la lista para ver los cambios
     } catch (error) {
-        console.error('Error al actualizar:', error);
-        alert('Error al actualizar la nota');
+        console.error('Error:', error);
+        alert('Vaya, algo ha fallado al actualizar la nota.');
     }
 }
 
