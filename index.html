@@ -159,25 +159,35 @@
     <div id="lista-stock" class="grid-estudio"></div>
 </div>
 
-   <div id="vista-CAPRICHOS" class="vista" style="display:none;">
+<div id="vista-CAPRICHOS" class="vista" style="display:none;">
     <div class="card">
-        <h2 style="color:var(--p); text-align:center;">💸 Nuevo Capricho</h2>
+        <h2 style="color:var(--p); text-align:center; margin-bottom:20px;">💸 Mis Caprichos</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            
+            <button class="btn-nav" onclick="cambiarVistaInterna('AÑADIR_CAPRICHO')" style="height:100px; display:flex; flex-direction:column; justify-content:center; background:white; border:2px solid var(--pc);">
+                <span style="font-size:2em;">🛍️</span>
+                <span style="font-size:0.8em; font-weight:bold; color:var(--p);">Añadir</span>
+            </button>
 
-        <div style="margin-bottom:15px;">
-            <label style="display:block; margin-bottom:5px; font-weight:bold;">¿Qué es? (Concepto) 🧶</label>
-            <input type="text" id="capricho-concepto" placeholder="Ej: Kit de agujas nuevas" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box;">
+            <button class="btn-nav" onclick="cambiarVistaInterna('LISTA_GASTOS')" style="height:100px; display:flex; flex-direction:column; justify-content:center; background:white; border:2px solid var(--pc);">
+                <span style="font-size:2em;">📖</span>
+                <span style="font-size:0.8em; font-weight:bold; color:var(--p);">Historial</span>
+            </button>
+
+            <button class="btn-nav" onclick="cambiarVistaInterna('TERMOMETRO')" style="height:100px; display:flex; flex-direction:column; justify-content:center; background:white; border:2px solid var(--pc);">
+                <span style="font-size:2em;">🌡️</span>
+                <span style="font-size:0.8em; font-weight:bold; color:var(--p);">Termómetro</span>
+            </button>
+
+            <button class="btn-nav" onclick="cambiarVistaInterna('FELICIDAD')" style="height:100px; display:flex; flex-direction:column; justify-content:center; background:white; border:2px solid var(--pc);">
+                <span style="font-size:2em;">✨</span>
+                <span style="font-size:0.8em; font-weight:bold; color:var(--p);">Felicidad</span>
+            </button>
+
         </div>
 
-        <div style="margin-bottom:15px;">
-            <label style="display:block; margin-bottom:5px; font-weight:bold;">¿Cuánto ha costado? 💶</label>
-            <input type="number" id="capricho-monto" placeholder="0.00" step="0.01" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box;">
-        </div>
-
-        <button class="btn-api" style="width:100%; background:#4CAF50; color:white; margin-bottom:10px; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;">
-            ✅ Guardar Capricho
-        </button>
-
-        <button class="btn-nav" onclick="cambiarVista('INICIO')" style="width:100%; background:var(--p); color:white; border:none; padding:12px; border-radius:10px; cursor:pointer;">
+        <button class="btn-nav" onclick="cambiarVista('INICIO')" style="width:100%; margin-top:20px; background:var(--p); color:white; border:none; padding:12px; border-radius:10px;">
             🏠 Volver al Inicio
         </button>
     </div>
@@ -984,6 +994,11 @@ async function guardarNuevaLlave() {
             cargarLlaves(); 
         }
     }
+    // Función para navegar DENTRO de la sección de Caprichos
+function cambiarVistaInterna(subSeccion) {
+    console.log("Cambiando a subsección: " + subSeccion);
+    alert("¡Próximamente! Estamos preparando la sección de " + subSeccion + " 🌸");
+}
     // ONLOAD ACTUALIZADO PARA RECUPERAR TEMA
     window.onload = function() {
         const temaGuardado = localStorage.getItem('tema-preferido');
