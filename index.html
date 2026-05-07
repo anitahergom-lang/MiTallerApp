@@ -192,18 +192,9 @@
 </div>
 
 <div id="vista-AÑADIR_CAPRICHO" class="vista" style="display:none;">
-    <div class="card" style="padding: 20px; max-width: 450px; margin: auto; border: 1px solid var(--br);">
+    <div class="card" style="padding: 20px; max-width: 450px; margin: auto; border: 1px solid var(--br); border-radius: 25px;">
         <h2 style="color:var(--s); text-align:center; margin-top:0; font-size: 1.4em;">🛍️ Registrar Compra</h2>
         
-        <div style="margin-bottom:20px; text-align:center;">
-            <div onclick="document.getElementById('capricho-foto').click()" style="width:100px; height:100px; border-radius:20px; border:2px solid var(--p); display:flex; align-items:center; justify-content:center; cursor:pointer; background:var(--pc); overflow:hidden; margin: 0 auto; position: relative;">
-                <img id="capricho-img-preview" style="width:100%; height:100%; object-fit:cover; display:none;">
-                <span id="capricho-placeholder" style="font-size: 1.5em;">📸</span>
-            </div>
-            <p style="font-size: 0.75em; color: var(--s); margin-top: 8px; font-weight: bold;">Toca para añadir foto</p>
-            <input type="file" id="capricho-foto" accept="image/*" style="display:none;" onchange="previsualizarImagenCapricho(event)">
-        </div>
-
         <div style="display: flex; gap: 10px; margin-bottom:12px;">
             <select id="capricho-tipo-general" onchange="mostrarSubcategorias(this.value)" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px; background:var(--pc); font-size:0.9em; outline:none;">
                 <option value="">✨ Categoría...</option>
@@ -254,6 +245,20 @@
         </div>
 
         <textarea id="capricho-notas" placeholder="📝 Notas adicionales..." rows="2" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; box-sizing: border-box; margin-bottom:15px; font-family:inherit;"></textarea>
+
+        <div style="margin-bottom: 20px;">
+            <div onclick="document.getElementById('capricho-foto').click()" 
+                 style="width: 100%; height: 150px; border: 2px dashed var(--p); border-radius: 20px; background-color: var(--b); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                
+                <img id="capricho-img-preview" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                
+                <div id="capricho-placeholder-group" style="text-align: center;">
+                    <span style="font-size: 3em; display: block; margin-bottom: 5px;">📸</span>
+                    <span style="font-size: 0.95em; color: var(--s); font-weight: 600; font-family: 'Segoe UI', sans-serif;">Añadir foto del material</span>
+                </div>
+            </div>
+            <input type="file" id="capricho-foto" accept="image/*" style="display: none;" onchange="previsualizarImagenCapricho(event)">
+        </div>
 
         <button class="btn-api" onclick="procesarGuardadoCapricho()" style="width:100%; background:var(--s); color:white; margin-bottom:10px; border:none; padding:14px; border-radius:12px; font-weight:bold; cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
             💖 Registrar Capricho
