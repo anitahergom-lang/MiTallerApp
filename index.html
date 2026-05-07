@@ -959,18 +959,22 @@
             el.innerText = '••••••••';
         }
     }
+// --- BLOQUE DE NOTAS CORREGIDO ---
+
 function editarNota(id, titulo, contenido) {
     cambiarVista('NOTAS');
     document.getElementById('n-titulo').value = titulo;
     document.getElementById('n-contenido').value = contenido;
     
-    // ELIMINAR EL BOTÓN DE GUARDAR TEMPORALMENTE Y PONER EL DE ACTUALIZAR
-    document.querySelector('#vista-NOTAS .btn-grande').style.display = 'none';
+    // Ocultamos el botón de guardar normal
+    const btnGuardar = document.querySelector('#vista-NOTAS .btn-grande');
+    if (btnGuardar) btnGuardar.style.display = 'none';
     
-    // Si ya existe un botón de actualizar previo, lo quitamos para no duplicar
+    // Si ya existe un botón de actualizar de antes, lo borramos para no repetir
     const btnPrevio = document.getElementById('btn-actualizar-nota');
     if (btnPrevio) btnPrevio.remove();
 
+    // Añadimos el nuevo botón rosa con el margen y el emoji
     document.querySelector('#vista-NOTAS .card-form').innerHTML += `
         <button id="btn-actualizar-nota" class="btn-grande" style="background: var(--s); margin-bottom: 10px;" onclick="actualizarNota('${id}')">💖 ACTUALIZAR NOTA</button>
     `;
@@ -993,22 +997,28 @@ async function actualizarNota(id) {
 
         if (error) throw error;
 
-        alert('Nota actualizada correctamente');
+        alert('✅ Nota actualizada correctamente');
+        
+        // Limpiamos los campos
         document.getElementById('n-titulo').value = '';
         document.getElementById('n-contenido').value = '';
         
-        // Restaurar botón original y quitar el de actualizar
-        document.querySelector('#vista-NOTAS .btn-grande').style.display = 'block';
+        // Quitamos el botón rosa y volvemos a mostrar el de guardar
         const btnAct = document.getElementById('btn-actualizar-nota');
         if (btnAct) btnAct.remove();
         
+        const btnGuardar = document.querySelector('#vista-NOTAS .btn-grande');
+        if (btnGuardar) btnGuardar.style.display = 'block';
+        
+        // Refrescamos la lista
         cargarNotas();
     } catch (error) {
         console.error('Error al actualizar:', error);
         alert('Error al actualizar la nota');
     }
 }
-    // Función para subir los datos arriba y poder editarlos
+
+// --- FIN DEL BLOQUE CORREGIDO ---
     function prepararEdicionLlave(id, nombre, usuario, clave) {
         document.getElementById('llave-nombre').value = nombre;
         document.getElementById('llave-usuario').value = usuario;
