@@ -51,10 +51,10 @@
 <div class="menu-secciones">
     <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
     <button class="btn-nav" id="nav-STOCK" onclick="cambiarVista('STOCK')">📦 STOCK</button>
-    <button class="btn-nav" id="nav-CAPRICHOS" onclick="cambiarVista('CAPRICHOS')">✨ CAPRICHOS</button>
     <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
     <button class="btn-nav" id="nav-PDFS" onclick="cambiarVista('PDFS')">📂 PDFs</button>
     <button class="btn-nav" id="nav-NOTAS" onclick="cambiarVista('NOTAS')">📝 NOTAS</button>
+    <button class="btn-nav" id="nav-LLAVES" onclick="cambiarVista('LLAVES')">🔑 LLAVES</button>
 </div>
 
 <div id="vista-INICIO">
@@ -94,12 +94,6 @@
 
 <div id="vista-STOCK" style="display:none;">
     <div id="lista-stock" class="grid-estudio"></div>
-</div>
-
-<div id="vista-CAPRICHOS" style="display:none;">
-    <div class="card-form">
-        <h2 style="color:var(--s); text-align:center; margin-top:0; font-size:20px;">✨ Mis Caprichos</h2>
-    </div>
 </div>
 
 <div id="vista-PROYECTOS" style="display:none;">
@@ -154,7 +148,7 @@
     function cambiarVista(v) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
         document.getElementById('nav-' + v).classList.add('active');
-        ['INICIO', 'STOCK', 'CAPRICHOS', 'PROYECTOS', 'PDFS', 'NOTAS'].forEach(id => {
+        ['INICIO', 'STOCK', 'PROYECTOS', 'PDFS', 'NOTAS'].forEach(id => {
             const el = document.getElementById('vista-' + id);
             if(el) el.style.display = (id === v ? 'block' : 'none');
         });
