@@ -192,76 +192,72 @@
 </div>
 
 <div id="vista-AÑADIR_CAPRICHO" class="vista" style="display:none;">
-    <div class="card">
-        <h2 style="color:var(--p); text-align:center;">🛍️ Registrar Compra</h2>
+    <div class="card" style="padding: 15px; max-width: 500px; margin: auto;">
+        <h2 style="color:var(--p); text-align:center; margin-top:0; font-size: 1.3em;">🛍️ Registrar Compra</h2>
         
-        <div style="margin-bottom:15px; text-align:center;">
-            <div onclick="document.getElementById('capricho-foto').click()" style="width:100%; height:150px; border:2px dashed var(--p); border-radius:15px; display:flex; align-items:center; justify-content:center; cursor:pointer; background:var(--pc); overflow:hidden;">
+        <div style="margin-bottom:12px; text-align:center;">
+            <div onclick="document.getElementById('capricho-foto').click()" style="width:100%; height:100px; border:2px dashed var(--p); border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:pointer; background:var(--pc); overflow:hidden;">
                 <img id="capricho-img-preview" style="max-width:100%; max-height:100%; display:none;">
-                <span id="capricho-placeholder">Pulsa para añadir foto 📸</span>
+                <span id="capricho-placeholder" style="font-size: 0.8em; color: var(--s);">Añadir Foto 📸</span>
             </div>
             <input type="file" id="capricho-foto" accept="image/*" style="display:none;" onchange="previsualizarImagenCapricho(event)">
         </div>
 
-        <div style="margin-bottom:15px;">
-            <label style="display:block; margin-bottom:5px; font-weight:bold;">Categoría ✨</label>
-            <select id="capricho-tipo-general" onchange="mostrarSubcategorias(this.value)" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:10px; background:var(--pc);">
-                <option value="">Selecciona...</option>
-                <option value="Material">🧶 Material</option>
-                <option value="Herramienta">🛠️ Herramientas</option>
-                <option value="Formacion">📚 Formación</option>
-            </select>
-        </div>
-
-        <div id="div-subcategoria" style="margin-bottom:15px; display:none;">
-            <label style="display:block; margin-bottom:5px; font-weight:bold;">Tipo de Material 🏷️</label>
-            <select id="capricho-subtipo" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:10px;">
-                <option value="Lanas">🧶 Lanas</option>
-                <option value="Telas">👗 Telas</option>
-                <option value="Hilos">🧵 Hilos</option>
-                <option value="Accesorios">🎀 Accesorios</option>
-                <option value="Otros">🧸 Otros</option>
-            </select>
-        </div>
-
-        <div style="margin-bottom:10px;">
-            <input type="text" id="capricho-nombre" placeholder="Nombre del material ✏️" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box; margin-bottom:10px;">
-            
-            <div style="display: flex; gap: 10px; margin-bottom:10px;">
-                <input type="text" id="capricho-grosor" placeholder="Grosor (Ej: DK)" style="flex:1; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box;">
-                <input type="text" id="capricho-longitud" placeholder="Longitud (m)" style="flex:1; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box;">
+        <div style="display: flex; gap: 8px; margin-bottom:10px;">
+            <div style="flex:1;">
+                <select id="capricho-tipo-general" onchange="mostrarSubcategorias(this.value)" style="width:100%; padding:8px; border:1px solid var(--br); border-radius:8px; font-size:0.85em; background:var(--pc);">
+                    <option value="">Categoría...</option>
+                    <option value="Material">🧶 Material</option>
+                    <option value="Herramienta">🛠️ Herramienta</option>
+                    <option value="Formacion">📚 Formación</option>
+                </select>
             </div>
-
-            <div style="display: flex; gap: 10px; margin-bottom:10px;">
-                <input type="text" id="capricho-tienda" placeholder="Tienda 🏪" style="flex:1; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box;">
-                <input type="text" id="capricho-composicion" placeholder="Composición 🔬" style="flex:1; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box;">
+            <div id="div-subcategoria" style="flex:1; display:none;">
+                <select id="capricho-subtipo" style="width:100%; padding:8px; border:1px solid var(--br); border-radius:8px; font-size:0.85em;">
+                    <option value="Lanas">🧶 Lanas</option>
+                    <option value="Telas">👗 Telas</option>
+                    <option value="Hilos">🧵 Hilos</option>
+                    <option value="Accesorios">🎀 Accesorios</option>
+                    <option value="Otros">🧸 Otros</option>
+                </select>
             </div>
         </div>
 
-        <div style="display: flex; gap: 10px; margin-bottom:10px; background: var(--pc); padding: 10px; border-radius: 10px;">
-            <div style="flex: 1;">
-                <label style="font-size:0.8em; font-weight:bold;">Precio Total €</label>
-                <input type="number" id="capricho-precio" step="0.01" placeholder="0.00" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:8px;">
+        <input type="text" id="capricho-nombre" placeholder="Nombre del material ✏️" style="width:100%; padding:8px; border:1px solid var(--br); border-radius:8px; box-sizing: border-box; margin-bottom:10px; font-size:0.9em;">
+
+        <div style="display: flex; gap: 8px; margin-bottom:10px;">
+            <input type="text" id="capricho-grosor" placeholder="Grosor" style="flex:1; padding:8px; border:1px solid var(--br); border-radius:8px; font-size:0.9em;">
+            <input type="text" id="capricho-longitud" placeholder="Longitud (m)" style="flex:1; padding:8px; border:1px solid var(--br); border-radius:8px; font-size:0.9em;">
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom:10px;">
+            <input type="text" id="capricho-tienda" placeholder="Tienda 🏪" style="flex:1; padding:8px; border:1px solid var(--br); border-radius:8px; font-size:0.9em;">
+            <input type="text" id="capricho-composicion" placeholder="Comp. 🔬" style="flex:1; padding:8px; border:1px solid var(--br); border-radius:8px; font-size:0.9em;">
+        </div>
+
+        <div style="display: flex; gap: 5px; margin-bottom:10px; background: #fff5f7; padding: 10px; border-radius: 10px; border: 1px solid var(--pc); align-items: flex-end;">
+            <div style="flex:1;">
+                <label style="display:block; font-size:0.65em; font-weight:bold; color:var(--s);">Precio Total €</label>
+                <input type="number" id="capricho-precio" step="0.01" placeholder="0.00" style="width:100%; padding:5px; border:1px solid var(--br); border-radius:5px; font-size:0.85em;">
             </div>
-            <div style="flex: 1;">
-                <label style="font-size:0.8em; font-weight:bold;">Cantidad</label>
-                <input type="number" id="capricho-cantidad" value="1" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:8px;">
+            <div style="flex:1;">
+                <label style="display:block; font-size:0.65em; font-weight:bold; color:var(--s);">Cant.</label>
+                <input type="number" id="capricho-cantidad" value="1" style="width:100%; padding:5px; border:1px solid var(--br); border-radius:5px; font-size:0.85em;">
+            </div>
+            <div style="flex:1.2;">
+                <label style="display:block; font-size:0.65em; font-weight:bold; color:var(--s);">Fecha</label>
+                <input type="date" id="capricho-fecha" style="width:100%; padding:4px; border:1px solid var(--br); border-radius:5px; font-size:0.75em;">
             </div>
         </div>
 
-        <div style="margin-bottom:15px;">
-            <label style="display:block; margin-bottom:5px; font-weight:bold;">Día de la compra 📅</label>
-            <input type="date" id="capricho-fecha" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box;">
-        </div>
+        <textarea id="capricho-notas" placeholder="Notas adicionales 📝" rows="1" style="width:100%; padding:8px; border:1px solid var(--br); border-radius:8px; box-sizing: border-box; margin-bottom:12px; font-size:0.85em; font-family:inherit;"></textarea>
 
-        <textarea id="capricho-notas" placeholder="Notas adicionales 📝" rows="2" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box; margin-bottom:15px;"></textarea>
-
-        <button class="btn-api" onclick="procesarGuardadoCapricho()" style="width:100%; background:#4CAF50; color:white; margin-bottom:10px; border:none; padding:15px; border-radius:10px; font-weight:bold; cursor:pointer;">
-            ✅ Registrar y enviar al Armario
+        <button class="btn-api" onclick="procesarGuardadoCapricho()" style="width:100%; background:#4CAF50; color:white; margin-bottom:8px; border:none; padding:12px; border-radius:10px; font-weight:bold; cursor:pointer;">
+            ✅ Registrar Material
         </button>
 
-        <button class="btn-nav" onclick="volverMenuCaprichos()" style="width:100%; background:var(--s); color:white; border:none; padding:12px; border-radius:10px; cursor:pointer;">
-            ⬅️ Volver a Mis Caprichos
+        <button class="btn-nav" onclick="volverMenuCaprichos()" style="width:100%; background:var(--s); color:white; border:none; padding:8px; border-radius:10px; cursor:pointer; font-size:0.85em;">
+            ⬅️ Volver a Caprichos
         </button>
     </div>
 </div>
@@ -426,27 +422,35 @@
     let toolsState = { 'canvas-punto': 'pincel', 'canvas-cuerpos': 'pincel' };
     let vueltasContador = 0;
 
-   function cambiarVista(v) {
-        document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
-        const navBtn = document.getElementById('nav-' + v);
-        if(navBtn) navBtn.classList.add('active');
+ function cambiarVista(v) {
+    // 1. Gestionar botones activos
+    document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
+    const navBtn = document.getElementById('nav-' + v);
+    if(navBtn) navBtn.classList.add('active');
 
-        ['INICIO', 'STOCK', 'COMPRAS', 'PROYECTOS', 'PDFS', 'REGALOS', 'NOTAS', 'LLAVES', 'CAPRICHOS'].forEach(id => {
-            const vista = document.getElementById('vista-' + id);
-            if(vista) vista.style.display = 'none';
-        });
+    // 2. Esconder todas las vistas principales
+    ['INICIO', 'STOCK', 'COMPRAS', 'PROYECTOS', 'PDFS', 'REGALOS', 'NOTAS', 'LLAVES', 'CAPRICHOS'].forEach(id => {
+        const vista = document.getElementById('vista-' + id);
+        if(vista) vista.style.display = 'none';
+    });
 
-        const vistaActiva = document.getElementById('vista-' + v);
-        if(vistaActiva) vistaActiva.style.display = 'block';
+    // 3. NUEVO: Esconder también la sub-vista de añadir de Caprichos para que no se solape
+    const vistaExtra = document.getElementById('vista-AÑADIR_CAPRICHO');
+    if (vistaExtra) vistaExtra.style.display = 'none';
 
-        if(v === 'STOCK') filtrar('Todo');
-        if(v === 'COMPRAS') cargarCompras();
-        if(v === 'PROYECTOS') setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
-        if(v === 'REGALOS') cargarRegalos();
-        if(v === 'PDFS') { cargarPDFs(); cargarBorradorLocal(); }
-        if(v === 'NOTAS') cargarNotas();
-        if(v === 'LLAVES') cargarLlaves();
-    }
+    // 4. Mostrar la vista activa
+    const vistaActiva = document.getElementById('vista-' + v);
+    if(vistaActiva) vistaActiva.style.display = 'block';
+
+    // 5. Cargas específicas de cada sección
+    if(v === 'STOCK') filtrar('Todo');
+    if(v === 'COMPRAS') cargarCompras();
+    if(v === 'PROYECTOS') setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
+    if(v === 'REGALOS') cargarRegalos();
+    if(v === 'PDFS') { cargarPDFs(); cargarBorradorLocal(); }
+    if(v === 'NOTAS') cargarNotas();
+    if(v === 'LLAVES') cargarLlaves();
+}
 
     function filtrar(cat) {
         document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('active'));
