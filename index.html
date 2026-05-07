@@ -959,29 +959,55 @@
             el.innerText = '••••••••';
         }
     }
-function prepararEdicionNota(id, contenido, titulo) {
-        // 1. Buscamos el cuadro del título y le ponemos el título de la nota
-        document.getElementById('n-titulo').value = titulo;
-        
-        // 2. Buscamos el cuadro grande y le ponemos el contenido de la nota
-        document.getElementById('n-contenido').value = contenido;
-        
-        // 3. Guardamos el ID de la nota en una "variable invisible" 
-        // para que la App sepa cuál es la nota que queremos cambiar luego
-        window.editandoNotaId = id;
-        
-        // 4. Buscamos el botón rosa de "Guardar Nota"
-        const btn = document.querySelector('button[onclick="guardarNota()"]');
-        
-        // 5. Si lo encontramos, lo ponemos de color verde y cambiamos el texto
-        if (btn) {
-            btn.innerHTML = "Actualizar Nota 🔄";
-            btn.style.background = "#4CAF50"; // Este es un color verde bonito
-        }
-        
-        // 6. Por último, hacemos que la pantalla suba suavemente al formulario
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+function editarNota(id, titulo, contenido) {
+    cambiarVista('NOTAS');
+    document.getElementById('n-titulo').value = titulo;
+    document.getElementById('n-contenido').value = contenido;
+    
+    // ELIMINAR EL BOTÓN DE GUARDAR TEMPORALMENTE Y PONER EL DE ACTUALIZAR
+    document.querySelector('#vista-NOTAS .btn-grande').style.display = 'none';
+    
+    // Si ya existe un botón de actualizar previo, lo quitamos para no duplicar
+    const btnPrevio = document.getElementById('btn-actualizar-nota');
+    if (btnPrevio) btnPrevio.remove();
+
+    document.querySelector('#vista-NOTAS .card-form').innerHTML += `
+        <button id="btn-actualizar-nota" class="btn-grande" style="background: var(--s); margin-bottom: 10px;" onclick="actualizarNota('${id}')">💖 ACTUALIZAR NOTA</button>
+    `;
+}
+
+async function actualizarNota(id) {
+    const titulo = document.getElementById('n-titulo').value;
+    const contenido = document.getElementById('n-contenido').value;
+
+    if (!titulo || !contenido) {
+        alert('Por favor, completa todos los campos');
+        return;
     }
+
+    try {
+        const { error } = await _supabase
+            .from('notas')
+            .update({ titulo, contenido })
+            .eq('id', id);
+
+        if (error) throw error;
+
+        alert('Nota actualizada correctamente');
+        document.getElementById('n-titulo').value = '';
+        document.getElementById('n-contenido').value = '';
+        
+        // Restaurar botón original y quitar el de actualizar
+        document.querySelector('#vista-NOTAS .btn-grande').style.display = 'block';
+        const btnAct = document.getElementById('btn-actualizar-nota');
+        if (btnAct) btnAct.remove();
+        
+        cargarNotas();
+    } catch (error) {
+        console.error('Error al actualizar:', error);
+        alert('Error al actualizar la nota');
+    }
+}
     // Función para subir los datos arriba y poder editarlos
     function prepararEdicionLlave(id, nombre, usuario, clave) {
         document.getElementById('llave-nombre').value = nombre;
