@@ -165,22 +165,22 @@
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
             
-            <button class="btn-nav" onclick="cambiarVistaInterna('AÑADIR_CAPRICHO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+            <button class="btn-nav" onclick="cambiarVistaInterna('AÑADIR_CAPRICHO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                 <span style="font-size:2.2em; margin-bottom:5px;">🛍️</span>
                 <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Añadir</span>
             </button>
 
-            <button class="btn-nav" onclick="cambiarVistaInterna('LISTA_GASTOS')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+            <button class="btn-nav" onclick="cambiarVistaInterna('LISTA_GASTOS')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                 <span style="font-size:2.2em; margin-bottom:5px;">📖</span>
                 <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Mi Historial</span>
             </button>
 
-            <button class="btn-nav" onclick="cambiarVistaInterna('TERMOMETRO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+            <button class="btn-nav" onclick="cambiarVistaInterna('TERMOMETRO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                 <span style="font-size:2.2em; margin-bottom:5px;">🌡️</span>
                 <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase; text-align:center;">El Termómetro<br>Rosa</span>
             </button>
 
-            <button class="btn-nav" onclick="cambiarVistaInterna('FELICIDAD')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+            <button class="btn-nav" onclick="cambiarVistaInterna('FELICIDAD')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                 <span style="font-size:2.2em; margin-bottom:5px;">✨</span>
                 <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Felicidad</span>
             </button>
@@ -189,6 +189,40 @@
 
         <button class="btn-nav" onclick="cambiarVista('INICIO')" style="width:100%; margin-top:25px; background:var(--p); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; cursor:pointer;">
             🏠 Volver al Inicio principal
+        </button>
+    </div>
+</div>
+
+<div id="vista-AÑADIR_CAPRICHO" class="vista" style="display:none;">
+    <div class="card">
+        <h2 style="color:var(--p); text-align:center;">🛍️ Registrar Compra</h2>
+        
+        <div style="margin-bottom:15px;">
+            <label style="display:block; margin-bottom:5px; font-weight:bold; color:var(--s);">¿Qué has comprado? ✨</label>
+            <select id="capricho-tipo-general" onchange="mostrarSubcategorias(this.value)" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:10px; background:var(--pc); color:var(--txt);">
+                <option value="">Selecciona una categoría...</option>
+                <option value="Material">🧶 Material</option>
+                <option value="Herramienta">🛠️ Herramientas</option>
+                <option value="Formacion">📚 Formación</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label style="display:block; margin-bottom:5px; font-weight:bold;">Nombre / Concepto ✏️</label>
+            <input type="text" id="capricho-nombre" placeholder="Ej: Lana Merino Soft" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:10px; box-sizing: border-box;">
+        </div>
+
+        <div id="contenedor-dinamico-caprichos">
+            </div>
+
+        <hr style="border:0; border-top:1px solid var(--pc); margin:20px 0;">
+
+        <button class="btn-api" onclick="alert('¡Estamos terminando de conectar los cables! 🌸')" style="width:100%; background:#4CAF50; color:white; margin-bottom:10px; border:none; padding:15px; border-radius:10px; font-weight:bold; cursor:pointer;">
+            ✅ Guardar Registro
+        </button>
+
+        <button class="btn-nav" onclick="volverMenuCaprichos()" style="width:100%; background:var(--s); color:white; border:none; padding:12px; border-radius:10px; cursor:pointer;">
+            ⬅️ Volver a Mis Caprichos
         </button>
     </div>
 </div>
