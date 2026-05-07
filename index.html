@@ -165,30 +165,30 @@
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
             
-            <button class="btn-nav" onclick="cambiarVistaInterna('AÑADIR_CAPRICHO')" style="height:100px; display:flex; flex-direction:column; justify-content:center; background:white; border:2px solid var(--pc);">
-                <span style="font-size:2em;">🛍️</span>
-                <span style="font-size:0.8em; font-weight:bold; color:var(--p);">Añadir</span>
+            <button class="btn-nav" onclick="cambiarVistaInterna('AÑADIR_CAPRICHO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <span style="font-size:2.2em; margin-bottom:5px;">🛍️</span>
+                <span style="font-size:0.85em; font-weight:bold; color:var(--p); text-transform: uppercase;">Añadir</span>
             </button>
 
-            <button class="btn-nav" onclick="cambiarVistaInterna('LISTA_GASTOS')" style="height:100px; display:flex; flex-direction:column; justify-content:center; background:white; border:2px solid var(--pc);">
-                <span style="font-size:2em;">📖</span>
-                <span style="font-size:0.8em; font-weight:bold; color:var(--p);">Historial</span>
+            <button class="btn-nav" onclick="cambiarVistaInterna('LISTA_GASTOS')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <span style="font-size:2.2em; margin-bottom:5px;">📖</span>
+                <span style="font-size:0.85em; font-weight:bold; color:var(--p); text-transform: uppercase;">Historial</span>
             </button>
 
-            <button class="btn-nav" onclick="cambiarVistaInterna('TERMOMETRO')" style="height:100px; display:flex; flex-direction:column; justify-content:center; background:white; border:2px solid var(--pc);">
-                <span style="font-size:2em;">🌡️</span>
-                <span style="font-size:0.8em; font-weight:bold; color:var(--p);">Termómetro</span>
+            <button class="btn-nav" onclick="cambiarVistaInterna('TERMOMETRO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <span style="font-size:2.2em; margin-bottom:5px;">🌡️</span>
+                <span style="font-size:0.85em; font-weight:bold; color:var(--p); text-transform: uppercase;">Gastos</span>
             </button>
 
-            <button class="btn-nav" onclick="cambiarVistaInterna('FELICIDAD')" style="height:100px; display:flex; flex-direction:column; justify-content:center; background:white; border:2px solid var(--pc);">
-                <span style="font-size:2em;">✨</span>
-                <span style="font-size:0.8em; font-weight:bold; color:var(--p);">Felicidad</span>
+            <button class="btn-nav" onclick="cambiarVistaInterna('FELICIDAD')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <span style="font-size:2.2em; margin-bottom:5px;">✨</span>
+                <span style="font-size:0.85em; font-weight:bold; color:var(--p); text-transform: uppercase;">Felicidad</span>
             </button>
 
         </div>
 
-        <button class="btn-nav" onclick="cambiarVista('INICIO')" style="width:100%; margin-top:20px; background:var(--p); color:white; border:none; padding:12px; border-radius:10px;">
-            🏠 Volver al Inicio
+        <button class="btn-nav" onclick="cambiarVista('INICIO')" style="width:100%; margin-top:25px; background:var(--p); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; cursor:pointer;">
+            🏠 Volver al Inicio principal
         </button>
     </div>
 </div>
@@ -994,7 +994,7 @@ async function guardarNuevaLlave() {
             cargarLlaves(); 
         }
     }
-    // Función para navegar DENTRO de la sección de Caprichos
+  // Función para navegar DENTRO de la sección de Caprichos
 function cambiarVistaInterna(subSeccion) {
     console.log("Cambiando a subsección: " + subSeccion);
     alert("¡Próximamente! Estamos preparando la sección de " + subSeccion + " 🌸");
