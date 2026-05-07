@@ -881,9 +881,14 @@ async function cargarNotas() {
         .select('*')
         .order('created_at', { ascending: false });
 
-    if (error) return console.error(error);
+    if (error) {
+        console.error("Error recuperando notas:", error);
+        return;
+    }
 
     const lista = document.getElementById('lista-notas');
+    if (!lista) return;
+    
     lista.innerHTML = '';
 
     notas.forEach(nota => {
@@ -896,7 +901,7 @@ async function cargarNotas() {
                     <small style="color:#888;">${new Date(nota.created_at).toLocaleDateString()}</small>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <span id="lapiz-${nota.id}" style="cursor:pointer; font-size:1.2rem;" title="Editar">✏️</span>
+                    <span id="edit-icon-${nota.id}" style="cursor:pointer; font-size:1.2rem;" title="Editar">✏️</span>
                     <span onclick="eliminarNota('${nota.id}')" style="cursor:pointer; font-size:1.2rem;" title="Eliminar">🗑️</span>
                 </div>
             </div>
@@ -904,8 +909,11 @@ async function cargarNotas() {
         `;
         lista.appendChild(div);
 
-        // CONEXIÓN DEL LÁPIZ: Aquí le damos la orden de "subir" al formulario
-        document.getElementById(`lapiz-${nota.id}`).onclick = () => prepararEdicion(nota);
+        // Vinculamos el clic del lápiz de esta nota específica
+        const elLapiz = document.getElementById(`edit-icon-${nota.id}`);
+        if (elLapiz) {
+            elLapiz.onclick = () => prepararEdicion(nota);
+        }
     });
 }
     async function guardarNota() {
