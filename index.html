@@ -290,14 +290,20 @@
     </div>
     <div id="lista-notas"></div>
 </div>
-<div id="vista-LLAVES" style="display:none;">
-        <div class="card-form">
-            <h2 style="color:var(--s); text-align:center; margin-top:0; font-size:20px;">🔑 Mis Llaves</h2>
-            <div id="contenedor-llaves">
-                <p style="text-align:center; opacity:0.6;">Cargando tus llaves...</p>
-            </div>
-        </div>
+<div id="vista-LLAVES" class="view" style="display:none;">
+    <h2 style="color:var(--s); text-align:center;">🔑 Mis Llaves</h2>
+    
+    <div style="background:var(--b); padding:15px; border-radius:20px; border:1px solid var(--br); margin-bottom:20px;">
+        <input type="text" id="llave-nombre" placeholder="Sitio (Ej: Netflix)" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
+        <input type="text" id="llave-usuario" placeholder="Usuario / Email" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
+        <input type="text" id="llave-pass" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
+        <button onclick="guardarNuevaLlave()" style="width:100%; background:var(--p); color:white; border:none; padding:12px; border-radius:10px; font-weight:bold; cursor:pointer;">
+            ✨ Guardar Nueva Llave
+        </button>
     </div>
+
+    <div id="lista-llaves"></div>
+</div>
 <script>
     const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
     const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
