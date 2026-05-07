@@ -312,23 +312,26 @@
     let toolsState = { 'canvas-punto': 'pincel', 'canvas-cuerpos': 'pincel' };
     let vueltasContador = 0;
 
-    function cambiarVista(v) {
+   function cambiarVista(v) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
         const navBtn = document.getElementById('nav-' + v);
         if(navBtn) navBtn.classList.add('active');
-        document.getElementById('vista-INICIO').style.display = v === 'INICIO' ? 'block' : 'none';
-        document.getElementById('vista-STOCK').style.display = v === 'STOCK' ? 'block' : 'none';
-        document.getElementById('vista-COMPRAS').style.display = v === 'COMPRAS' ? 'block' : 'none';
-        document.getElementById('vista-PROYECTOS').style.display = v === 'PROYECTOS' ? 'block' : 'none';
-        document.getElementById('vista-PDFS').style.display = v === 'PDFS' ? 'block' : 'none';
-        document.getElementById('vista-REGALOS').style.display = v === 'REGALOS' ? 'block' : 'none';
-        document.getElementById('vista-NOTAS').style.display = v === 'NOTAS' ? 'block' : 'none';
+
+        ['INICIO', 'STOCK', 'COMPRAS', 'PROYECTOS', 'PDFS', 'REGALOS', 'NOTAS', 'LLAVES'].forEach(id => {
+            const vista = document.getElementById('vista-' + id);
+            if(vista) vista.style.display = 'none';
+        });
+
+        const vistaActiva = document.getElementById('vista-' + v);
+        if(vistaActiva) vistaActiva.style.display = 'block';
+
         if(v === 'STOCK') filtrar('Todo');
         if(v === 'COMPRAS') cargarCompras();
         if(v === 'PROYECTOS') setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
         if(v === 'REGALOS') cargarRegalos();
         if(v === 'PDFS') { cargarPDFs(); cargarBorradorLocal(); }
         if(v === 'NOTAS') cargarNotas();
+        if(v === 'LLAVES') cargarLlaves();
     }
 
     function filtrar(cat) {
