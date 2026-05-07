@@ -789,31 +789,33 @@
     }
 
     // 2. FUNCIÓN PARA DIBUJAR LAS LLAVES EN LA PANTALLA
-  function renderizarLlaves(llaves) {
+ function renderizarLlaves(llaves) {
         const contenedor = document.getElementById('lista-llaves');
         if (!contenedor) return;
 
         contenedor.innerHTML = llaves.map(l => `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; margin-bottom: 10px; border-radius: 15px; background: var(--b); border: 1px solid var(--br);">
-                <div style="flex-grow: 1;">
-                    <strong style="display:block; color:var(--s); font-size: 16px;">${l.nombre}</strong>
-                    <span style="display:block; font-size: 13px; color: var(--txt); opacity: 0.8; margin-bottom: 5px;">👤 ${l.usuario || 'Sin usuario'}</span>
-                    <code style="background: var(--pc); padding: 2px 6px; border-radius: 5px; font-size: 14px;">${l.clave}</code>
+            <div style="display: flex; flex-direction: column; padding: 15px; margin-bottom: 10px; border-radius: 15px; background: var(--b); border: 1px solid var(--br);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                    <div style="flex-grow: 1;">
+                        <strong style="display:block; color:var(--s); font-size: 16px;">${l.nombre}</strong>
+                        <span style="display:block; font-size: 13px; color: var(--txt); opacity: 0.8;">👤 ${l.usuario || 'Sin usuario'}</span>
+                    </div>
+                    <div style="display: flex; gap: 5px;">
+                        <button onclick="prepararEdicionLlave('${l.id}', '${l.nombre}', '${l.usuario}', '${l.clave}')" style="background: #e3f2fd; border: none; padding: 8px; border-radius: 50%; cursor: pointer; color: #1976d2; width: 35px; height: 35px;">✏️</button>
+                        <button onclick="eliminarLlave('${l.id}')" style="background: #ffcdd2; border: none; padding: 8px; border-radius: 50%; cursor: pointer; color: #c62828; width: 35px; height: 35px;">🗑️</button>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 5px;">
-                    <button onclick="navigator.clipboard.writeText('${l.clave}'); alert('¡Copiado! 📋')" 
-                            style="background: var(--p); border: none; padding: 10px; border-radius: 50%; cursor: pointer; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                        📋
-                    </button>
-                    <button onclick="eliminarLlave('${l.id}')" 
-                            style="background: #ffcdd2; border: none; padding: 10px; border-radius: 50%; cursor: pointer; color: #c62828; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                        🗑️
-                    </button>
+                
+                <div style="display: flex; align-items: center; gap: 10px; background: var(--pc); padding: 8px 12px; border-radius: 10px;">
+                    <code id="pass-${l.id}" style="flex-grow: 1; font-family: monospace; font-size: 14px;">••••••••</code>
+                    <div style="display: flex; gap: 5px;">
+                        <button onclick="togglePass('${l.id}', '${l.clave}')" style="background: none; border: none; cursor: pointer; font-size: 16px;" title="Ver/Ocultar">👁️</button>
+                        <button onclick="navigator.clipboard.writeText('${l.clave}'); alert('¡Copiado! 📋')" style="background: none; border: none; cursor: pointer; font-size: 16px;" title="Copiar">📋</button>
+                    </div>
                 </div>
             </div>
         `).join('');
     }
-
     async function eliminarLlave(id) {
         if (confirm("¿Estás segura de que quieres borrar esta llave?")) {
             const { error } = await client
