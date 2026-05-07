@@ -755,18 +755,22 @@
         selPdf.innerHTML = '<option value="">Ninguno</option>' + pdfsGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
     }
 
-    async function cargarNotas() {
+   async function cargarNotas() {
         const { data } = await client.from('notas_data').select('*').order('created_at', {ascending: false});
         document.getElementById('lista-notas').innerHTML = (data || []).map(n => `
             <div class="card-form" style="margin-bottom:15px; position:relative;">
-                <button onclick="eliminarNota(${n.id})" style="position:absolute; top:10px; right:10px; border:none; background:none; cursor:pointer;">🗑️</button>
+                <div style="position:absolute; top:10px; right:10px; display: flex; gap: 10px;">
+                    <button onclick="prepararEdicionNota('${n.id}', \`${n.contenido.replace(/'/g, "\\'")}\`, \`${n.titulo.replace(/'/g, "\\'")}\`)" style="border:none; background:none; cursor:pointer; font-size:16px;" title="Editar">✏️</button>
+                    
+                    <button onclick="eliminarNota(${n.id})" style="border:none; background:none; cursor:pointer; font-size:16px;" title="Borrar">🗑️</button>
+                </div>
+
                 <h3 style="color:var(--s); margin:0 0 10px 0; font-size:16px;">${n.titulo}</h3>
                 <p style="white-space:pre-wrap; font-size:13px; margin:0; line-height:1.5;">${n.contenido}</p>
                 <small style="display:block; margin-top:10px; opacity:0.5; font-size:10px;">${new Date(n.created_at).toLocaleString()}</small>
             </div>
         `).join('');
     }
-
     async function guardarNota() {
         const titulo = document.getElementById('n-titulo').value;
         const contenido = document.getElementById('n-contenido').value;
@@ -839,7 +843,29 @@
             el.innerText = '••••••••';
         }
     }
-
+function prepararEdicionNota(id, contenido, titulo) {
+        // 1. Buscamos el cuadro del título y le ponemos el título de la nota
+        document.getElementById('n-titulo').value = titulo;
+        
+        // 2. Buscamos el cuadro grande y le ponemos el contenido de la nota
+        document.getElementById('n-contenido').value = contenido;
+        
+        // 3. Guardamos el ID de la nota en una "variable invisible" 
+        // para que la App sepa cuál es la nota que queremos cambiar luego
+        window.editandoNotaId = id;
+        
+        // 4. Buscamos el botón rosa de "Guardar Nota"
+        const btn = document.querySelector('button[onclick="guardarNota()"]');
+        
+        // 5. Si lo encontramos, lo ponemos de color verde y cambiamos el texto
+        if (btn) {
+            btn.innerHTML = "Actualizar Nota 🔄";
+            btn.style.background = "#4CAF50"; // Este es un color verde bonito
+        }
+        
+        // 6. Por último, hacemos que la pantalla suba suavemente al formulario
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     // Función para subir los datos arriba y poder editarlos
     function prepararEdicionLlave(id, nombre, usuario, clave) {
         document.getElementById('llave-nombre').value = nombre;
