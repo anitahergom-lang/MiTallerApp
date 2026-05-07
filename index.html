@@ -875,22 +875,39 @@
         selPdf.innerHTML = '<option value="">Ninguno</option>' + pdfsGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
     }
 
-   async function cargarNotas() {
-        const { data } = await client.from('notas_data').select('*').order('created_at', {ascending: false});
-        document.getElementById('lista-notas').innerHTML = (data || []).map(n => `
-            <div class="card-form" style="margin-bottom:15px; position:relative;">
-                <div style="position:absolute; top:10px; right:10px; display: flex; gap: 10px;">
-                    <button onclick="prepararEdicionNota('${n.id}', \`${n.contenido.replace(/'/g, "\\'")}\`, \`${n.titulo.replace(/'/g, "\\'")}\`)" style="border:none; background:none; cursor:pointer; font-size:16px;" title="Editar">✏️</button>
-                    
-                    <button onclick="eliminarNota(${n.id})" style="border:none; background:none; cursor:pointer; font-size:16px;" title="Borrar">🗑️</button>
-                </div>
+async function cargarNotas() {
+    const { data: notas, error } = await _supabase
+        .from('notas')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-                <h3 style="color:var(--s); margin:0 0 10px 0; font-size:16px;">${n.titulo}</h3>
-                <p style="white-space:pre-wrap; font-size:13px; margin:0; line-height:1.5;">${n.contenido}</p>
-                <small style="display:block; margin-top:10px; opacity:0.5; font-size:10px;">${new Date(n.created_at).toLocaleString()}</small>
+    if (error) return console.error(error);
+
+    const lista = document.getElementById('lista-notas');
+    lista.innerHTML = '';
+
+    notas.forEach(nota => {
+        const div = document.createElement('div');
+        div.className = 'card-nota';
+        div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items: flex-start;">
+                <div>
+                    <h3 style="margin:0; color:var(--s);">${nota.titulo}</h3>
+                    <small style="color:#888;">${new Date(nota.created_at).toLocaleDateString()}</small>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <span id="lapiz-${nota.id}" style="cursor:pointer; font-size:1.2rem;" title="Editar">✏️</span>
+                    <span onclick="eliminarNota('${nota.id}')" style="cursor:pointer; font-size:1.2rem;" title="Eliminar">🗑️</span>
+                </div>
             </div>
-        `).join('');
-    }
+            <p style="margin:10px 0; white-space:pre-wrap;">${nota.contenido}</p>
+        `;
+        lista.appendChild(div);
+
+        // CONEXIÓN DEL LÁPIZ: Aquí le damos la orden de "subir" al formulario
+        document.getElementById(`lapiz-${nota.id}`).onclick = () => prepararEdicion(nota);
+    });
+}
     async function guardarNota() {
         const titulo = document.getElementById('n-titulo').value;
         const contenido = document.getElementById('n-contenido').value;
@@ -962,71 +979,80 @@
             el.innerText = '••••••••';
         }
     }
-function editarNota(id, titulo, contenido) {
-    cambiarVista('NOTAS');
-    document.getElementById('n-titulo').value = titulo;
-    document.getElementById('n-contenido').value = contenido;
-    
-    // 1. Ocultamos el botón de GUARDAR para que no se dupliquen
-    const btnGuardar = document.querySelector('#vista-NOTAS .btn-grande');
-    if (btnGuardar) btnGuardar.style.display = 'none';
-    
-    // 2. Limpiamos cualquier botón de actualizar previo
-    const btnPrevio = document.getElementById('btn-actualizar-nota');
-    if (btnPrevio) btnPrevio.remove();
+// --- INICIO DEL BLOQUE DE NOTAS ---
 
-    // 3. Creamos el nuevo botón ROSA de ACTUALIZAR
-    const btnUpdate = document.createElement('button');
-    btnUpdate.id = 'btn-actualizar-nota';
-    btnUpdate.className = 'btn-grande';
-    btnUpdate.style.background = 'var(--s)';
-    btnUpdate.style.marginBottom = '10px';
-    btnUpdate.innerHTML = '💖 ACTUALIZAR NOTA';
+function prepararEdicion(nota) {
+    // 1. Subimos los datos de la nota a los campos de texto
+    document.getElementById('n-titulo').value = nota.titulo;
+    document.getElementById('n-contenido').value = nota.contenido;
     
-    // AQUÍ SE ASIGNA LA FUNCIÓN QUE HACE QUE FUNCIONE
-    btnUpdate.onclick = function() { actualizarNota(id); };
+    // 2. Scroll suave hacia arriba para que veas el formulario relleno
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    document.querySelector('#vista-NOTAS .card-form').appendChild(btnUpdate);
+    // 3. Gestión de botones
+    // Ocultamos el botón de GUARDAR normal
+    const btnGuardarOriginal = document.querySelector('#vista-NOTAS .btn-grande');
+    if (btnGuardarOriginal) btnGuardarOriginal.style.display = 'none';
+    
+    // Borramos cualquier botón rosa previo para que no se acumulen
+    const btnViejo = document.getElementById('btn-actualizar-nota');
+    if (btnViejo) btnViejo.remove();
+
+    // 4. Creamos el botón ROSA de MODIFICAR
+    const btnRosa = document.createElement('button');
+    btnRosa.id = 'btn-actualizar-nota';
+    btnRosa.className = 'btn-grande';
+    btnRosa.style.background = 'var(--s)'; // Tu rosa corporativo
+    btnRosa.style.marginBottom = '10px';
+    btnRosa.innerHTML = '💖 GUARDAR CAMBIOS ROSA';
+    
+    // Le asignamos la función de guardado real
+    btnRosa.onclick = () => ejecutarGuardadoReal(nota.id);
+
+    // Lo añadimos al formulario
+    document.querySelector('#vista-NOTAS .card-form').appendChild(btnRosa);
 }
 
-// ESTA ES LA FUNCIÓN QUE TE FALTA EN EL ARCHIVO 0.2 Y QUE HACE QUE EL BOTÓN FUNCIONE
-async function actualizarNota(id) {
-    const titulo = document.getElementById('n-titulo').value;
-    const contenido = document.getElementById('n-contenido').value;
+async function ejecutarGuardadoReal(id) {
+    const nuevoTit = document.getElementById('n-titulo').value;
+    const nuevoCont = document.getElementById('n-contenido').value;
 
-    if (!titulo || !contenido) {
-        alert('Por favor, rellena los campos');
+    if (!nuevoTit || !nuevoCont) {
+        alert('Por favor, rellena ambos campos');
         return;
     }
 
     try {
         const { error } = await _supabase
             .from('notas')
-            .update({ titulo: titulo, contenido: contenido })
+            .update({ titulo: nuevoTit, contenido: nuevoCont })
             .eq('id', id);
 
         if (error) throw error;
 
-        alert('✅ Nota actualizada correctamente');
+        alert('✅ Nota modificada con éxito');
         
-        // Limpiamos y restauramos el botón de Guardar original
+        // Limpiamos los cuadros de texto
         document.getElementById('n-titulo').value = '';
         document.getElementById('n-contenido').value = '';
         
-        const btnAct = document.getElementById('btn-actualizar-nota');
-        if (btnAct) btnAct.remove();
+        // Quitamos el botón rosa y volvemos a mostrar el botón de "Añadir"
+        const btnRosa = document.getElementById('btn-actualizar-nota');
+        if (btnRosa) btnRosa.remove();
         
-        const btnGuardar = document.querySelector('#vista-NOTAS .btn-grande');
-        if (btnGuardar) btnGuardar.style.display = 'block';
+        const btnGuardarNormal = document.querySelector('#vista-NOTAS .btn-grande');
+        if (btnGuardarNormal) btnGuardarNormal.style.display = 'block';
         
+        // Refrescamos la lista de notas para ver los cambios
         cargarNotas();
+        
     } catch (error) {
-        console.error('Error:', error);
-        alert('No se pudo actualizar');
+        console.error('Error al actualizar:', error);
+        alert('No se pudo guardar la modificación');
     }
 }
 
-// --- FIN DEL BLOQUE CORREGIDO ---
+// --- FIN DEL BLOQUE DE NOTAS ---
     function prepararEdicionLlave(id, nombre, usuario, clave) {
         document.getElementById('llave-nombre').value = nombre;
         document.getElementById('llave-usuario').value = usuario;
