@@ -93,6 +93,7 @@
 <div class="menu-secciones">
     <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
     <button class="btn-nav" id="nav-STOCK" onclick="cambiarVista('STOCK')">📦 STOCK</button>
+    <button class="btn-nav" id="nav-CAPRICHOS" onclick="cambiarVista('CAPRICHOS')">💸 Mis Caprichos</button>
     <button class="btn-nav" id="nav-COMPRAS" onclick="cambiarVista('COMPRAS')">🛒 COMPRAS</button>
     <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
     <button class="btn-nav" id="nav-PDFS" onclick="cambiarVista('PDFS')">📂 PDFs</button>
@@ -158,6 +159,21 @@
     <div id="lista-stock" class="grid-estudio"></div>
 </div>
 
+    <div id="vista-CAPRICHOS" class="vista" style="display:none;">
+    <div class="card">
+        <h2 style="color:var(--p); text-align:center;">💸 Mis Caprichos</h2>
+        
+        <div style="background: var(--pc); padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 20px;">
+            <p style="margin:0; font-weight:bold;">¡Bienvenida a tu sección de compras! 🌸</p>
+            <p style="font-size: 0.9em; margin-top: 5px;">Aquí prepararemos el formulario para registrar tus materiales y el termómetro rosa.</p>
+        </div>
+
+        <button class="nav-btn" onclick="cambiarVista('INICIO')" style="background:var(--p); width:100%; color:white; border:none; padding:10px; border-radius:10px; cursor:pointer;">
+            Volver al Inicio
+        </button>
+    </div>
+</div>
+    
 <div id="vista-COMPRAS" style="display:none;">
     <div class="card-form">
         <h2 style="color:var(--s); text-align:center; margin-top:0;">🛒 Lista de Compras</h2>
