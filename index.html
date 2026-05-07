@@ -859,8 +859,36 @@
         // Sube la pantalla suavemente hasta el formulario
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    async function eliminarNota(id) { if(confirm("¿Borrar nota?")) { await client.from('notas_data').delete().eq('id', id); cargarNotas(); } }
-async function guardarNuevaLlave() {
+async function eliminarNota(id) { if(confirm("¿Borrar nota?")) { await client.from('notas_data').delete().eq('id', id); cargarNotas(); } }
+
+    // --- AQUÍ PEGAMOS LAS NUEVAS FUNCIONES ---
+
+    function togglePass(id, claveReal) {
+        const el = document.getElementById('pass-' + id);
+        if (el.innerText === '••••••••') {
+            el.innerText = claveReal;
+        } else {
+            el.innerText = '••••••••';
+        }
+    }
+
+    function prepararEdicionLlave(id, nombre, usuario, clave) {
+        document.getElementById('llave-nombre').value = nombre;
+        document.getElementById('llave-usuario').value = usuario;
+        document.getElementById('llave-pass').value = clave;
+        window.editandoLlaveId = id;
+        const btn = document.querySelector('button[onclick="guardarNuevaLlave()"]');
+        if (btn) {
+            btn.innerText = "Actualizar Llave 🔄";
+            btn.style.background = "#4CAF50"; 
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- AQUÍ EMPIEZA LA QUE YA TENÍAS ---
+
+    async function guardarNuevaLlave() {
+        // ... (el resto del código que ya tienes)
         const nombre = document.getElementById('llave-nombre').value;
         const usuario = document.getElementById('llave-usuario').value;
         const clave = document.getElementById('llave-pass').value;
