@@ -776,17 +776,28 @@
         document.getElementById('n-contenido').value = "";
         cargarNotas();
     }
-async function cargarLlaves() {
-        const { data: llaves, error } = await client.from('llaves_data').select('id, nombre, usuario, clave').order('nombre', { ascending: true });
-        const contenedor = document.getElementById('contenedor-llaves');
-        if (!llaves || llaves.length === 0) {
-            contenedor.innerHTML = '<p style="text-align:center; opacity:0.6;">No hay llaves guardadas aún 🗝️</p>';
-            return;
+// 1. FUNCIÓN PARA BUSCAR LOS DATOS EN SUPABASE
+    async function cargarLlaves() {
+        const { data: llaves, error } = await client
+            .from('llaves_data')
+            .select('id, nombre, usuario, clave') // Buscamos las 4 cosas
+            .order('nombre', { ascending: true });
+
+        if (!error && llaves) {
+            renderizarLlaves(llaves); // Si todo está bien, mandamos a dibujar
         }
+    }
+
+    // 2. FUNCIÓN PARA DIBUJAR LAS LLAVES EN LA PANTALLA
+    function renderizarLlaves(llaves) {
+        const contenedor = document.getElementById('lista-llaves');
+        if (!contenedor) return;
+
         contenedor.innerHTML = llaves.map(l => `
-            <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; margin-bottom: 10px; border-radius: 15px; background: var(--b); border: 1px solid var(--br);">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; margin-bottom: 10px; border-radius: 15px; background: var(--b); border: 1px solid var(--br);">
                 <div style="flex-grow: 1;">
                     <strong style="display:block; color:var(--s); font-size: 16px;">${l.nombre}</strong>
+                    <span style="display:block; font-size: 13px; color: var(--txt); opacity: 0.8; margin-bottom: 5px;">👤 ${l.usuario || 'Sin usuario'}</span>
                     <code style="background: var(--pc); padding: 2px 6px; border-radius: 5px; font-size: 14px;">${l.clave}</code>
                 </div>
                 <button onclick="navigator.clipboard.writeText('${l.clave}'); alert('¡Copiado! 📋')" 
