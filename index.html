@@ -959,42 +959,40 @@
             el.innerText = '••••••••';
         }
     }
-// --- BLOQUE DE NOTAS CORREGIDO ---
-
-// --- BLOQUE DE NOTAS CORREGIDO Y COMPLETO ---
-
 function editarNota(id, titulo, contenido) {
     cambiarVista('NOTAS');
     document.getElementById('n-titulo').value = titulo;
     document.getElementById('n-contenido').value = contenido;
     
-    // Ocultamos el botón de guardar normal para que no haya confusión
+    // 1. Ocultamos el botón de GUARDAR para que no se dupliquen
     const btnGuardar = document.querySelector('#vista-NOTAS .btn-grande');
     if (btnGuardar) btnGuardar.style.display = 'none';
     
-    // Si ya existe un botón de actualizar de un clic previo, lo eliminamos
+    // 2. Limpiamos cualquier botón de actualizar previo
     const btnPrevio = document.getElementById('btn-actualizar-nota');
     if (btnPrevio) btnPrevio.remove();
 
-    // Creamos el botón rosa de actualizar
+    // 3. Creamos el nuevo botón ROSA de ACTUALIZAR
     const btnUpdate = document.createElement('button');
     btnUpdate.id = 'btn-actualizar-nota';
     btnUpdate.className = 'btn-grande';
     btnUpdate.style.background = 'var(--s)';
     btnUpdate.style.marginBottom = '10px';
     btnUpdate.innerHTML = '💖 ACTUALIZAR NOTA';
+    
+    // AQUÍ SE ASIGNA LA FUNCIÓN QUE HACE QUE FUNCIONE
     btnUpdate.onclick = function() { actualizarNota(id); };
 
-    // Lo añadimos al formulario
     document.querySelector('#vista-NOTAS .card-form').appendChild(btnUpdate);
 }
 
+// ESTA ES LA FUNCIÓN QUE TE FALTA EN EL ARCHIVO 0.2 Y QUE HACE QUE EL BOTÓN FUNCIONE
 async function actualizarNota(id) {
     const titulo = document.getElementById('n-titulo').value;
     const contenido = document.getElementById('n-contenido').value;
 
     if (!titulo || !contenido) {
-        alert('Por favor, rellena todos los campos para actualizar.');
+        alert('Por favor, rellena los campos');
         return;
     }
 
@@ -1006,9 +1004,9 @@ async function actualizarNota(id) {
 
         if (error) throw error;
 
-        alert('✅ ¡Nota actualizada con éxito!');
+        alert('✅ Nota actualizada correctamente');
         
-        // Limpiamos y restauramos la vista
+        // Limpiamos y restauramos el botón de Guardar original
         document.getElementById('n-titulo').value = '';
         document.getElementById('n-contenido').value = '';
         
@@ -1018,10 +1016,10 @@ async function actualizarNota(id) {
         const btnGuardar = document.querySelector('#vista-NOTAS .btn-grande');
         if (btnGuardar) btnGuardar.style.display = 'block';
         
-        cargarNotas(); // Refrescamos la lista para ver los cambios
+        cargarNotas();
     } catch (error) {
         console.error('Error:', error);
-        alert('Vaya, algo ha fallado al actualizar la nota.');
+        alert('No se pudo actualizar');
     }
 }
 
