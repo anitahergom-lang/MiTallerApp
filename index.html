@@ -774,51 +774,50 @@
     async function guardarNota() {
         const titulo = document.getElementById('n-titulo').value;
         const contenido = document.getElementById('n-contenido').value;
-        if(!titulo || !contenido) return alert("Escribe un título y el contenido de tu nota 🎀");
-        await client.from('notas_data').insert([{ titulo, contenido }]);
-        document.getElementById('n-titulo').value = ""; 
-        document.getElementById('n-contenido').value = "";
-        cargarNotas();
-    }
-// 1. FUNCIÓN PARA BUSCAR LOS DATOS EN SUPABASE
-    async function cargarLlaves() {
-        const { data: llaves, error } = await client
-            .from('llaves_data')
-            .select('id, nombre, usuario, clave') // Buscamos las 4 cosas
-            .order('nombre', { ascending: true });
 
-        if (!error && llaves) {
-            renderizarLlaves(llaves); // Si todo está bien, mandamos a dibujar
+        if (!contenido) {
+            alert("Por favor, escribe algo en la nota");
+            return;
         }
-    }
 
-    // 2. FUNCIÓN PARA DIBUJAR LAS LLAVES EN LA PANTALLA
- function renderizarLlaves(llaves) {
-        const contenedor = document.getElementById('lista-llaves');
-        if (!contenedor) return;
+        let error;
 
-        contenedor.innerHTML = llaves.map(l => `
-            <div style="display: flex; flex-direction: column; padding: 15px; margin-bottom: 10px; border-radius: 15px; background: var(--b); border: 1px solid var(--br);">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                    <div style="flex-grow: 1;">
-                        <strong style="display:block; color:var(--s); font-size: 16px;">${l.nombre}</strong>
-                        <span style="display:block; font-size: 13px; color: var(--txt); opacity: 0.8;">👤 ${l.usuario || 'Sin usuario'}</span>
-                    </div>
-                    <div style="display: flex; gap: 5px;">
-                        <button onclick="prepararEdicionLlave('${l.id}', '${l.nombre}', '${l.usuario}', '${l.clave}')" style="background: #e3f2fd; border: none; padding: 8px; border-radius: 50%; cursor: pointer; color: #1976d2; width: 35px; height: 35px;">✏️</button>
-                        <button onclick="eliminarLlave('${l.id}')" style="background: #ffcdd2; border: none; padding: 8px; border-radius: 50%; cursor: pointer; color: #c62828; width: 35px; height: 35px;">🗑️</button>
-                    </div>
-                </div>
-                
-                <div style="display: flex; align-items: center; gap: 10px; background: var(--pc); padding: 8px 12px; border-radius: 10px;">
-                    <code id="pass-${l.id}" style="flex-grow: 1; font-family: monospace; font-size: 14px;">••••••••</code>
-                    <div style="display: flex; gap: 5px;">
-                        <button onclick="togglePass('${l.id}', '${l.clave}')" style="background: none; border: none; cursor: pointer; font-size: 16px;" title="Ver/Ocultar">👁️</button>
-                        <button onclick="navigator.clipboard.writeText('${l.clave}'); alert('¡Copiado! 📋')" style="background: none; border: none; cursor: pointer; font-size: 16px;" title="Copiar">📋</button>
-                    </div>
-                </div>
-            </div>
-        `).join('');
+        // ¿Estamos editando una nota que ya existe?
+        if (window.editandoNotaId) {
+            // MODO EDICIÓN: Sobrescribimos la nota actual
+            const { error: err } = await client
+                .from('notas_data')
+                .update({ titulo, contenido })
+                .eq('id', window.editandoNotaId);
+            error = err;
+        } else {
+            // MODO NUEVO: Creamos una nota desde cero
+            const { error: err } = await client
+                .from('notas_data')
+                .insert([{ titulo, contenido }]);
+            error = err;
+        }
+
+        if (error) {
+            alert("Error al guardar: " + error.message);
+        } else {
+            // SI TODO SALIÓ BIEN, LIMPIAMOS:
+            
+            // 1. Vaciamos las cajas de texto
+            document.getElementById('n-titulo').value = '';
+            document.getElementById('n-contenido').value = '';
+
+            // 2. IMPORTANTE: El botón vuelve a ser el original
+            window.editandoNotaId = null; // Borramos el ID de la memoria
+            const btn = document.querySelector('button[onclick="guardarNota()"]');
+            if (btn) {
+                btn.innerHTML = "Guardar Nota 📝";
+                btn.style.background = "var(--p)"; // Vuelve al rosa original
+            }
+
+            // 3. Recargamos la lista para ver el cambio
+            cargarNotas();
+        }
     }
     async function eliminarLlave(id) {
         if (confirm("¿Estás segura de que quieres borrar esta llave?")) {
