@@ -246,15 +246,15 @@
 
         <textarea id="capricho-notas" placeholder="📝 Notas adicionales..." rows="2" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; box-sizing: border-box; margin-bottom:15px; font-family:inherit;"></textarea>
 
-        <div style="margin-top: 15px; margin-bottom: 20px;">
-            <label style="display: block; color: #f06292; font-weight: bold; font-size: 0.8em; margin-bottom: 5px; text-transform: uppercase; font-family: sans-serif;">
+<div style="margin-top: 15px; margin-bottom: 20px;">
+            <label style="display: block; color: #f06292; font-weight: bold; font-size: 0.8em; margin-bottom: 8px; text-transform: uppercase; font-family: sans-serif;">
                 FOTO DEL MATERIAL
             </label>
-            <div style="padding: 10px; border: 1px solid #fce4ec; border-radius: 12px; background-color: var(--f); display: flex; align-items: center;">
-                <input type="file" id="capricho-foto" accept="image/*" onchange="previsualizarImagenCapricho(event)" 
-                       style="font-size: 0.9em; color: var(--txt); width: 100%;">
-            </div>
-            <img id="capricho-img-preview" style="width: 100px; height: 100px; object-fit: cover; border-radius: 10px; margin-top: 10px; display: none; border: 1px solid var(--br);">
+            
+            <input type="file" id="capricho-foto" accept="image/*" onchange="previsualizarImagenCapricho(event)" 
+                   style="font-size: 0.9em; color: var(--txt); width: 100%; font-family: inherit; cursor: pointer;">
+
+            <img id="capricho-img-preview" style="width: 100px; height: 100px; object-fit: cover; border-radius: 12px; margin-top: 10px; display: none; border: 1px solid var(--br);">
         </div>
 
         <button class="btn-api" onclick="procesarGuardadoCapricho()" style="width:100%; background:var(--s); color:white; margin-bottom:10px; border:none; padding:14px; border-radius:12px; font-weight:bold; cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
