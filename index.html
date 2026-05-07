@@ -830,6 +830,35 @@
             }
         }
     }
+    // Función para mostrar/ocultar contraseña
+    function togglePass(id, claveReal) {
+        const el = document.getElementById('pass-' + id);
+        if (el.innerText === '••••••••') {
+            el.innerText = claveReal;
+        } else {
+            el.innerText = '••••••••';
+        }
+    }
+
+    // Función para subir los datos arriba y poder editarlos
+    function prepararEdicionLlave(id, nombre, usuario, clave) {
+        document.getElementById('llave-nombre').value = nombre;
+        document.getElementById('llave-usuario').value = usuario;
+        document.getElementById('llave-pass').value = clave;
+        
+        // Guardamos el ID en un lugar "invisible" para saber que estamos editando
+        window.editandoLlaveId = id;
+        
+        // Cambiamos el color y texto del botón rosa para saber que estamos en modo edición
+        const btn = document.querySelector('button[onclick="guardarNuevaLlave()"]');
+        if (btn) {
+            btn.innerText = "Actualizar Llave 🔄";
+            btn.style.background = "#4CAF50"; // Se pone verde para avisar
+        }
+        
+        // Sube la pantalla suavemente hasta el formulario
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     async function eliminarNota(id) { if(confirm("¿Borrar nota?")) { await client.from('notas_data').delete().eq('id', id); cargarNotas(); } }
 async function guardarNuevaLlave() {
         const nombre = document.getElementById('llave-nombre').value;
