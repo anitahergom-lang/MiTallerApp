@@ -777,7 +777,7 @@
         cargarNotas();
     }
 async function cargarLlaves() {
-        const { data: llaves } = await client.from('llaves_data').select('*').order('nombre', { ascending: true });
+        const { data: llaves, error } = await client.from('llaves_data').select('id, nombre, usuario, clave').order('nombre', { ascending: true });
         const contenedor = document.getElementById('contenedor-llaves');
         if (!llaves || llaves.length === 0) {
             contenedor.innerHTML = '<p style="text-align:center; opacity:0.6;">No hay llaves guardadas aún 🗝️</p>';
