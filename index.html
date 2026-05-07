@@ -17,31 +17,73 @@
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--f); color: var(--txt); margin: 0; padding: 15px; padding-bottom: 80px; transition: 0.3s; }
         
-        /* Menú superior */
         .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 50px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow-x: auto; scrollbar-width: none; }
         .btn-nav { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 40px; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
         .btn-nav.active { background: var(--pc); color: var(--s); border: 1px solid var(--p); }
 
-        /* Estilo general tarjetas y formularios */
-        .card-form { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 500px; margin: 0 auto 20px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        label { display: block; font-size: 11px; color: var(--s); font-weight: 700; margin: 10px 0 4px 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-        input, select, textarea { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--br); box-sizing: border-box; font-size: 14px; background: var(--f); color: var(--txt); transition: 0.3s; }
-        input:focus { border-color: var(--p); outline: none; box-shadow: 0 0 0 3px var(--pc); }
-        .btn-grande { width: 100%; background: var(--p); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; transition: 0.3s; box-shadow: 0 4px 10px rgba(255, 133, 162, 0.3); }
-        .btn-grande:active { transform: scale(0.98); }
+        .filtros-container { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0 15px 0; scrollbar-width: none; }
+        .btn-filtro { white-space: nowrap; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--br); background: var(--b); color: var(--txt); font-size: 12px; cursor: pointer; font-weight: 600; }
+        .btn-filtro.active { background: var(--p); color: white; border-color: var(--p); }
 
-        /* Grid de materiales en Stock */
         .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
-        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; display: flex; flex-direction: column; min-height: 310px; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-        .foto-material { width: 100%; height: 115px; object-fit: cover; background: #eee; border-bottom: 1px solid var(--br); }
+        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; display: flex; flex-direction: column; min-height: 300px; }
+        .foto-material { width: 100%; height: 110px; object-fit: cover; background: #eee; }
         .info-material { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; gap: 4px; color: var(--txt); }
-        .info-titulo { font-size: 13px; font-weight: 700; color: var(--s); line-height: 1.2; margin: 0 0 4px 0; min-height: 32px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .info-detalle { font-size: 10px; opacity: 0.7; }
-        .info-cantidad { font-size: 12px; font-weight: 800; color: var(--p); margin-top: auto; padding-top: 8px; border-top: 1px dashed var(--br); display: flex; justify-content: space-between; }
         
-        .btn-eliminar { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.8); border: none; width: 24px; height: 24px; border-radius: 50%; color: #ff5252; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .info-titulo { font-size: 13px; font-weight: 700; color: var(--s); margin: 0 0 4px 0; line-height: 1.2; display: block; }
+        .info-detalle { font-size: 10px; color: var(--txt) !important; margin: 0; line-height: 1.3; display: block; }
+        .info-label { font-weight: 800; text-transform: uppercase; font-size: 8px; color: var(--s); opacity: 0.8; margin-right: 4px; }
+        .info-notas { font-size: 9px; font-style: italic; color: var(--txt); opacity: 0.8; margin-top: 5px; padding-top: 5px; border-top: 1px dashed var(--br); width: 100%; }
 
-        #dark-mode-toggle { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; cursor: pointer; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
+        .btn-edit-float { position: absolute; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.6); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 5; }
+        .btn-delete-float { position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.6); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 5; }
+
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-top: 5px; }
+        .badge-idea { background: #e2e3e5; color: #383d41; }
+        .badge-proceso { background: #fff3cd; color: #856404; }
+        .badge-listo { background: #d4edda; color: #155724; }
+
+        .card-form { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 500px; margin: 0 auto; margin-bottom: 20px; }
+        label { display: block; font-size: 11px; color: var(--s); font-weight: 700; margin: 10px 0 4px 4px; }
+        input, select, textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--br); box-sizing: border-box; font-size: 14px; background: var(--f); color: var(--txt); }
+        textarea { height: 80px; resize: none; }
+        .btn-grande { width: 100%; background: var(--p); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; }
+
+        .compra-item { background: var(--b); padding: 15px; border-radius: 18px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--br); }
+        .prio-Alta { border-left: 6px solid #ff4d4d !important; }
+        .prio-Media { border-left: 6px solid #ffcc00 !important; }
+        .prio-Baja { border-left: 6px solid #2ecc71 !important; }
+
+        .canvas-container { background: white; border: 1px solid var(--br); border-radius: 15px; margin-top: 10px; position: relative; overflow: hidden; }
+        .canvas-base { display: block; width: 100%; height: 250px; cursor: crosshair; }
+        .canvas-largo { height: 500px !important; }
+        .canvas-grid { background-image: linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
+        .canvas-cuerpos { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 600' opacity='0.3'><g fill='none' stroke='%23f06292' stroke-width='1.5'><path d='M100,100 Q100,50 125,50 Q150,50 150,100 L150,150 L180,180 L180,250 L160,400 L170,550 M100,150 L70,180 L70,250 L90,400 L80,550'/><path d='M300,100 Q300,50 325,50 Q350,50 350,100 L350,150 L380,180 L380,250 L360,400 L370,550 M300,150 L270,180 L270,250 L290,400 L280,550'/><path d='M200,80 Q200,40 225,40 Q250,40 250,80 L250,130 L280,160 L280,230 L260,380 L270,530 M200,130 L170,160 L170,230 L190,380 L180,530'/></g></svg>"); background-size: contain; background-repeat: no-repeat; background-position: center; }
+
+        .canvas-tools { display: flex; gap: 5px; margin-top: 5px; margin-bottom: 15px; }
+        .btn-tool { flex: 1; padding: 8px; font-size: 12px; border: 1px solid var(--br); border-radius: 8px; background: var(--b); cursor: pointer; color: var(--txt); }
+        .btn-tool.active { background: var(--pc); border-color: var(--p); color: var(--s); }
+
+        #dark-mode-toggle { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--br); }
+        .btn-qty { background: var(--pc); border: none; width: 25px; height: 25px; border-radius: 50%; color: var(--s); font-weight: bold; cursor: pointer; }
+
+        .pdf-item, .regalo-item { background: var(--b); border: 1px solid var(--br); border-radius: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; text-decoration: none; color: var(--txt); transition: 0.2s; }
+        .pdf-item:hover { border-color: var(--p); background: var(--pc); }
+        .pdf-icon, .regalo-icon { font-size: 24px; color: var(--s); }
+        .pdf-info, .regalo-info { flex: 1; }
+        .pdf-nombre, .regalo-nombre { font-weight: 600; font-size: 14px; margin: 0; }
+        .pdf-fecha, .regalo-meta { font-size: 11px; color: #888; margin: 0; }
+        
+        .preferencias-box { font-size: 12px; font-style: italic; color: var(--s); margin-top: 5px; padding: 5px; background: var(--pc); border-radius: 8px; }
+        .enlace-tag { display: inline-block; padding: 2px 8px; background: var(--p); color: white; border-radius: 10px; font-size: 10px; margin-right: 5px; margin-top: 5px; }
+
+        .editor-rich { background: var(--f); border: 1px solid var(--br); border-radius: 10px; min-height: 200px; padding: 12px; outline: none; margin-top: 5px; color: var(--txt); overflow-y: auto; }
+        .editor-rich img { max-width: 100%; border-radius: 10px; margin: 10px 0; }
+        .editor-toolbar { display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; background: var(--pc); padding: 5px; border-radius: 10px; }
+        .btn-editor { background: var(--b); border: 1px solid var(--br); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; color: var(--txt); }
+        
+        .contador-vueltas-mini { display: flex; align-items: center; gap: 10px; background: var(--s); color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -51,19 +93,19 @@
 <div class="menu-secciones">
     <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
     <button class="btn-nav" id="nav-STOCK" onclick="cambiarVista('STOCK')">📦 STOCK</button>
-    <button class="btn-nav" id="nav-CAPRICHOS" onclick="cambiarVista('CAPRICHOS')">✨ CAPRICHOS</button>
+    <button class="btn-nav" id="nav-COMPRAS" onclick="cambiarVista('COMPRAS')">🛒 COMPRAS</button>
     <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
     <button class="btn-nav" id="nav-PDFS" onclick="cambiarVista('PDFS')">📂 PDFs</button>
+    <button class="btn-nav" id="nav-REGALOS" onclick="cambiarVista('REGALOS')">🎁 REGALOS</button>
     <button class="btn-nav" id="nav-NOTAS" onclick="cambiarVista('NOTAS')">📝 NOTAS</button>
 </div>
 
 <div id="vista-INICIO">
     <div class="card-form">
-        <h2 id="titulo-formulario" style="color:var(--s); text-align:center; margin-top:0; font-size:20px;">📦 Añadir Material</h2>
+        <h2 id="titulo-formulario" style="color:var(--s); text-align:center; margin-top:0;">📦 Añadir Material</h2>
         <input type="hidden" id="m-id">
         <label>NOMBRE DEL MATERIAL</label>
         <input type="text" id="m-nombre" placeholder="Ej: Lana Merino Azul">
-        
         <div style="display:flex; gap:10px;">
             <div style="flex:1;">
                 <label>CATEGORÍA</label>
@@ -80,33 +122,70 @@
                 <input type="number" id="m-cantidad" value="1">
             </div>
         </div>
-
         <label>🧵 COMPOSICIÓN</label>
         <input type="text" id="m-composicion" placeholder="Ej: 100% Algodón">
-        <label>📍 TIENDA</label>
+        <label>📍 TIENDA DONDE SE COMPRÓ</label>
         <input type="text" id="m-tienda" placeholder="Ej: Mercería del Barrio">
-        <label>📸 FOTO DEL MATERIAL</label>
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label>🪡 GROSOR / WPI</label>
+                <input type="text" id="m-grosor" placeholder="Ej: Fingering, 3mm...">
+            </div>
+            <div style="flex:1;">
+                <label>📏 LONGITUD</label>
+                <input type="text" id="m-longitud" placeholder="Ej: 120m / 50g">
+            </div>
+        </div>
+        <label>NOTAS ADICIONALES</label>
+        <textarea id="m-notas" placeholder="Nº de lote, etc..."></textarea>
+        <label>FOTO DEL MATERIAL</label>
         <input type="file" id="m-archivo" accept="image/*">
-        
         <button id="btn-accion-stock" class="btn-grande" onclick="guardarNuevo('stock')">GUARDAR EN STOCK</button>
+        <button id="btn-cancelar-edit" class="btn-grande" style="display:none; background:#888" onclick="limpiarFormulario()">CANCELAR EDICIÓN</button>
     </div>
 </div>
 
 <div id="vista-STOCK" style="display:none;">
+    <div class="filtros-container">
+        <button class="btn-filtro active" id="filtro-Todo" onclick="filtrar('Todo')">✨ Todo</button>
+        <button class="btn-filtro" id="filtro-Lana" onclick="filtrar('Lana')">🧶 Lana</button>
+        <button class="btn-filtro" id="filtro-Telas" onclick="filtrar('Telas')">👗 Telas</button>
+        <button class="btn-filtro" id="filtro-Hilos" onclick="filtrar('Hilos')">🧵 Hilos</button>
+        <button class="btn-filtro" id="filtro-Accesorios" onclick="filtrar('Accesorios')">🎀 Accesorios</button>
+        <button class="btn-filtro" id="filtro-Otros" onclick="filtrar('Otros')">🧸 Otros</button>
+    </div>
     <div id="lista-stock" class="grid-estudio"></div>
 </div>
 
-<div id="vista-CAPRICHOS" style="display:none;">
+<div id="vista-COMPRAS" style="display:none;">
     <div class="card-form">
-        <h2 style="color:var(--s); text-align:center; margin-top:0; font-size:20px;">✨ Mis Caprichos</h2>
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">🛒 Lista de Compras</h2>
+        <input type="text" id="c-nombre" placeholder="¿Qué necesitas comprar?">
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label>TIENDA</label>
+                <input type="text" id="c-tienda" placeholder="Ej: Mercería Ana">
+            </div>
+            <div style="flex:1;">
+                <label>PRIORIDAD</label>
+                <select id="c-prioridad">
+                    <option value="Alta">🔴 Alta</option>
+                    <option value="Media">🟡 Media</option>
+                    <option value="Baja">🟢 Baja</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-grande" style="background:var(--s)" onclick="guardarCompra()">AÑADIR A LA LISTA</button>
     </div>
+    <div class="filtros-container" id="filtros-tiendas-compras"></div>
+    <div id="lista-compras"></div>
 </div>
 
 <div id="vista-PROYECTOS" style="display:none;">
     <div class="card-form">
-        <h2 style="color:var(--s); text-align:center; margin-top:0; font-size:20px;">✨ Nuevo Proyecto</h2>
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">✨ Nuevo Proyecto</h2>
         <label>NOMBRE DEL PROYECTO</label>
-        <input type="text" id="p-nombre" placeholder="Ej: Jersey de invierno">
+        <input type="text" id="p-nombre" placeholder="Ej: Jersey de Invierno">
         <label>ESTADO</label>
         <select id="p-estado">
             <option value="Idea">💡 Idea</option>
@@ -114,36 +193,101 @@
             <option value="Terminado">✅ Terminado</option>
         </select>
         <label>NOTAS DEL PROYECTO</label>
-        <textarea id="p-notas" placeholder="Detalles, agujas usadas..."></textarea>
-        <label>📸 FOTO DEL PROYECTO</label>
+        <textarea id="p-notas" placeholder="Patrón, agujas usadas..."></textarea>
+        <label>DIBUJO DEL PUNTO</label>
+        <div class="canvas-container"><canvas id="canvas-punto" class="canvas-base canvas-grid"></canvas></div>
+        <div class="canvas-tools">
+            <button class="btn-tool active" id="tool-pincel-punto" onclick="setTool('canvas-punto', 'pincel')">🖌️ Pincel</button>
+            <button class="btn-tool" id="tool-goma-punto" onclick="setTool('canvas-punto', 'goma')">🧽 Goma</button>
+            <button class="btn-tool" onclick="limpiarCanvas('canvas-punto')">🗑️</button>
+        </div>
+        <label>DISEÑO SOBRE CUERPOS (PLANTILLA TÉCNICA)</label>
+        <div class="canvas-container"><canvas id="canvas-cuerpos" class="canvas-base canvas-cuerpos canvas-largo"></canvas></div>
+        <div class="canvas-tools">
+            <button class="btn-tool active" id="tool-pincel-cuerpos" onclick="setTool('canvas-cuerpos', 'pincel')">🖌️ Pincel</button>
+            <button class="btn-tool" id="tool-goma-cuerpos" onclick="setTool('canvas-cuerpos', 'goma')">🧽 Goma</button>
+            <button class="btn-tool" onclick="limpiarCanvas('canvas-cuerpos')">🗑️</button>
+        </div>
+        <label>FOTO FINAL</label>
         <input type="file" id="p-archivo" accept="image/*">
-        <button class="btn-grande" onclick="guardarNuevo('proyecto')">CREAR PROYECTO</button>
+        <button class="btn-grande" style="background:var(--p)" onclick="guardarNuevo('proyecto')">CREAR PROYECTO</button>
     </div>
     <div id="lista-proyectos" class="grid-estudio"></div>
 </div>
 
 <div id="vista-PDFS" style="display:none;">
-    <div class="card-form">
-        <h2 style="color:var(--s); text-align:center; margin-top:0; font-size:20px;">📂 Subir Patrón (PDF)</h2>
-        <label>NOMBRE DEL PATRÓN</label>
-        <input type="text" id="pdf-nombre" placeholder="Ej: Patrón Chaleco">
-        <label>ARCHIVO PDF</label>
-        <input type="file" id="pdf-archivo" accept="application/pdf">
-        <button class="btn-grande" onclick="subirPDF()">SUBIR PDF</button>
+    <div class="card-form" style="border: 2px solid var(--p);">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">📝 Diseñador de Patrones</h2>
+        
+        <div class="contador-vueltas-mini">
+            <span>🔢 Vuelta: <span id="vueltas-editor">0</span></span>
+            <button onclick="cambiarVueltaEditor(-1)" style="border:none; background:white; border-radius:50%; width:20px; height:20px; cursor:pointer;">-</button>
+            <button onclick="cambiarVueltaEditor(1)" style="border:none; background:white; border-radius:50%; width:20px; height:20px; cursor:pointer;">+</button>
+        </div>
+
+        <label>TÍTULO DEL PATRÓN</label>
+        <input type="text" id="borrador-titulo" placeholder="Ej: Mi primera manta">
+        
+        <label>HERRAMIENTAS</label>
+        <div class="editor-toolbar">
+            <button class="btn-editor" onclick="document.execCommand('bold', false, null)"><b>B</b></button>
+            <button class="btn-editor" onclick="document.execCommand('italic', false, null)"><i>I</i></button>
+            <button class="btn-editor" onclick="document.execCommand('insertUnorderedList', false, null)">• Lista</button>
+            
+            <button class="btn-editor" onclick="document.getElementById('input-foto-editor').click()">🖼️ Subir Foto</button>
+            <input type="file" id="input-foto-editor" accept="image/*" style="display:none" onchange="insertarFotoEnEditor(this)">
+        </div>
+        
+        <div id="borrador-contenido" class="editor-rich" contenteditable="true"></div>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
+            <button class="btn-grande" style="background:#888; font-size:12px; margin-top:0;" onclick="guardarBorradorLocal()">💾 GUARDAR</button>
+            <button class="btn-grande" style="background:var(--p); font-size:12px; margin-top:0;" onclick="generarPDF()">📥 PDF</button>
+        </div>
+        <button class="btn-grande" style="background:#e74c3c; font-size:12px; margin-top:10px;" onclick="eliminarBorradorTotal()">🗑️ ELIMINAR TODO EL BORRADOR</button>
     </div>
-    <div id="lista-pdfs" class="grid-estudio"></div>
+
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">📂 Biblioteca de PDFs</h2>
+        <label>SUBIR ARCHIVO EXISTENTE</label>
+        <input type="text" id="pdf-nombre" placeholder="Nombre del patrón">
+        <input type="file" id="pdf-archivo" accept=".pdf" style="margin-top:10px;">
+        <button class="btn-grande" style="background:var(--s)" onclick="subirPDF()">SUBIR PDF</button>
+    </div>
+    <div id="lista-pdfs"></div>
+</div>
+
+<div id="vista-REGALOS" style="display:none;">
+    <div class="card-form">
+        <h2 id="titulo-regalo" style="color:var(--s); text-align:center; margin-top:0;">🎁 Regalos y Encargos</h2>
+        <label>¿PARA QUIÉN ES?</label>
+        <input type="text" id="reg-persona" placeholder="Nombre de la persona">
+        <label>¿QUÉ VAS A REGALAR/HACER?</label>
+        <input type="text" id="reg-detalle" placeholder="Ej: Manta de apego">
+        <label>GUSTOS Y PREFERENCIAS</label>
+        <textarea id="reg-preferencias" placeholder="Le gustan los colores pastel..."></textarea>
+        <label>ENLAZAR DISEÑO (PROYECTO)</label>
+        <select id="reg-enlace-proyecto"><option value="">Ninguno</option></select>
+        <label>ENLAZAR PATRÓN PDF</label>
+        <select id="reg-enlace-pdf"><option value="">Ninguno</option></select>
+        <button class="btn-grande" style="background:var(--p)" onclick="guardarRegalo()">AÑADIR AL MAPA</button>
+    </div>
+    <h3 style="color:var(--s); padding-left:10px;">📍 Mapa de Regalos Pendientes</h3>
+    <div id="lista-regalos-pendientes"></div>
+    <h3 style="color:var(--txt); padding-left:10px; margin-top:30px; opacity:0.6;">✅ Entregados (Historial)</h3>
+    <div id="lista-regalos-entregados" style="opacity:0.6;"></div>
 </div>
 
 <div id="vista-NOTAS" style="display:none;">
     <div class="card-form">
-        <h2 style="color:var(--s); text-align:center; margin-top:0; font-size:20px;">📝 Nueva Nota</h2>
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">📝 Notas y Recordatorios</h2>
         <label>TÍTULO</label>
-        <input type="text" id="n-titulo">
+        <input type="text" id="n-titulo" placeholder="Ej: Ideas para colcha">
         <label>CONTENIDO</label>
-        <textarea id="n-contenido" style="height: 150px;"></textarea>
-        <button class="btn-grande" onclick="guardarNota()">GUARDAR NOTA</button>
+        <textarea id="n-contenido" style="height:120px;" placeholder="Escribe aquí tus ideas..."></textarea>
+        <button class="btn-grande" style="background:var(--s)" onclick="guardarNota()">GUARDAR NOTA</button>
     </div>
-    <div id="lista-notas" style="display: grid; gap: 15px;"></div>
+    <div id="lista-notas"></div>
 </div>
 
 <script>
@@ -151,148 +295,459 @@
     const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
     const client = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+    let lanasGlobal = [];
+    let proyectosGlobal = [];
+    let pdfsGlobal = [];
+    let regalosGlobal = [];
+    let comprasGlobal = [];
+    let tiendaFiltradaCompras = 'Todas';
+    let toolsState = { 'canvas-punto': 'pincel', 'canvas-cuerpos': 'pincel' };
+    let vueltasContador = 0;
+
     function cambiarVista(v) {
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
-        document.getElementById('nav-' + v).classList.add('active');
-        ['INICIO', 'STOCK', 'CAPRICHOS', 'PROYECTOS', 'PDFS', 'NOTAS'].forEach(id => {
-            const el = document.getElementById('vista-' + id);
-            if(el) el.style.display = (id === v ? 'block' : 'none');
-        });
-        if(v === 'STOCK') cargarDatos();
-        if(v === 'PROYECTOS') cargarProyectos();
-        if(v === 'PDFS') cargarPDFs();
+        const navBtn = document.getElementById('nav-' + v);
+        if(navBtn) navBtn.classList.add('active');
+        document.getElementById('vista-INICIO').style.display = v === 'INICIO' ? 'block' : 'none';
+        document.getElementById('vista-STOCK').style.display = v === 'STOCK' ? 'block' : 'none';
+        document.getElementById('vista-COMPRAS').style.display = v === 'COMPRAS' ? 'block' : 'none';
+        document.getElementById('vista-PROYECTOS').style.display = v === 'PROYECTOS' ? 'block' : 'none';
+        document.getElementById('vista-PDFS').style.display = v === 'PDFS' ? 'block' : 'none';
+        document.getElementById('vista-REGALOS').style.display = v === 'REGALOS' ? 'block' : 'none';
+        document.getElementById('vista-NOTAS').style.display = v === 'NOTAS' ? 'block' : 'none';
+        if(v === 'STOCK') filtrar('Todo');
+        if(v === 'COMPRAS') cargarCompras();
+        if(v === 'PROYECTOS') setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
+        if(v === 'REGALOS') cargarRegalos();
+        if(v === 'PDFS') { cargarPDFs(); cargarBorradorLocal(); }
         if(v === 'NOTAS') cargarNotas();
     }
 
-    async function guardarNuevo(tipo) {
-        const btn = tipo === 'stock' ? document.getElementById('btn-accion-stock') : event.target;
-        btn.innerText = "Subiendo..."; btn.disabled = true;
-
-        const fileInput = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo');
-        let fotoUrl = "";
-
-        if (fileInput.files[0]) {
-            const f = fileInput.files[0];
-            const name = `${Date.now()}_${f.name}`;
-            const { data, error } = await client.storage.from('fotos-lanas').upload(name, f);
-            if(data) fotoUrl = client.storage.from('fotos-lanas').getPublicUrl(name).data.publicUrl;
-        }
-
-        if (tipo === 'stock') {
-            const { error } = await client.from('estudio_data').insert([{
-                tipo_material: document.getElementById('m-nombre').value,
-                categoria: document.getElementById('m-categoria').value,
-                cantidad: parseInt(document.getElementById('m-cantidad').value),
-                composicion: document.getElementById('m-composicion').value,
-                tienda: document.getElementById('m-tienda').value,
-                contenido: fotoUrl
-            }]);
-            if(!error) { alert("¡Material guardado! 🧶"); location.reload(); }
-        } else {
-            const { error } = await client.from('Proyectos').insert([{
-                nombre: document.getElementById('p-nombre').value,
-                estado: document.getElementById('p-estado').value,
-                notas: document.getElementById('p-notas').value,
-                foto: fotoUrl
-            }]);
-            if(!error) { alert("¡Proyecto creado! ✨"); cambiarVista('PROYECTOS'); }
-        }
-        btn.innerText = (tipo === 'stock' ? "GUARDAR EN STOCK" : "CREAR PROYECTO"); btn.disabled = false;
+    function filtrar(cat) {
+        document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('active'));
+        const fBtn = document.getElementById('filtro-' + cat);
+        if(fBtn) fBtn.classList.add('active');
+        if (cat === 'Todo') { renderizarStock(lanasGlobal); } 
+        else { const filtrados = lanasGlobal.filter(m => m.categoria === cat); renderizarStock(filtrados); }
     }
 
     async function cargarDatos() {
-        const { data, error } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
-        if (data) {
-            document.getElementById('lista-stock').innerHTML = data.map(m => `
-                <div class="item-card">
-                    <button class="btn-eliminar" onclick="eliminarItem(${m.id}, 'estudio_data')">✕</button>
-                    <img src="${m.contenido || 'https://via.placeholder.com/150'}" class="foto-material" onerror="this.src='https://via.placeholder.com/150'">
-                    <div class="info-material">
-                        <span class="info-titulo">${m.tipo_material}</span>
-                        <span class="info-detalle"><b>📦 Categoría:</b> ${m.categoria}</span>
-                        <span class="info-detalle"><b>🧵 Comp:</b> ${m.composicion || 'N/A'}</span>
-                        <span class="info-detalle"><b>📍 Tienda:</b> ${m.tienda || 'N/A'}</span>
-                        <div class="info-cantidad">
-                            <span>Disponible:</span>
-                            <span>${m.cantidad}</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-    }
-
-    async function eliminarItem(id, tabla) {
-        if (confirm("¿Estás segura de eliminar este item? 🎀")) {
-            const { error } = await client.from(tabla).delete().eq('id', id);
-            if (!error) {
-                if(tabla === 'estudio_data') cargarDatos();
-                else if(tabla === 'Proyectos') cargarProyectos();
-                else if(tabla === 'pdfs_data') cargarPDFs();
-            }
-        }
-    }
-
-    async function cargarProyectos() {
-        const { data } = await client.from('Proyectos').select('*').order('created_at', {ascending: false});
-        if (data) {
-            document.getElementById('lista-proyectos').innerHTML = data.map(p => `
-                <div class="item-card">
-                    <button class="btn-eliminar" onclick="eliminarItem(${p.id}, 'Proyectos')">✕</button>
-                    <img src="${p.foto || 'https://via.placeholder.com/150'}" class="foto-material" onerror="this.src='https://via.placeholder.com/150'">
-                    <div class="info-material">
-                        <span class="info-titulo">${p.nombre}</span>
-                        <span class="info-detalle"><b>Estado:</b> ${p.estado}</span>
-                        <p style="font-size:10px; margin:5px 0; opacity:0.8;">${p.notas || ''}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
-    }
-
-    async function subirPDF() {
-        const input = document.getElementById('pdf-archivo');
-        const nombre = document.getElementById('pdf-nombre').value;
-        if (!input.files[0] || !nombre) return alert("Rellena el nombre y selecciona un PDF 🎀");
-        
-        const f = input.files[0];
-        const fileName = `${Date.now()}_${f.name}`;
-        const { data, error } = await client.storage.from('pdfs-patrones').upload(fileName, f);
-        
-        if (data) {
-            const { data: urlData } = client.storage.from('pdfs-patrones').getPublicUrl(fileName);
-            await client.from('pdfs_data').insert([{ nombre: nombre, url: urlData.publicUrl }]);
-            alert("¡PDF subido! 📂");
-            document.getElementById('pdf-nombre').value = ""; input.value = "";
+        try {
+            const { data: stock } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
+            lanasGlobal = stock || [];
+            renderizarStock(lanasGlobal);
+            const { data: proy } = await client.from('proyectos_data').select('*').order('created_at', {ascending: false});
+            proyectosGlobal = proy || [];
+            renderizarProyectos(proyectosGlobal);
             cargarPDFs();
-        }
+        } catch (e) { console.error(e); }
     }
+
+    function renderizarStock(lista) {
+        document.getElementById('lista-stock').innerHTML = lista.map(m => `
+            <div class="item-card">
+                <button class="btn-delete-float" onclick="eliminarStock(${m.id})">✖</button>
+                <button class="btn-edit-float" onclick="cargarEdicion(${m.id})">✏️</button>
+                <img src="${m.contenido || 'https://via.placeholder.com/150?text=Material'}" class="foto-material">
+                <div class="info-material">
+                    <span class="info-titulo">${m.tipo_material}</span>
+                    <div class="info-detalle">🧵 ${m.composicion || 'n/a'}</div>
+                    <div class="info-detalle">🪡 ${m.grosor || 'n/a'}</div>
+                    <div class="info-detalle">📏 ${m.longitud || 'n/a'}</div>
+                    <div class="info-detalle">📍 ${m.tienda || 'n/a'}</div>
+                    ${m.notas ? `<div class="info-notas">📝 ${m.notas}</div>` : ''}
+                    <div class="controles-stock">
+                        <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
+                        <span style="font-weight:bold; font-size:14px;">${m.cantidad}</span>
+                        <button class="btn-qty" onclick="cambiarStock(${m.id}, 1)">+</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function cargarEdicion(id) {
+        const item = lanasGlobal.find(m => m.id === id);
+        if(!item) return;
+        document.getElementById('m-id').value = item.id;
+        document.getElementById('m-nombre').value = item.tipo_material;
+        document.getElementById('m-categoria').value = item.categoria;
+        document.getElementById('m-cantidad').value = item.cantidad;
+        document.getElementById('m-composicion').value = item.composicion || "";
+        document.getElementById('m-tienda').value = item.tienda || "";
+        document.getElementById('m-grosor').value = item.grosor || "";
+        document.getElementById('m-longitud').value = item.longitud || "";
+        document.getElementById('m-notas').value = item.notas || "";
+        document.getElementById('titulo-formulario').innerText = "✏️ Editar Material";
+        document.getElementById('btn-accion-stock').innerText = "ACTUALIZAR MATERIAL";
+        document.getElementById('btn-cancelar-edit').style.display = "block";
+        cambiarVista('INICIO');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function limpiarFormulario() {
+        document.getElementById('m-id').value = "";
+        document.getElementById('m-nombre').value = "";
+        document.getElementById('m-cantidad').value = "1";
+        document.getElementById('m-composicion').value = "";
+        document.getElementById('m-tienda').value = "";
+        document.getElementById('m-grosor').value = "";
+        document.getElementById('m-longitud').value = "";
+        document.getElementById('m-notas').value = "";
+        document.getElementById('m-archivo').value = "";
+        document.getElementById('titulo-formulario').innerText = "📦 Añadir Material";
+        document.getElementById('btn-accion-stock').innerText = "GUARDAR EN STOCK";
+        document.getElementById('btn-cancelar-edit').style.display = "none";
+    }
+
+    async function guardarNuevo(tipo) {
+        const idEdit = document.getElementById('m-id').value;
+        const fileInput = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo');
+        let fotoUrl = "";
+
+        try {
+            if(fileInput && fileInput.files[0]) {
+                const f = fileInput.files[0];
+                const name = `${Date.now()}_${f.name}`;
+                const { error: uploadError } = await client.storage.from('fotos-lanas').upload(name, f);
+                if (uploadError) throw new Error("Error al subir foto: " + uploadError.message);
+                else fotoUrl = client.storage.from('fotos-lanas').getPublicUrl(name).data.publicUrl;
+            }
+
+            if(tipo === 'stock') {
+                const nombreVal = document.getElementById('m-nombre').value;
+                if(!nombreVal) throw new Error("Debes poner un nombre al material");
+                const datos = { 
+                    tipo_material: nombreVal, 
+                    categoria: document.getElementById('m-categoria').value, 
+                    cantidad: parseInt(document.getElementById('m-cantidad').value) || 0,
+                    composicion: document.getElementById('m-composicion').value || "",
+                    tienda: document.getElementById('m-tienda').value || "",
+                    grosor: document.getElementById('m-grosor').value || "",
+                    longitud: document.getElementById('m-longitud').value || "",
+                    notas: document.getElementById('m-notas').value || ""
+                };
+                if(fotoUrl) datos.contenido = fotoUrl;
+                if(idEdit) { await client.from('estudio_data').update(datos).eq('id', idEdit); } 
+                else { await client.from('estudio_data').insert([datos]); }
+                limpiarFormulario();
+            } else {
+                await client.from('proyectos_data').insert([{
+                    nombre: document.getElementById('p-nombre').value,
+                    estado: document.getElementById('p-estado').value,
+                    notas: document.getElementById('p-notas').value,
+                    foto: fotoUrl || null
+                }]);
+            }
+            alert("¡Guardado correctamente! 💖");
+            await cargarDatos();
+            cambiarVista(tipo === 'stock' ? 'STOCK' : 'PROYECTOS');
+        } catch (err) { alert("Error al guardar: " + err.message); }
+    }
+
+    async function guardarCompra() {
+        const nombre = document.getElementById('c-nombre').value;
+        const tienda = document.getElementById('c-tienda').value || 'General';
+        const prioridad = document.getElementById('c-prioridad').value;
+        if(!nombre) return alert("Escribe qué necesitas comprar 🎀");
+        await client.from('compras_data').insert([{ nombre, tienda, prioridad, completado: false }]);
+        document.getElementById('c-nombre').value = "";
+        cargarCompras();
+    }
+
+    async function cargarCompras() {
+        const { data } = await client.from('compras_data').select('*').order('created_at', {ascending: false});
+        comprasGlobal = data || [];
+        renderizarFiltrosCompras();
+        renderizarListaCompras();
+    }
+
+    function renderizarFiltrosCompras() {
+        const tiendas = ['Todas', ...new Set(comprasGlobal.map(c => c.tienda))];
+        document.getElementById('filtros-tiendas-compras').innerHTML = tiendas.map(t => `
+            <button class="btn-filtro ${tiendaFiltradaCompras === t ? 'active' : ''}" onclick="filtrarTiendaCompra('${t}')">${t}</button>
+        `).join('');
+    }
+
+    function filtrarTiendaCompra(t) {
+        tiendaFiltradaCompras = t;
+        renderizarFiltrosCompras();
+        renderizarListaCompras();
+    }
+
+    function renderizarListaCompras() {
+        const filtradas = tiendaFiltradaCompras === 'Todas' ? comprasGlobal : comprasGlobal.filter(c => c.tienda === tiendaFiltradaCompras);
+        document.getElementById('lista-compras').innerHTML = filtradas.map(c => `
+            <div class="compra-item prio-${c.prioridad}" style="${c.completado ? 'opacity:0.5; text-decoration:line-through;' : ''}">
+                <div>
+                    <strong style="color:var(--s);">${c.nombre}</strong><br>
+                    <small>📍 ${c.tienda}</small>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="toggleCompra(${c.id}, ${c.completado})" style="border:none; background:transparent; font-size:20px; cursor:pointer;">${c.completado ? '🔄' : '✅'}</button>
+                    <button onclick="eliminarCompra(${c.id})" style="border:none; background:transparent; font-size:20px; cursor:pointer;">🗑️</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function toggleCompra(id, estado) { await client.from('compras_data').update({ completado: !estado }).eq('id', id); cargarCompras(); }
+    async function eliminarCompra(id) { if(confirm("¿Borrar de la lista?")) { await client.from('compras_data').delete().eq('id', id); cargarCompras(); } }
+
+    function renderizarProyectos(lista) {
+        document.getElementById('lista-proyectos').innerHTML = lista.map(p => `
+            <div class="item-card">
+                <button class="btn-delete-float" onclick="eliminarProyecto(${p.id})">✖</button>
+                <img src="${p.foto || 'https://via.placeholder.com/150?text=Proyecto'}" class="foto-material">
+                <div class="info-material">
+                    <span class="info-titulo">${p.nombre}</span>
+                    <span class="badge badge-${p.estado.toLowerCase().replace(' ', '')}">${p.estado}</span>
+                    <div class="info-notas" style="margin-top:10px; border:none; padding:0;">${p.notas || ''}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function eliminarStock(id) { if(confirm("¿Eliminar material?")) { await client.from('estudio_data').delete().eq('id', id); cargarDatos(); } }
+    async function eliminarProyecto(id) { if(confirm("¿Eliminar proyecto?")) { await client.from('proyectos_data').delete().eq('id', id); cargarDatos(); } }
+    async function cambiarStock(id, cambio) {
+        const m = lanasGlobal.find(x => x.id === id);
+        const nuevaCant = Math.max(0, m.cantidad + cambio);
+        await client.from('estudio_data').update({ cantidad: nuevaCant }).eq('id', id);
+        cargarDatos();
+    }
+
+    // FUNCIÓN ACTUALIZADA CON MEMORIA
+    function toggleDarkMode() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        document.getElementById('dark-mode-toggle').innerText = newTheme === 'dark' ? '☀️' : '🌙';
+        localStorage.setItem('tema-preferido', newTheme);
+    }
+
+    function iniciarCanvas(id) {
+        const canvas = document.getElementById(id);
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+        const getPos = e => {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        };
+        const start = e => { drawing = true; const pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); e.preventDefault(); };
+        const end = () => drawing = false;
+        const draw = e => {
+            if (!drawing) return;
+            const pos = getPos(e);
+            if (toolsState[id] === 'goma') { ctx.globalCompositeOperation = 'destination-out'; ctx.lineWidth = 20; } 
+            else { ctx.globalCompositeOperation = 'source-over'; ctx.lineWidth = 3; ctx.strokeStyle = '#f06292'; }
+            ctx.lineCap = 'round'; ctx.lineTo(pos.x, pos.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); e.preventDefault();
+        };
+        canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+        canvas.addEventListener('mousedown', start); canvas.addEventListener('touchstart', start);
+        canvas.addEventListener('mouseup', end); canvas.addEventListener('touchend', end);
+        canvas.addEventListener('mousemove', draw); canvas.addEventListener('touchmove', draw);
+    }
+
+    function setTool(canvasId, tool) {
+        toolsState[canvasId] = tool;
+        const suffix = canvasId.split('-')[1];
+        document.getElementById(`tool-pincel-${suffix}`).classList.toggle('active', tool === 'pincel');
+        document.getElementById(`tool-goma-${suffix}`).classList.toggle('active', tool === 'goma');
+    }
+
+    function limpiarCanvas(id) { const canvas = document.getElementById(id); canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height); }
 
     async function cargarPDFs() {
         const { data } = await client.from('pdfs_data').select('*').order('created_at', {ascending: false});
-        if (data) {
-            document.getElementById('lista-pdfs').innerHTML = data.map(p => `
-                <div class="item-card" style="min-height:120px; padding:15px; justify-content:center; align-items:center; text-align:center;">
-                    <button class="btn-eliminar" onclick="eliminarItem(${p.id}, 'pdfs_data')">✕</button>
-                    <span style="font-weight:bold; color:var(--s); font-size:14px; margin-bottom:10px;">${p.nombre}</span>
-                    <a href="${p.url}" target="_blank" style="text-decoration:none; background:var(--p); color:white; padding:8px 15px; border-radius:10px; font-size:12px; font-weight:bold;">Abrir Patrón</a>
-                </div>
-            `).join('');
+        pdfsGlobal = data || [];
+        document.getElementById('lista-pdfs').innerHTML = pdfsGlobal.map(p => `
+            <div style="position:relative">
+                <a href="${p.url}" target="_blank" class="pdf-item">
+                    <div class="pdf-icon">📄</div>
+                    <div class="pdf-info">
+                        <p class="pdf-nombre">${p.nombre}</p>
+                        <p class="pdf-fecha">${new Date(p.created_at).toLocaleDateString()}</p>
+                    </div>
+                </a>
+                <button onclick="eliminarPDF(${p.id})" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer;">🗑️</button>
+            </div>
+        `).join('');
+        actualizarSelectsRegalos();
+    }
+
+    async function subirPDF() {
+        const file = document.getElementById('pdf-archivo').files[0];
+        const nombre = document.getElementById('pdf-nombre').value;
+        if(!file || !nombre) return alert("Ponle un nombre y selecciona un PDF");
+        const fileName = `${Date.now()}_${file.name}`;
+        await client.storage.from('patrones_pdf').upload(fileName, file);
+        const { data: urlData } = client.storage.from('patrones_pdf').getPublicUrl(fileName);
+        await client.from('pdfs_data').insert([{ nombre, url: urlData.publicUrl }]);
+        document.getElementById('pdf-nombre').value = ""; document.getElementById('pdf-archivo').value = "";
+        cargarPDFs();
+    }
+
+    async function eliminarPDF(id) { if(confirm("¿Borrar PDF de la biblioteca?")) { await client.from('pdfs_data').delete().eq('id', id); cargarPDFs(); } }
+
+    function cambiarVueltaEditor(v) {
+        vueltasContador = Math.max(0, vueltasContador + v);
+        document.getElementById('vueltas-editor').innerText = vueltasContador;
+        const sel = window.getSelection();
+        if (sel.rangeCount) {
+            const range = sel.getRangeAt(0);
+            const span = document.createElement("span");
+            span.style.color = "var(--s)"; span.style.fontWeight = "bold";
+            span.innerHTML = ` (Vta ${vueltasContador}) `;
+            range.insertNode(span);
+            range.collapse(false);
         }
+    }
+
+    function insertarFotoEnEditor(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgHtml = `<img src="${e.target.result}" style="max-width:100%; border-radius:10px; margin:10px 0;">`;
+                document.getElementById('borrador-contenido').focus();
+                document.execCommand('insertHTML', false, imgHtml);
+                input.value = "";
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function guardarBorradorLocal() {
+        localStorage.setItem('borrador_patron_titulo', document.getElementById('borrador-titulo').value);
+        localStorage.setItem('borrador_patron_cuerpo', document.getElementById('borrador-contenido').innerHTML);
+        alert("¡Progreso guardado! 💾");
+    }
+
+    function cargarBorradorLocal() {
+        const t = localStorage.getItem('borrador_patron_titulo');
+        const c = localStorage.getItem('borrador_patron_cuerpo');
+        if(t) document.getElementById('borrador-titulo').value = t;
+        if(c) document.getElementById('borrador-contenido').innerHTML = c;
+    }
+
+    function eliminarBorradorTotal() {
+        if(confirm("¿Estás segura? Se borrará todo el texto y el título del diseñador.")) {
+            document.getElementById('borrador-titulo').value = "";
+            document.getElementById('borrador-contenido').innerHTML = "";
+            localStorage.removeItem('borrador_patron_titulo');
+            localStorage.removeItem('borrador_patron_cuerpo');
+            vueltasContador = 0;
+            document.getElementById('vueltas-editor').innerText = "0";
+            alert("Borrador limpiado. ✨");
+        }
+    }
+
+    async function generarPDF() {
+        const titulo = document.getElementById('borrador-titulo').value || 'Sin titulo';
+        const contenido = document.getElementById('borrador-contenido').innerHTML;
+        if(!contenido) return alert("¡Escribe algo primero! 🧶");
+
+        const temp = document.createElement('div');
+        temp.innerHTML = `<div style="padding:40px; font-family:serif; color:#444;"><h1 style="color:#f06292; text-align:center; border-bottom:2px solid #fce4ec; padding-bottom:10px;">${titulo}</h1><div style="margin-top:20px; line-height:1.6;">${contenido}</div></div>`;
+        
+        const opt = { 
+            margin: 10, 
+            filename: `${titulo}.pdf`, 
+            image: { type: 'jpeg', quality: 0.98 }, 
+            html2canvas: { scale: 2 }, 
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+        };
+
+        try {
+            const pdfBlob = await html2pdf().set(opt).from(temp).output('blob');
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(pdfBlob); 
+            link.download = `${titulo}.pdf`; 
+            link.click();
+
+            const fileName = `${Date.now()}_${titulo.replace(/\s+/g, '_')}.pdf`;
+            await client.storage.from('patrones_pdf').upload(fileName, pdfBlob, { contentType: 'application/pdf' });
+            const { data: urlData } = client.storage.from('patrones_pdf').getPublicUrl(fileName);
+            await client.from('pdfs_data').insert([{ nombre: titulo, url: urlData.publicUrl }]);
+
+            alert("¡PDF generado y guardado en tu biblioteca! 💖✨");
+            cargarPDFs();
+        } catch (error) { 
+            console.error(error); 
+            alert("Hubo un error al procesar el PDF."); 
+        }
+    }
+
+    async function cargarRegalos() {
+        const { data } = await client.from('regalos_data').select('*').order('created_at', {ascending: false});
+        regalosGlobal = data || [];
+        renderizarRegalos();
+    }
+
+    function renderizarRegalos() {
+        const pend = regalosGlobal.filter(r => !r.entregado);
+        const entr = regalosGlobal.filter(r => r.entregado);
+        const html = r => `
+            <div class="regalo-item">
+                <div class="regalo-icon">${r.entregado ? '💝' : '🎁'}</div>
+                <div class="regalo-info">
+                    <p class="regalo-nombre">Para: ${r.persona}</p>
+                    <p class="regalo-meta">✨ ${r.detalle}</p>
+                    ${r.preferencias ? `<div class="preferencias-box">${r.preferencias}</div>` : ''}
+                    <div style="margin-top:5px;">
+                        ${r.proyecto_id ? `<span class="enlace-tag">🎨 Proyecto</span>` : ''}
+                        ${r.pdf_id ? `<span class="enlace-tag">📄 PDF</span>` : ''}
+                    </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                    <button onclick="toggleRegalo(${r.id}, ${r.entregado})" style="border:none; background:none; cursor:pointer; font-size:18px;">${r.entregado ? '🔄' : '✅'}</button>
+                    <button onclick="eliminarRegalo(${r.id})" style="border:none; background:none; cursor:pointer; font-size:18px;">🗑️</button>
+                </div>
+            </div>
+        `;
+        document.getElementById('lista-regalos-pendientes').innerHTML = pend.map(html).join('');
+        document.getElementById('lista-regalos-entregados').innerHTML = entr.map(html).join('');
+    }
+
+    async function guardarRegalo() {
+        const persona = document.getElementById('reg-persona').value;
+        const detalle = document.getElementById('reg-detalle').value;
+        if(!persona || !detalle) return alert("Mínimo dime para quién es y qué vas a hacer 🎀");
+        await client.from('regalos_data').insert([{
+            persona, detalle, 
+            preferencias: document.getElementById('reg-preferencias').value,
+            proyecto_id: document.getElementById('reg-enlace-proyecto').value || null,
+            pdf_id: document.getElementById('reg-enlace-pdf').value || null,
+            entregado: false
+        }]);
+        document.getElementById('reg-persona').value = ""; 
+        document.getElementById('reg-detalle').value = ""; 
+        document.getElementById('reg-preferencias').value = "";
+        cargarRegalos();
+    }
+
+    async function toggleRegalo(id, estado) { await client.from('regalos_data').update({ entregado: !estado }).eq('id', id); cargarRegalos(); }
+    async function eliminarRegalo(id) { if(confirm("¿Borrar este regalo?")) { await client.from('regalos_data').delete().eq('id', id); cargarRegalos(); } }
+    
+    function actualizarSelectsRegalos() {
+        const selProy = document.getElementById('reg-enlace-proyecto');
+        const selPdf = document.getElementById('reg-enlace-pdf');
+        selProy.innerHTML = '<option value="">Ninguno</option>' + proyectosGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+        selPdf.innerHTML = '<option value="">Ninguno</option>' + pdfsGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
     }
 
     async function cargarNotas() {
         const { data } = await client.from('notas_data').select('*').order('created_at', {ascending: false});
-        if (data) {
-            document.getElementById('lista-notas').innerHTML = data.map(n => `
-                <div class="card-form" style="margin:0; width:auto; max-width:none; position:relative;">
-                    <button class="btn-eliminar" onclick="eliminarNota(${n.id})">✕</button>
-                    <h3 style="color:var(--s); margin:0 0 10px 0; font-size:16px;">${n.titulo}</h3>
-                    <p style="white-space:pre-wrap; font-size:13px; margin:0; line-height:1.5;">${n.contenido}</p>
-                    <small style="display:block; margin-top:10px; opacity:0.5; font-size:10px;">${new Date(n.created_at).toLocaleString()}</small>
-                </div>
-            `).join('');
-        }
+        document.getElementById('lista-notas').innerHTML = (data || []).map(n => `
+            <div class="card-form" style="margin-bottom:15px; position:relative;">
+                <button onclick="eliminarNota(${n.id})" style="position:absolute; top:10px; right:10px; border:none; background:none; cursor:pointer;">🗑️</button>
+                <h3 style="color:var(--s); margin:0 0 10px 0; font-size:16px;">${n.titulo}</h3>
+                <p style="white-space:pre-wrap; font-size:13px; margin:0; line-height:1.5;">${n.contenido}</p>
+                <small style="display:block; margin-top:10px; opacity:0.5; font-size:10px;">${new Date(n.created_at).toLocaleString()}</small>
+            </div>
+        `).join('');
     }
 
     async function guardarNota() {
@@ -307,19 +762,17 @@
 
     async function eliminarNota(id) { if(confirm("¿Borrar nota?")) { await client.from('notas_data').delete().eq('id', id); cargarNotas(); } }
 
-    function toggleDarkMode() {
-        const tema = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', tema);
-        localStorage.setItem('tema-preferido', tema);
-    }
-
+    // ONLOAD ACTUALIZADO PARA RECUPERAR TEMA
     window.onload = function() {
         const temaGuardado = localStorage.getItem('tema-preferido');
         if (temaGuardado === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
+            const toggleBtn = document.getElementById('dark-mode-toggle');
+            if(toggleBtn) toggleBtn.innerText = '☀️';
         }
         cargarDatos();
-    }
+    };
 </script>
+
 </body>
 </html>
