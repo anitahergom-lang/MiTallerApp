@@ -797,7 +797,29 @@ async function cargarLlaves() {
         `).join('');
     }
     async function eliminarNota(id) { if(confirm("¿Borrar nota?")) { await client.from('notas_data').delete().eq('id', id); cargarNotas(); } }
+async function guardarNuevaLlave() {
+        const nombre = document.getElementById('llave-nombre').value;
+        const usuario = document.getElementById('llave-usuario').value;
+        const clave = document.getElementById('llave-pass').value;
 
+        if (!nombre || !clave) {
+            alert("Por favor, rellena al menos el nombre y la contraseña");
+            return;
+        }
+
+        const { error } = await client
+            .from('llaves_data')
+            .insert([{ nombre, usuario, clave }]);
+
+        if (error) {
+            alert("Error al guardar: " + error.message);
+        } else {
+            document.getElementById('llave-nombre').value = '';
+            document.getElementById('llave-usuario').value = '';
+            document.getElementById('llave-pass').value = '';
+            cargarLlaves(); 
+        }
+    }
     // ONLOAD ACTUALIZADO PARA RECUPERAR TEMA
     window.onload = function() {
         const temaGuardado = localStorage.getItem('tema-preferido');
