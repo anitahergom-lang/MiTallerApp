@@ -1191,58 +1191,53 @@ function cerrarModalNota() {
 }
 
 async function cargarNotas() {
-    // Eliminamos el .order() por ahora para ver si ese es el bloqueo
+    // Pedimos todo sin filtros raros para que aparezcan sí o sí
     const { data, error } = await client.from('notas').select('*');
     
-    if (error) {
-        console.error("Error de Supabase al cargar:", error.message);
-        return;
-    }
+    if (error) return console.error("Error cargando notas:", error);
 
     const muro = document.getElementById('muro-notas');
     if (!muro) return;
     muro.innerHTML = '';
 
-    if (data) {
-        data.forEach((n, index) => {
-            const colorClass = coloresPostIt[index % coloresPostIt.length];
-            const div = document.createElement('div');
-            div.className = `post-it ${colorClass}`;
-            div.onclick = () => abrirModalNota(n.id, n.titulo, n.contenido, n.url);
-            
-            div.innerHTML = `
-                ${n.titulo ? `<h3>${n.titulo}</h3>` : ''}
-                <p>${n.contenido || ''}</p>
-                <button onclick="event.stopPropagation(); eliminarNota('${n.id}')" style="position:absolute; top:5px; right:5px; background:none; border:none; opacity:0.3; font-size:12px; cursor:pointer;">✕</button>
-            `;
-            muro.appendChild(div);
-        });
-    }
+    data.forEach((n, index) => {
+        const colorClass = coloresPostIt[index % coloresPostIt.length];
+        const div = document.createElement('div');
+        div.className = `post-it ${colorClass}`;
+        // Importante: usamos n.contenido porque así se llama en tu base de datos
+        div.onclick = () => abrirModalNota(n.id, n.titulo, n.contenido, n.url);
+        
+        div.innerHTML = `
+            ${n.titulo ? `<h3>${n.titulo}</h3>` : ''}
+            <p>${n.contenido || ''}</p>
+            <button onclick="event.stopPropagation(); eliminarNota('${n.id}')" style="position:absolute; top:5px; right:5px; background:none; border:none; opacity:0.3; font-size:12px; cursor:pointer;">✕</button>
+        `;
+        muro.appendChild(div);
+    });
 }
 
 async function guardarNota() {
     const id = document.getElementById('nota-id-edit').value;
-    // Creamos el objeto asegurándonos de que los nombres coinciden con tu tabla
     const notaData = {
-        titulo: document.getElementById('n-titulo').value || '',
-        contenido: document.getElementById('n-contenido').value || '',
-        url: document.getElementById('n-url').value || ''
+        titulo: document.getElementById('n-titulo').value,
+        contenido: document.getElementById('n-contenido').value, // <--- CAMBIADO A 'contenido'
+        url: document.getElementById('n-url').value
     };
+
+    if (!notaData.titulo && !notaData.contenido && !notaData.url) return alert("¡No puedes pegar un post-it vacío!");
 
     let respuesta;
     if (id) {
         respuesta = await client.from('notas').update(notaData).eq('id', id);
     } else {
-        // Intentamos un insert limpio
         respuesta = await client.from('notas').insert([notaData]);
     }
 
-    if (respuesta.error) {
-        // Este alert es VITAL: dime qué pone exactamente cuando falle
-        alert("ERROR CRÍTICO: " + respuesta.error.message + " | Código: " + respuesta.error.code);
-    } else {
+    if (!respuesta.error) {
         cerrarModalNota();
         cargarNotas();
+    } else {
+        alert("Fallo al guardar: " + respuesta.error.message);
     }
 }
 
