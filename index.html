@@ -5,483 +5,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Mi Taller Rosa</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
-        :root { 
-            --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --br: #f1e1e5; --txt: #444; 
-        }
-        [data-theme="dark"] {
-            --p: #ff85a2; --pc: #4a2b34; --s: #f06292; --f: #121212; --b: #1e1e1e; --br: #333333; --txt: #fce4ec;
-        }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--f); color: var(--txt); margin: 0; padding: 15px; padding-bottom: 80px; transition: 0.3s; }
-        
-        .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 50px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow-x: auto; scrollbar-width: none; }
-        .btn-nav { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 40px; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
-        .btn-nav.active { background: var(--pc); color: var(--s); border: 1px solid var(--p); }
+    :root { 
+        --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --br: #f1e1e5; --txt: #444; 
+    }
+    [data-theme="dark"] {
+        --p: #ff85a2; --pc: #4a2b34; --s: #f06292; --f: #121212; --b: #1e1e1e; --br: #333333; --txt: #fce4ec;
+    }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--f); color: var(--txt); margin: 0; padding: 15px; padding-bottom: 80px; transition: 0.3s; }
+    
+    /* ESTILOS DEL MURO DE NOTAS */
+    #sec-notas {
+        background-image: radial-gradient(var(--br) 1px, transparent 1px);
+        background-size: 20px 20px;
+        padding: 10px;
+    }
+    .muro {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
+        padding: 10px;
+    }
+    .post-it {
+        padding: 15px;
+        border-radius: 4px 4px 25px 4px;
+        min-height: 140px;
+        position: relative;
+        cursor: pointer;
+        box-shadow: 4px 4px 8px rgba(0,0,0,0.1);
+        transition: 0.3s;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    .p-rosa { background: #ffd1dc; }
+    .p-crema { background: #fff4e0; }
+    .p-melocoton { background: #ffe5d9; }
 
-        .filtros-container { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0 15px 0; scrollbar-width: none; }
-        .btn-filtro { white-space: nowrap; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--br); background: var(--b); color: var(--txt); font-size: 12px; cursor: pointer; font-weight: 600; }
-        .btn-filtro.active { background: var(--p); color: white; border-color: var(--p); }
+    [data-theme="dark"] .post-it {
+        opacity: 0.85;
+        border: 1px solid var(--p);
+    }
 
-        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
-        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; display: flex; flex-direction: column; min-height: 300px; }
-        .foto-material { width: 100%; height: 110px; object-fit: cover; background: #eee; }
-        .info-material { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; gap: 4px; color: var(--txt); }
-        
-        .info-titulo { font-size: 13px; font-weight: 700; color: var(--s); margin: 0 0 4px 0; line-height: 1.2; display: block; }
-        .info-detalle { font-size: 10px; color: var(--txt) !important; margin: 0; line-height: 1.3; display: block; }
-        .info-label { font-weight: 800; text-transform: uppercase; font-size: 8px; color: var(--s); opacity: 0.8; margin-right: 4px; }
-        .info-notas { font-size: 9px; font-style: italic; color: var(--txt); opacity: 0.8; margin-top: 5px; padding-top: 5px; border-top: 1px dashed var(--br); width: 100%; }
-
-        .btn-edit-float { position: absolute; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.6); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 5; }
-        .btn-delete-float { position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.6); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 5; }
-
-        .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-top: 5px; }
-        .badge-idea { background: #e2e3e5; color: #383d41; }
-        .badge-proceso { background: #fff3cd; color: #856404; }
-        .badge-listo { background: #d4edda; color: #155724; }
-
-        .card-form { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 500px; margin: 0 auto; margin-bottom: 20px; }
-        label { display: block; font-size: 11px; color: var(--s); font-weight: 700; margin: 10px 0 4px 4px; }
-        input, select, textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--br); box-sizing: border-box; font-size: 14px; background: var(--f); color: var(--txt); }
-        textarea { height: 80px; resize: none; }
-        .btn-grande { width: 100%; background: var(--p); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; }
-
-        .compra-item { background: var(--b); padding: 15px; border-radius: 18px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--br); }
-        .prio-Alta { border-left: 6px solid #ff4d4d !important; }
-        .prio-Media { border-left: 6px solid #ffcc00 !important; }
-        .prio-Baja { border-left: 6px solid #2ecc71 !important; }
-
-        .canvas-container { background: white; border: 1px solid var(--br); border-radius: 15px; margin-top: 10px; position: relative; overflow: hidden; }
-        .canvas-base { display: block; width: 100%; height: 250px; cursor: crosshair; }
-        .canvas-largo { height: 500px !important; }
-        .canvas-grid { background-image: linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
-        .canvas-cuerpos { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 600' opacity='0.3'><g fill='none' stroke='%23f06292' stroke-width='1.5'><path d='M100,100 Q100,50 125,50 Q150,50 150,100 L150,150 L180,180 L180,250 L160,400 L170,550 M100,150 L70,180 L70,250 L90,400 L80,550'/><path d='M300,100 Q300,50 325,50 Q350,50 350,100 L350,150 L380,180 L380,250 L360,400 L370,550 M300,150 L270,180 L270,250 L290,400 L280,550'/><path d='M200,80 Q200,40 225,40 Q250,40 250,80 L250,130 L280,160 L280,230 L260,380 L270,530 M200,130 L170,160 L170,230 L190,380 L180,530'/></g></svg>"); background-size: contain; background-repeat: no-repeat; background-position: center; }
-
-        .canvas-tools { display: flex; gap: 5px; margin-top: 5px; margin-bottom: 15px; }
-        .btn-tool { flex: 1; padding: 8px; font-size: 12px; border: 1px solid var(--br); border-radius: 8px; background: var(--b); cursor: pointer; color: var(--txt); }
-        .btn-tool.active { background: var(--pc); border-color: var(--p); color: var(--s); }
-
-        #dark-mode-toggle { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--br); }
-        .btn-qty { background: var(--pc); border: none; width: 25px; height: 25px; border-radius: 50%; color: var(--s); font-weight: bold; cursor: pointer; }
-
-        .pdf-item, .regalo-item { background: var(--b); border: 1px solid var(--br); border-radius: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; text-decoration: none; color: var(--txt); transition: 0.2s; }
-        .pdf-item:hover { border-color: var(--p); background: var(--pc); }
-        .pdf-icon, .regalo-icon { font-size: 24px; color: var(--s); }
-        .pdf-info, .regalo-info { flex: 1; }
-        .pdf-nombre, .regalo-nombre { font-weight: 600; font-size: 14px; margin: 0; }
-        .pdf-fecha, .regalo-meta { font-size: 11px; color: #888; margin: 0; }
-        
-        .preferencias-box { font-size: 12px; font-style: italic; color: var(--s); margin-top: 5px; padding: 5px; background: var(--pc); border-radius: 8px; }
-        .enlace-tag { display: inline-block; padding: 2px 8px; background: var(--p); color: white; border-radius: 10px; font-size: 10px; margin-right: 5px; margin-top: 5px; }
-
-       /* ESTILOS DEL MURO DE POST-ITS */
-.muro-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 20px;
-    padding: 10px;
-}
-
-.post-it {
-    padding: 15px;
-    aspect-ratio: 1 / 1;
-    border-radius: 2px 2px 2px 25px; /* Esquina levantada */
-    position: relative;
-    box-shadow: 5px 5px 10px rgba(0,0,0,0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    color: #444; /* Texto siempre legible en post-it */
-}
-
-.post-it:hover { transform: scale(1.03) rotate(-1deg); }
-
-/* Colores de Post-its */
-.p-rosa { background: #ffcfd2; }
-.p-crema { background: #fdfcf0; }
-.p-naranja { background: #fde4cf; }
-
-[data-theme="dark"] .post-it {
-    opacity: 0.85;
-    border: 1px solid rgba(255,133,162,0.3);
-}
-
-.post-it h3 { font-size: 14px; margin: 0 0 8px 0; font-weight: 700; text-transform: uppercase; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 5px; }
-.post-it p { font-size: 13px; line-height: 1.4; overflow: hidden; flex-grow: 1; margin: 0; }
-.post-it .url-icon { position: absolute; bottom: 10px; right: 10px; font-size: 18px; }
-
-.fab-nota {
-    position: fixed;
-    bottom: 90px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: var(--p);
-    color: white;
-    font-size: 30px;
-    border: none;
-    box-shadow: 0 4px 15px rgba(255,133,162,0.4);
-    z-index: 99;
-    cursor: pointer;
-}
-
-.modal-overlay {
-    position: fixed;
-    top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}        
-        .contador-vueltas-mini { display: flex; align-items: center; gap: 10px; background: var(--s); color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
-    </style>
+    /* Resto de estilos de tu archivo 0.2 */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .btn-icon { background: var(--pc); border: none; padding: 10px; border-radius: 12px; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+    .menu-item { background: var(--b); padding: 20px; border-radius: 20px; text-align: center; border: 2px solid var(--br); cursor: pointer; }
+    .section { display: none; }
+    .active { display: block; }
+    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; }
+    .modal-content { background: var(--b); padding: 25px; border-radius: 25px; width: 90%; max-width: 400px; }
+    input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--br); border-radius: 10px; background: var(--f); color: var(--txt); }
+    .btn-principal { background: var(--p); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; }
+</style>
 </head>
 <body>
+    ```
 
-<button id="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+### PARTE 2 (El JavaScript corregido)
+*Busca tus funciones de notas al final y cámbialas por estas. Fíjate que he puesto un "seguro" para la fecha.*
 
-<div class="menu-secciones">
-    <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
-    <button class="btn-nav" id="nav-STOCK" onclick="cambiarVista('STOCK')">📦 STOCK</button>
-    <button class="btn-nav" id="nav-CAPRICHOS" onclick="cambiarVista('CAPRICHOS')">💸 Mis Caprichos</button>
-    <button class="btn-nav" id="nav-COMPRAS" onclick="cambiarVista('COMPRAS')">🛒 COMPRAS</button>
-    <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
-    <button class="btn-nav" id="nav-PDFS" onclick="cambiarVista('PDFS')">📂 PDFs</button>
-    <button class="btn-nav" id="nav-REGALOS" onclick="cambiarVista('REGALOS')">🎁 REGALOS</button>
-    <button class="btn-nav" id="nav-NOTAS" onclick="cambiarVista('NOTAS')">📝 NOTAS</button>
-    <button class="btn-nav" id="nav-LLAVES" onclick="cambiarVista('LLAVES')">🔑 LLAVES</button>
-</div>
+```javascript
+async function cargarNotas() {
+    const muro = document.getElementById('muro-notas');
+    if (!muro) return;
+    muro.innerHTML = '<p style="text-align:center;">Abriendo mural...</p>';
 
-<div id="vista-INICIO">
-    <div class="card-form">
-        <h2 id="titulo-formulario" style="color:var(--s); text-align:center; margin-top:0;">📦 Añadir Material</h2>
-        <input type="hidden" id="m-id">
-        <label>NOMBRE DEL MATERIAL</label>
-        <input type="text" id="m-nombre" placeholder="Ej: Lana Merino Azul">
-        <div style="display:flex; gap:10px;">
-            <div style="flex:1;">
-                <label>CATEGORÍA</label>
-                <select id="m-categoria">
-                    <option value="Lana">🧶 Lana</option>
-                    <option value="Telas">👗 Telas</option>
-                    <option value="Hilos">🧵 Hilos</option>
-                    <option value="Accesorios">🎀 Accesorios</option>
-                    <option value="Otros">🧸 Otros</option>
-                </select>
-            </div>
-            <div style="width:80px;">
-                <label>CANTIDAD</label>
-                <input type="number" id="m-cantidad" value="1">
-            </div>
-        </div>
-        <label>🧵 COMPOSICIÓN</label>
-        <input type="text" id="m-composicion" placeholder="Ej: 100% Algodón">
-        <label>📍 TIENDA DONDE SE COMPRÓ</label>
-        <input type="text" id="m-tienda" placeholder="Ej: Mercería del Barrio">
-        <div style="display:flex; gap:10px;">
-            <div style="flex:1;">
-                <label>🪡 GROSOR / WPI</label>
-                <input type="text" id="m-grosor" placeholder="Ej: Fingering, 3mm...">
-            </div>
-            <div style="flex:1;">
-                <label>📏 LONGITUD</label>
-                <input type="text" id="m-longitud" placeholder="Ej: 120m / 50g">
-            </div>
-        </div>
-        <label>NOTAS ADICIONALES</label>
-        <textarea id="m-notas" placeholder="Nº de lote, etc..."></textarea>
-        <label>FOTO DEL MATERIAL</label>
-        <input type="file" id="m-archivo" accept="image/*">
-        <button id="btn-accion-stock" class="btn-grande" onclick="guardarNuevo('stock')">GUARDAR EN STOCK</button>
-        <button id="btn-cancelar-edit" class="btn-grande" style="display:none; background:#888" onclick="limpiarFormulario()">CANCELAR EDICIÓN</button>
-    </div>
-</div>
+    // IMPORTANTE: Si te da error de columna fecha, cambia 'fecha' por 'id' aquí abajo
+    const { data, error } = await client.from('notas').select('*').order('fecha', { ascending: false });
 
-<div id="vista-STOCK" style="display:none;">
-    <div class="filtros-container">
-        <button class="btn-filtro active" id="filtro-Todo" onclick="filtrar('Todo')">✨ Todo</button>
-        <button class="btn-filtro" id="filtro-Lana" onclick="filtrar('Lana')">🧶 Lana</button>
-        <button class="btn-filtro" id="filtro-Telas" onclick="filtrar('Telas')">👗 Telas</button>
-        <button class="btn-filtro" id="filtro-Hilos" onclick="filtrar('Hilos')">🧵 Hilos</button>
-        <button class="btn-filtro" id="filtro-Accesorios" onclick="filtrar('Accesorios')">🎀 Accesorios</button>
-        <button class="btn-filtro" id="filtro-Otros" onclick="filtrar('Otros')">🧸 Otros</button>
-    </div>
-    <div id="lista-stock" class="grid-estudio"></div>
-</div>
+    if (error) {
+        console.log("Reintentando sin orden de fecha...");
+        // Si falla por la columna fecha, carga las notas sin orden cronológico para que no se bloquee
+        const { data: data2, error: error2 } = await client.from('notas').select('*');
+        if (error2) return alert("Error crítico: " + error2.message);
+        renderizarNotas(data2);
+    } else {
+        renderizarNotas(data);
+    }
+}
 
-<div id="vista-CAPRICHOS" class="vista" style="display:none;">
-    <div class="card">
-        <h2 style="color:var(--p); text-align:center; margin-bottom:20px;">💸 Mis Caprichos</h2>
+function renderizarNotas(notas) {
+    const muro = document.getElementById('muro-notas');
+    muro.innerHTML = '';
+    const colores = ['p-rosa', 'p-crema', 'p-melocoton'];
+
+    notas.forEach((n, index) => {
+        const colorClass = colores[index % colores.length];
+        const div = document.createElement('div');
+        div.className = `post-it ${colorClass}`;
+        // Rotación aleatoria sutil
+        const deg = (index % 2 === 0) ? 1.5 : -1.5;
+        div.style.transform = `rotate(${deg}deg)`;
+
+        div.onclick = () => abrirModalNota(n.id, n.titulo, n.texto || n.contenido, n.url);
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <button class="btn-nav" onclick="cambiarVistaInterna('AÑADIR_CAPRICHO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
-                <span style="font-size:2.2em; margin-bottom:5px;">🛍️</span>
-                <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Añadir</span>
-            </button>
-
-            <button class="btn-nav" onclick="cambiarVistaInterna('LISTA_GASTOS')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
-                <span style="font-size:2.2em; margin-bottom:5px;">📖</span>
-                <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Mi Historial</span>
-            </button>
-
-            <button class="btn-nav" onclick="cambiarVistaInterna('TERMOMETRO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
-                <span style="font-size:2.2em; margin-bottom:5px;">🌡️</span>
-                <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase; text-align:center;">El Termómetro<br>Rosa</span>
-            </button>
-
-            <button class="btn-nav" onclick="cambiarVistaInterna('FELICIDAD')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
-                <span style="font-size:2.2em; margin-bottom:5px;">✨</span>
-                <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Felicidad</span>
-            </button>
-        </div>
-
-        <button class="btn-nav" onclick="cambiarVista('INICIO')" style="width:100%; margin-top:25px; background:var(--p); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; cursor:pointer;">
-            🏠 Volver al Inicio principal
-        </button>
-    </div>
-</div>
-
-<div id="vista-AÑADIR_CAPRICHO" class="vista" style="display:none;">
-    <div class="card" style="padding: 20px; max-width: 450px; margin: auto; border: 1px solid var(--br); border-radius: 25px;">
-        <h2 style="color:var(--s); text-align:center; margin-top:0; font-size: 1.4em;">🛍️ Registrar Compra</h2>
-        
-        <div style="display: flex; gap: 10px; margin-bottom:12px;">
-            <select id="capricho-tipo-general" onchange="mostrarSubcategorias(this.value)" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px; background:var(--pc); font-size:0.9em; outline:none;">
-                <option value="">✨ Categoría...</option>
-                <option value="Material">🧶 Material</option>
-                <option value="Herramienta">🛠️ Herramienta</option>
-                <option value="Formacion">📚 Formación</option>
-            </select>
-            <div id="div-subcategoria" style="flex:1; display:none;">
-                <select id="capricho-subtipo" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; font-size:0.9em;">
-                    <option value="Lanas">🧶 Lanas</option>
-                    <option value="Telas">👗 Telas</option>
-                    <option value="Hilos">🧵 Hilos</option>
-                    <option value="Accesorios">🎀 Accesorios</option>
-                    <option value="Otros">🧸 Otros</option>
-                </select>
+        div.innerHTML = `
+            <div>
+                <strong style="display:block; margin-bottom:5px;">${n.titulo || ''}</strong>
+                <p style="margin:0; font-size:0.85rem;">${n.texto || n.contenido || ''}</p>
             </div>
-        </div>
+            <button onclick="event.stopPropagation(); eliminarNota('${n.id}')" style="position:absolute; top:5px; right:5px; background:none; border:none; cursor:pointer; opacity:0.3;">✕</button>
+        `;
+        muro.appendChild(div);
+    });
+}
 
-        <div style="margin-bottom:12px;">
-            <input type="text" id="capricho-nombre" placeholder="✏️ Nombre del material" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; box-sizing: border-box;">
-        </div>
-
-        <div style="display: flex; gap: 10px; margin-bottom:12px;">
-            <input type="text" id="capricho-grosor" placeholder="🪡 Grosor" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px;">
-            <input type="text" id="capricho-longitud" placeholder="📏 Longitud" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px;">
-        </div>
-
-        <div style="display: flex; gap: 10px; margin-bottom:12px;">
-            <input type="text" id="capricho-tienda" placeholder="📍 Tienda" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px;">
-            <input type="text" id="capricho-composicion" placeholder="🧵 Composición" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px;">
-        </div>
-
-<div style="background: var(--pc); padding: 12px; border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--p);">
-    <div style="display: flex; gap: 8px; align-items: flex-end;">
-        <div style="flex:1;">
-            <label style="display:block; font-size:0.7em; font-weight:bold; color:var(--s); margin-bottom:4px;">Precio Total €</label>
-            <input type="number" id="capricho-precio" step="0.01" placeholder="0.00" style="width:100%; padding:8px; border:none; border-radius:8px; background: var(--b); color: var(--txt);">
-        </div>
-        <div style="flex:0.7;">
-            <label style="display:block; font-size:0.7em; font-weight:bold; color:var(--s); margin-bottom:4px;">Cant.</label>
-            <input type="number" id="capricho-cantidad" value="1" style="width:100%; padding:8px; border:none; border-radius:8px; background: var(--b); color: var(--txt);">
-        </div>
-        <div style="flex:1.3;">
-            <label style="display:block; font-size:0.7em; font-weight:bold; color:var(--s); margin-bottom:4px;">Fecha</label>
-            <input type="date" id="capricho-fecha" style="width:100%; padding:7px; border:none; border-radius:8px; background: var(--b); color: var(--txt); font-size:0.8em;">
-        </div>
-    </div>
-</div>
-
-        <textarea id="capricho-notas" placeholder="📝 Notas adicionales..." rows="2" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; box-sizing: border-box; margin-bottom:15px; font-family:inherit;"></textarea>
-
-<div style="margin-top: 15px; margin-bottom: 20px;">
-            <label style="display: block; color: #f06292; font-weight: bold; font-size: 0.8em; margin-bottom: 8px; text-transform: uppercase; font-family: sans-serif;">
-                FOTO DEL MATERIAL
-            </label>
-            
-            <input type="file" id="capricho-foto" accept="image/*" onchange="previsualizarImagenCapricho(event)" 
-                   style="font-size: 0.9em; color: var(--txt); width: 100%; font-family: inherit; cursor: pointer;">
-
-            <img id="capricho-img-preview" style="width: 100px; height: 100px; object-fit: cover; border-radius: 12px; margin-top: 10px; display: none; border: 1px solid var(--br);">
-        </div>
-
-        <button class="btn-api" onclick="procesarGuardadoCapricho()" style="width:100%; background:var(--s); color:white; margin-bottom:10px; border:none; padding:14px; border-radius:12px; font-weight:bold; cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            💖 Registrar Capricho
-        </button>
-
-        <button class="btn-nav" onclick="volverMenuCaprichos()" style="width:100%; background:none; color:var(--s); border:1px solid var(--s); padding:10px; border-radius:12px; cursor:pointer; font-size:0.9em; font-weight:bold;">
-            ⬅️ Volver
-        </button>
-    </div>
-</div>
+async function guardarNota() {
+    const id = document.getElementById('nota-id-edit').value;
+    const valor = document.getElementById('n-contenido').value;
     
-<div id="vista-COMPRAS" style="display:none;">
-    <div class="card-form">
-        <h2 style="color:var(--s); text-align:center; margin-top:0;">🛒 Lista de Compras</h2>
-        <input type="text" id="c-nombre" placeholder="¿Qué necesitas comprar?">
-        <div style="display:flex; gap:10px;">
-            <div style="flex:1;">
-                <label>TIENDA</label>
-                <input type="text" id="c-tienda" placeholder="Ej: Mercería Ana">
-            </div>
-            <div style="flex:1;">
-                <label>PRIORIDAD</label>
-                <select id="c-prioridad">
-                    <option value="Alta">🔴 Alta</option>
-                    <option value="Media">🟡 Media</option>
-                    <option value="Baja">🟢 Baja</option>
-                </select>
-            </div>
-        </div>
-        <button class="btn-grande" style="background:var(--s)" onclick="guardarCompra()">AÑADIR A LA LISTA</button>
-    </div>
-    <div class="filtros-container" id="filtros-tiendas-compras"></div>
-    <div id="lista-compras"></div>
-</div>
+    const notaData = {
+        titulo: document.getElementById('n-titulo').value,
+        texto: valor,
+        contenido: valor,
+        url: document.getElementById('n-url').value,
+        fecha: new Date().toISOString() // Aquí enviamos la fecha
+    };
 
-<div id="vista-PROYECTOS" style="display:none;">
-    <div class="card-form">
-        <h2 style="color:var(--s); text-align:center; margin-top:0;">✨ Nuevo Proyecto</h2>
-        <label>NOMBRE DEL PROYECTO</label>
-        <input type="text" id="p-nombre" placeholder="Ej: Jersey de Invierno">
-        <label>ESTADO</label>
-        <select id="p-estado">
-            <option value="Idea">💡 Idea</option>
-            <option value="En proceso">⏳ En proceso</option>
-            <option value="Terminado">✅ Terminado</option>
-        </select>
-        <label>NOTAS DEL PROYECTO</label>
-        <textarea id="p-notas" placeholder="Patrón, agujas usadas..."></textarea>
-        <label>DIBUJO DEL PUNTO</label>
-        <div class="canvas-container"><canvas id="canvas-punto" class="canvas-base canvas-grid"></canvas></div>
-        <div class="canvas-tools">
-            <button class="btn-tool active" id="tool-pincel-punto" onclick="setTool('canvas-punto', 'pincel')">🖌️ Pincel</button>
-            <button class="btn-tool" id="tool-goma-punto" onclick="setTool('canvas-punto', 'goma')">🧽 Goma</button>
-            <button class="btn-tool" onclick="limpiarCanvas('canvas-punto')">🗑️</button>
-        </div>
-        <label>DISEÑO SOBRE CUERPOS (PLANTILLA TÉCNICA)</label>
-        <div class="canvas-container"><canvas id="canvas-cuerpos" class="canvas-base canvas-cuerpos canvas-largo"></canvas></div>
-        <div class="canvas-tools">
-            <button class="btn-tool active" id="tool-pincel-cuerpos" onclick="setTool('canvas-cuerpos', 'pincel')">🖌️ Pincel</button>
-            <button class="btn-tool" id="tool-goma-cuerpos" onclick="setTool('canvas-cuerpos', 'goma')">🧽 Goma</button>
-            <button class="btn-tool" onclick="limpiarCanvas('canvas-cuerpos')">🗑️</button>
-        </div>
-        <label>FOTO FINAL</label>
-        <input type="file" id="p-archivo" accept="image/*">
-        <button class="btn-grande" style="background:var(--p)" onclick="guardarNuevo('proyecto')">CREAR PROYECTO</button>
-    </div>
-    <div id="lista-proyectos" class="grid-estudio"></div>
-</div>
+    let res;
+    if (id) {
+        res = await client.from('notas').update(notaData).eq('id', id);
+    } else {
+        res = await client.from('notas').insert([notaData]);
+    }
 
-<div id="vista-PDFS" style="display:none;">
-    <div class="card-form" style="border: 2px solid var(--p);">
-        <h2 style="color:var(--s); text-align:center; margin-top:0;">📝 Diseñador de Patrones</h2>
-        
-        <div class="contador-vueltas-mini">
-            <span>🔢 Vuelta: <span id="vueltas-editor">0</span></span>
-            <button onclick="cambiarVueltaEditor(-1)" style="border:none; background:white; border-radius:50%; width:20px; height:20px; cursor:pointer;">-</button>
-            <button onclick="cambiarVueltaEditor(1)" style="border:none; background:white; border-radius:50%; width:20px; height:20px; cursor:pointer;">+</button>
-        </div>
-
-        <label>TÍTULO DEL PATRÓN</label>
-        <input type="text" id="borrador-titulo" placeholder="Ej: Mi primera manta">
-        
-        <label>HERRAMIENTAS</label>
-        <div class="editor-toolbar">
-            <button class="btn-editor" onclick="document.execCommand('bold', false, null)"><b>B</b></button>
-            <button class="btn-editor" onclick="document.execCommand('italic', false, null)"><i>I</i></button>
-            <button class="btn-editor" onclick="document.execCommand('insertUnorderedList', false, null)">• Lista</button>
-            
-            <button class="btn-editor" onclick="document.getElementById('input-foto-editor').click()">🖼️ Subir Foto</button>
-            <input type="file" id="input-foto-editor" accept="image/*" style="display:none" onchange="insertarFotoEnEditor(this)">
-        </div>
-        
-        <div id="borrador-contenido" class="editor-rich" contenteditable="true"></div>
-        
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
-            <button class="btn-grande" style="background:#888; font-size:12px; margin-top:0;" onclick="guardarBorradorLocal()">💾 GUARDAR</button>
-            <button class="btn-grande" style="background:var(--p); font-size:12px; margin-top:0;" onclick="generarPDF()">📥 PDF</button>
-        </div>
-        <button class="btn-grande" style="background:#e74c3c; font-size:12px; margin-top:10px;" onclick="eliminarBorradorTotal()">🗑️ ELIMINAR TODO EL BORRADOR</button>
-    </div>
-
-    <div class="card-form">
-        <h2 style="color:var(--s); text-align:center; margin-top:0;">📂 Biblioteca de PDFs</h2>
-        <label>SUBIR ARCHIVO EXISTENTE</label>
-        <input type="text" id="pdf-nombre" placeholder="Nombre del patrón">
-        <input type="file" id="pdf-archivo" accept=".pdf" style="margin-top:10px;">
-        <button class="btn-grande" style="background:var(--s)" onclick="subirPDF()">SUBIR PDF</button>
-    </div>
-    <div id="lista-pdfs"></div>
-</div>
-
-<div id="vista-REGALOS" style="display:none;">
-    <div class="card-form">
-        <h2 id="titulo-regalo" style="color:var(--s); text-align:center; margin-top:0;">🎁 Regalos y Encargos</h2>
-        <label>¿PARA QUIÉN ES?</label>
-        <input type="text" id="reg-persona" placeholder="Nombre de la persona">
-        <label>¿QUÉ VAS A REGALAR/HACER?</label>
-        <input type="text" id="reg-detalle" placeholder="Ej: Manta de apego">
-        <label>GUSTOS Y PREFERENCIAS</label>
-        <textarea id="reg-preferencias" placeholder="Le gustan los colores pastel..."></textarea>
-        <label>ENLAZAR DISEÑO (PROYECTO)</label>
-        <select id="reg-enlace-proyecto"><option value="">Ninguno</option></select>
-        <label>ENLAZAR PATRÓN PDF</label>
-        <select id="reg-enlace-pdf"><option value="">Ninguno</option></select>
-        <button class="btn-grande" style="background:var(--p)" onclick="guardarRegalo()">AÑADIR AL MAPA</button>
-    </div>
-    <h3 style="color:var(--s); padding-left:10px;">📍 Mapa de Regalos Pendientes</h3>
-    <div id="lista-regalos-pendientes"></div>
-    <h3 style="color:var(--txt); padding-left:10px; margin-top:30px; opacity:0.6;">✅ Entregados (Historial)</h3>
-    <div id="lista-regalos-entregados" style="opacity:0.6;"></div>
-</div>
-
-<div id="vista-NOTAS" style="display:none; position: relative; min-height: 80vh;">
-    <div id="muro-notas" class="muro-grid"></div>
-
-    <button class="fab-nota" onclick="abrirModalNota()">+</button>
-
-    <div id="modal-nota" class="modal-overlay" style="display:none;">
-        <div id="modal-nota-content" class="card-form" style="width: 90%; max-width: 400px;">
-            <h2 id="modal-titulo-accion" style="color:var(--s); text-align:center; margin:0 0 15px 0;">Nueva Nota</h2>
-            <input type="hidden" id="nota-id-edit">
-            <label>TÍTULO (Opcional)</label>
-            <input type="text" id="n-titulo" placeholder="¿De qué trata?">
-            <label>CUERPO DE LA NOTA</label>
-            <textarea id="n-contenido" style="height:150px;" placeholder="Escribe aquí..."></textarea>
-            <label>URL (Youtube / Instagram / Web)</label>
-            <input type="url" id="n-url" placeholder="https://...">
-            
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button class="btn-grande" style="background:#888; margin-top:0;" onclick="cerrarModalNota()">CANCELAR</button>
-                <button id="btn-guardar-nota" class="btn-grande" style="margin-top:0;" onclick="guardarNota()">PEGAR AL MURO</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div id="vista-LLAVES" class="view" style="display:none;">
-    <h2 style="color:var(--s); text-align:center;">🔑 Mis Llaves</h2>
-    
-    <div style="background:var(--b); padding:15px; border-radius:20px; border:1px solid var(--br); margin-bottom:20px;">
-        <input type="text" id="llave-nombre" placeholder="Sitio (Ej: Netflix)" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
-        <input type="text" id="llave-usuario" placeholder="Usuario / Email" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
-        <input type="text" id="llave-pass" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
-        <button onclick="guardarNuevaLlave()" style="width:100%; background:var(--p); color:white; border:none; padding:12px; border-radius:10px; font-weight:bold; cursor:pointer;">
-            ✨ Guardar Nueva Llave
-        </button>
-    </div>
-
-    <div id="lista-llaves"></div>
-</div>
+    if (!res.error) {
+        cerrarModalNota();
+        cargarNotas();
+    } else {
+        // Si el error dice que la columna fecha no existe, la quitamos y reintentamos
+        if (res.error.message.includes("fecha")) {
+            delete notaData.fecha;
+            const res2 = id ? await client.from('notas').update(notaData).eq('id', id) : await client.from('notas').insert([notaData]);
+            if (!res2.error) { cerrarModalNota(); cargarNotas(); }
+        } else {
+            alert("Error: " + res.error.message);
+        }
+    }
+}
 <script>
     const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
     const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
