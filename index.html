@@ -447,7 +447,6 @@
 
 <div id="vista-NOTAS" style="display:none; position: relative; min-height: 80vh;">
     <div id="muro-notas" class="muro-grid"></div>
-
     <button class="fab-nota" onclick="abrirModalNota()">+</button>
 
     <div id="modal-nota" class="modal-overlay" style="display:none;">
@@ -1195,32 +1194,26 @@ async function cargarNotas() {
     if (!muro) return;
     muro.innerHTML = '<p style="text-align:center; opacity:0.5;">Abriendo mural...</p>';
 
-    // Ahora que la tabla es nueva, el orden por fecha funcionará perfecto
     const { data, error } = await client.from('notas').select('*').order('fecha', { ascending: false });
 
-    if (error) {
-        console.error("Error Supabase:", error.message);
-        muro.innerHTML = '<p>Error al conectar. Revisa la tabla.</p>';
-        return;
-    }
+    if (error) return console.error(error.message);
 
     muro.innerHTML = '';
-    const colores = ['p-rosa', 'p-crema', 'p-melocoton'];
+    const colores = ['p-rosa', 'p-crema', 'p-naranja'];
 
     data.forEach((n, index) => {
-        const colorClass = colores[index % colores.length];
         const div = document.createElement('div');
-        div.className = `post-it ${colorClass}`;
-        // Rotación para el efecto "pegado a mano"
-        div.style.transform = `rotate(${(index % 2 === 0 ? 2 : -2)}deg)`;
+        div.className = `post-it ${colores[index % 3]}`;
+        div.style.transform = `rotate(${(index % 2 === 0 ? 1.5 : -1.5)}deg)`;
         
         div.onclick = () => abrirModalNota(n.id, n.titulo, n.contenido, n.url);
         
         div.innerHTML = `
             <div>
                 <h3 style="margin:0 0 8px 0; font-size:1rem;">${n.titulo || '📌'}</h3>
-                <p style="margin:0; font-size:0.85rem; line-height:1.2;">${n.contenido || ''}</p>
+                <p style="margin:0; font-size:0.85rem; line-height:1.4;">${n.contenido || ''}</p>
             </div>
+            ${n.url ? '<span style="position:absolute; bottom:10px; right:10px; font-size:14px;">🔗</span>' : ''}
             <button onclick="event.stopPropagation(); eliminarNota('${n.id}')" style="position:absolute; top:5px; right:5px; background:none; border:none; opacity:0.2; cursor:pointer;">✕</button>
         `;
         muro.appendChild(div);
@@ -1233,13 +1226,12 @@ async function guardarNota() {
 
     const notaData = {
         titulo: document.getElementById('n-titulo').value,
-        contenido: valorContenido,
-        texto: valorContenido, // Rellenamos ambos campos para máxima seguridad
+        contenido: valorContenido, // Usamos contenido para que coincida con Supabase
         url: document.getElementById('n-url').value,
         fecha: new Date().toISOString()
     };
 
-    if (!notaData.titulo && !valorContenido) return alert("Escribe algo antes de guardar.");
+    if (!valorContenido) return alert("¡Escribe algo en la nota!");
 
     let res;
     if (id) {
@@ -1255,7 +1247,6 @@ async function guardarNota() {
         alert("Error al guardar: " + res.error.message);
     }
 }
-
 async function eliminarNota(id) {
     if (confirm("¿Quieres arrancar este post-it del muro?")) {
         const { error } = await client.from('notas').delete().eq('id', id);
