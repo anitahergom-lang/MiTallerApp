@@ -8,7 +8,7 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-    <style>
+<style>
         :root { 
             --p: #ff85a2; --pc: #fce4ec; --s: #f06292; --f: #fcf8f9; --b: #ffffff; --br: #f1e1e5; --txt: #444; 
         }
@@ -78,6 +78,7 @@
         .preferencias-box { font-size: 12px; font-style: italic; color: var(--s); margin-top: 5px; padding: 5px; background: var(--pc); border-radius: 8px; }
         .enlace-tag { display: inline-block; padding: 2px 8px; background: var(--p); color: white; border-radius: 10px; font-size: 10px; margin-right: 5px; margin-top: 5px; }
 
+        /* ESTILOS RESCATADOS SECCIÓN NOTAS */
         .editor-rich { background: var(--f); border: 1px solid var(--br); border-radius: 10px; min-height: 200px; padding: 12px; outline: none; margin-top: 5px; color: var(--txt); overflow-y: auto; }
         .editor-rich img { max-width: 100%; border-radius: 10px; margin: 10px 0; }
         .editor-toolbar { display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; background: var(--pc); padding: 5px; border-radius: 10px; }
@@ -390,15 +391,12 @@
 
 <div id="vista-NOTAS" style="display:none;">
     <div class="card-form">
-        <h2 style="color:var(--s); margin-top:0;">
-    Mis Notas 
-    <span style="cursor:pointer; font-size:0.8em;" onclick="alert('Selecciona una nota de la lista de abajo pulsando el botón verde MODIFICAR para editarla.')">✏️</span>
-</h2>
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">📝 Notas y Recordatorios</h2>
         <label>TÍTULO</label>
         <input type="text" id="n-titulo" placeholder="Ej: Ideas para colcha">
         <label>CONTENIDO</label>
         <textarea id="n-contenido" style="height:120px;" placeholder="Escribe aquí tus ideas..."></textarea>
-        <button class="btn-grande" style="background:var(--s)" onclick="guardarNota()">GUARDAR NOTA</button>
+        <button class="btn-grande" style="background:#2ecc71" onclick="guardarNota()">GUARDAR NOTA</button>
     </div>
     <div id="lista-notas"></div>
 </div>
@@ -875,95 +873,42 @@
         selPdf.innerHTML = '<option value="">Ninguno</option>' + pdfsGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
     }
 
+// LÓGICA DE NOTAS RESCATADA AL 100%
 async function cargarNotas() {
-    const { data: notas, error } = await _supabase
-        .from('notas')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        console.error("Error recuperando notas:", error);
-        return;
-    }
-
+    const { data, error } = await client.from('notas').select('*').order('created_at', { ascending: false });
+    if (error) return;
     const lista = document.getElementById('lista-notas');
-    if (!lista) return;
-    
     lista.innerHTML = '';
-
-    notas.forEach(nota => {
+    data.forEach(n => {
         const div = document.createElement('div');
-        div.className = 'card-nota';
+        div.className = 'compra-item'; // Usa la clase de item del código antiguo
         div.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items: flex-start;">
-                <div>
-                    <h3 style="margin:0; color:var(--s);">${nota.titulo}</h3>
-                    <small style="color:#888;">${new Date(nota.created_at).toLocaleDateString()}</small>
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <span id="edit-icon-${nota.id}" style="cursor:pointer; font-size:1.2rem;" title="Editar">✏️</span>
-                    <span onclick="eliminarNota('${nota.id}')" style="cursor:pointer; font-size:1.2rem;" title="Eliminar">🗑️</span>
-                </div>
+            <div style="flex:1;">
+                <h3 style="margin:0; font-size:14px; color:var(--s);">${n.titulo}</h3>
+                <p style="margin:5px 0 0 0; font-size:12px; white-space:pre-wrap;">${n.contenido}</p>
+                <small style="font-size:9px; color:#888;">${new Date(n.created_at).toLocaleDateString()}</small>
             </div>
-            <p style="margin:10px 0; white-space:pre-wrap;">${nota.contenido}</p>
+            <button onclick="eliminarNota('${n.id}')" style="background:none; border:none; color:#e74c3c; cursor:pointer;">🗑️</button>
         `;
         lista.appendChild(div);
-
-        // Vinculamos el clic del lápiz de esta nota específica
-        const elLapiz = document.getElementById(`edit-icon-${nota.id}`);
-        if (elLapiz) {
-            elLapiz.onclick = () => prepararEdicion(nota);
-        }
     });
 }
-    async function guardarNota() {
-        const titulo = document.getElementById('n-titulo').value;
-        const contenido = document.getElementById('n-contenido').value;
 
-        if (!contenido) {
-            alert("Por favor, escribe algo en la nota");
-            return;
-        }
+async function guardarNota() {
+    const titulo = document.getElementById('n-titulo').value;
+    const contenido = document.getElementById('n-contenido').value;
 
-        let error;
+    if (!titulo || !contenido) return alert("Rellena título y contenido");
 
-        // ¿Estamos editando una nota que ya existe?
-        if (window.editandoNotaId) {
-            // MODO EDICIÓN: Sobrescribimos la nota actual
-            const { error: err } = await client
-                .from('notas_data')
-                .update({ titulo, contenido })
-                .eq('id', window.editandoNotaId);
-            error = err;
-        } else {
-            // MODO NUEVO: Creamos una nota desde cero
-            const { error: err } = await client
-                .from('notas_data')
-                .insert([{ titulo, contenido }]);
-            error = err;
-        }
-
-        if (error) {
-            alert("Error al guardar: " + error.message);
-        } else {
-            // SI TODO SALIÓ BIEN, LIMPIAMOS:
-            
-            // 1. Vaciamos las cajas de texto
-            document.getElementById('n-titulo').value = '';
-            document.getElementById('n-contenido').value = '';
-
-            // 2. IMPORTANTE: El botón vuelve a ser el original
-            window.editandoNotaId = null; // Borramos el ID de la memoria
-            const btn = document.querySelector('button[onclick="guardarNota()"]');
-            if (btn) {
-                btn.innerHTML = "Guardar Nota 📝";
-                btn.style.background = "var(--p)"; // Vuelve al rosa original
-            }
-
-            // 3. Recargamos la lista para ver el cambio
-            cargarNotas();
-        }
+    const { error } = await client.from('notas').insert([{ titulo, contenido }]);
+    if (error) {
+        alert("Error al guardar nota");
+    } else {
+        document.getElementById('n-titulo').value = '';
+        document.getElementById('n-contenido').value = '';
+        cargarNotas();
     }
+}
     async function eliminarLlave(id) {
         if (confirm("¿Estás segura de que quieres borrar esta llave?")) {
             const { error } = await client
@@ -1079,8 +1024,11 @@ async function ejecutarGuardadoReal(id) {
         // Sube la pantalla suavemente hasta el formulario
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-async function eliminarNota(id) { if(confirm("¿Borrar nota?")) { await client.from('notas_data').delete().eq('id', id); cargarNotas(); } }
-
+async function eliminarNota(id) {
+    if (!confirm("¿Eliminar esta nota?")) return;
+    const { error } = await client.from('notas').delete().eq('id', id);
+    if (!error) cargarNotas();
+}
     // --- AQUÍ PEGAMOS LAS NUEVAS FUNCIONES ---
 
     function togglePass(id, claveReal) {
