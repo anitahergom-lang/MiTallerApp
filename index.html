@@ -17,348 +17,1257 @@
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--f); color: var(--txt); margin: 0; padding: 15px; padding-bottom: 80px; transition: 0.3s; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .btn-icon { background: var(--pc); border: none; padding: 10px; border-radius: 12px; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .btn-icon:active { transform: scale(0.9); }
+        .menu-secciones { display: flex; gap: 8px; background: var(--b); padding: 8px; border-radius: 50px; position: sticky; top: 10px; z-index: 100; border: 1px solid var(--br); margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow-x: auto; scrollbar-width: none; }
+        .btn-nav { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; color: #888; cursor: pointer; border-radius: 40px; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
+        .btn-nav.active { background: var(--pc); color: var(--s); border: 1px solid var(--p); }
 
-        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
-        .menu-item { background: var(--b); padding: 20px; border-radius: 20px; text-align: center; border: 2px solid var(--br); cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .menu-item:active { transform: scale(0.95); }
-        .menu-item i { font-size: 2.5rem; display: block; margin-bottom: 10px; }
-        .menu-item span { font-weight: 600; font-size: 0.9rem; }
+        .filtros-container { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0 15px 0; scrollbar-width: none; }
+        .btn-filtro { white-space: nowrap; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--br); background: var(--b); color: var(--txt); font-size: 12px; cursor: pointer; font-weight: 600; }
+        .btn-filtro.active { background: var(--p); color: white; border-color: var(--p); }
 
-        .section { display: none; animation: fadeIn 0.3s ease-out; }
-        .active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .search-container { position: relative; margin-bottom: 20px; }
-        .search-input { width: 100%; padding: 15px 45px 15px 15px; border-radius: 15px; border: 2px solid var(--br); background: var(--b); font-size: 1rem; box-sizing: border-box; outline: none; transition: 0.3s; color: var(--txt); }
-        .search-input:focus { border-color: var(--p); box-shadow: 0 0 0 4px var(--pc); }
+        .grid-estudio { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
+        .item-card { background: var(--b); border-radius: 18px; border: 1px solid var(--br); overflow: hidden; position: relative; display: flex; flex-direction: column; min-height: 300px; }
+        .foto-material { width: 100%; height: 110px; object-fit: cover; background: #eee; }
+        .info-material { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; gap: 4px; color: var(--txt); }
         
-        .muro { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-        .post-it { padding: 15px; border-radius: 10px; min-height: 120px; position: relative; cursor: pointer; box-shadow: 3px 3px 10px rgba(0,0,0,0.1); transition: 0.3s; transform: rotate(-1deg); }
-        .post-it:nth-child(even) { transform: rotate(1.5deg); }
-        .post-it:hover { transform: scale(1.05) rotate(0deg); z-index: 10; }
-        .p-rosa { background: #ffc1e3; } .p-azul { background: #c1e3ff; } .p-verde { background: #c1ffda; } .p-amarillo { background: #fffec1; }
+        .info-titulo { font-size: 13px; font-weight: 700; color: var(--s); margin: 0 0 4px 0; line-height: 1.2; display: block; }
+        .info-detalle { font-size: 10px; color: var(--txt) !important; margin: 0; line-height: 1.3; display: block; }
+        .info-label { font-weight: 800; text-transform: uppercase; font-size: 8px; color: var(--s); opacity: 0.8; margin-right: 4px; }
+        .info-notas { font-size: 9px; font-style: italic; color: var(--txt); opacity: 0.8; margin-top: 5px; padding-top: 5px; border-top: 1px dashed var(--br); width: 100%; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
-        .modal-content { background: var(--b); padding: 25px; border-radius: 25px; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        
-        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--br); border-radius: 10px; background: var(--f); color: var(--txt); box-sizing: border-box; font-family: inherit; }
-        
-        .btn-principal { background: var(--p); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        
-        .nav-bottom { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--b); display: flex; justify-content: space-around; padding: 15px 0; border-top: 2px solid var(--br); z-index: 900; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; font-size: 0.7rem; color: #888; }
-        .nav-item.active { color: var(--p); }
-        .nav-item i { font-size: 1.5rem; margin-bottom: 2px; }
+        .btn-edit-float { position: absolute; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.6); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 5; }
+        .btn-delete-float { position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.6); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 5; }
 
-        .stock-card { background: var(--b); padding: 15px; border-radius: 15px; border: 1px solid var(--br); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; }
-        .badge-low { background: #ffebee; color: #c62828; }
-        .badge-ok { background: #e8f5e9; color: #2e7d32; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-top: 5px; }
+        .badge-idea { background: #e2e3e5; color: #383d41; }
+        .badge-proceso { background: #fff3cd; color: #856404; }
+        .badge-listo { background: #d4edda; color: #155724; }
 
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .calc-btn { background: var(--pc); border: none; padding: 15px; border-radius: 10px; font-size: 1.2rem; font-weight: bold; cursor: pointer; color: var(--txt); }
-        .calc-btn.op { background: var(--p); color: white; }
-        #calc-display { grid-column: span 4; background: var(--f); padding: 20px; text-align: right; font-size: 1.5rem; border-radius: 10px; margin-bottom: 10px; border: 2px solid var(--br); }
+        .card-form { background: var(--b); padding: 20px; border-radius: 25px; border: 1px solid var(--br); max-width: 500px; margin: 0 auto; margin-bottom: 20px; }
+        label { display: block; font-size: 11px; color: var(--s); font-weight: 700; margin: 10px 0 4px 4px; }
+        input, select, textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--br); box-sizing: border-box; font-size: 14px; background: var(--f); color: var(--txt); }
+        textarea { height: 80px; resize: none; }
+        .btn-grande { width: 100%; background: var(--p); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; }
+
+        .compra-item { background: var(--b); padding: 15px; border-radius: 18px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--br); }
+        .prio-Alta { border-left: 6px solid #ff4d4d !important; }
+        .prio-Media { border-left: 6px solid #ffcc00 !important; }
+        .prio-Baja { border-left: 6px solid #2ecc71 !important; }
+
+        .canvas-container { background: white; border: 1px solid var(--br); border-radius: 15px; margin-top: 10px; position: relative; overflow: hidden; }
+        .canvas-base { display: block; width: 100%; height: 250px; cursor: crosshair; }
+        .canvas-largo { height: 500px !important; }
+        .canvas-grid { background-image: linear-gradient(to right, rgba(240, 98, 146, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(240, 98, 146, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
+        .canvas-cuerpos { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 600' opacity='0.3'><g fill='none' stroke='%23f06292' stroke-width='1.5'><path d='M100,100 Q100,50 125,50 Q150,50 150,100 L150,150 L180,180 L180,250 L160,400 L170,550 M100,150 L70,180 L70,250 L90,400 L80,550'/><path d='M300,100 Q300,50 325,50 Q350,50 350,100 L350,150 L380,180 L380,250 L360,400 L370,550 M300,150 L270,180 L270,250 L290,400 L280,550'/><path d='M200,80 Q200,40 225,40 Q250,40 250,80 L250,130 L280,160 L280,230 L260,380 L270,530 M200,130 L170,160 L170,230 L190,380 L180,530'/></g></svg>"); background-size: contain; background-repeat: no-repeat; background-position: center; }
+
+        .canvas-tools { display: flex; gap: 5px; margin-top: 5px; margin-bottom: 15px; }
+        .btn-tool { flex: 1; padding: 8px; font-size: 12px; border: 1px solid var(--br); border-radius: 8px; background: var(--b); cursor: pointer; color: var(--txt); }
+        .btn-tool.active { background: var(--pc); border-color: var(--p); color: var(--s); }
+
+        #dark-mode-toggle { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .controles-stock { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--br); }
+        .btn-qty { background: var(--pc); border: none; width: 25px; height: 25px; border-radius: 50%; color: var(--s); font-weight: bold; cursor: pointer; }
+
+        .pdf-item, .regalo-item { background: var(--b); border: 1px solid var(--br); border-radius: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; text-decoration: none; color: var(--txt); transition: 0.2s; }
+        .pdf-item:hover { border-color: var(--p); background: var(--pc); }
+        .pdf-icon, .regalo-icon { font-size: 24px; color: var(--s); }
+        .pdf-info, .regalo-info { flex: 1; }
+        .pdf-nombre, .regalo-nombre { font-weight: 600; font-size: 14px; margin: 0; }
+        .pdf-fecha, .regalo-meta { font-size: 11px; color: #888; margin: 0; }
+        
+        .preferencias-box { font-size: 12px; font-style: italic; color: var(--s); margin-top: 5px; padding: 5px; background: var(--pc); border-radius: 8px; }
+        .enlace-tag { display: inline-block; padding: 2px 8px; background: var(--p); color: white; border-radius: 10px; font-size: 10px; margin-right: 5px; margin-top: 5px; }
+
+       /* ESTILOS DEL MURO DE POST-ITS */
+.muro-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+    padding: 10px;
+}
+
+.post-it {
+    padding: 15px;
+    aspect-ratio: 1 / 1;
+    border-radius: 2px 2px 2px 25px; /* Esquina levantada */
+    position: relative;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    color: #444; /* Texto siempre legible en post-it */
+}
+
+.post-it:hover { transform: scale(1.03) rotate(-1deg); }
+
+/* Colores de Post-its */
+.p-rosa { background: #ffcfd2; }
+.p-crema { background: #fdfcf0; }
+.p-naranja { background: #fde4cf; }
+
+[data-theme="dark"] .post-it {
+    opacity: 0.85;
+    border: 1px solid rgba(255,133,162,0.3);
+}
+
+.post-it h3 { font-size: 14px; margin: 0 0 8px 0; font-weight: 700; text-transform: uppercase; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 5px; }
+.post-it p { font-size: 13px; line-height: 1.4; overflow: hidden; flex-grow: 1; margin: 0; }
+.post-it .url-icon { position: absolute; bottom: 10px; right: 10px; font-size: 18px; }
+
+.fab-nota {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--p);
+    color: white;
+    font-size: 30px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(255,133,162,0.4);
+    z-index: 99;
+    cursor: pointer;
+}
+
+.modal-overlay {
+    position: fixed;
+    top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}        
+        .contador-vueltas-mini { display: flex; align-items: center; gap: 10px; background: var(--s); color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1 style="font-size: 1.5rem; margin: 0;">🌸 Mi Taller Rosa</h1>
-        <button class="btn-icon" onclick="toggleTheme()">🌓</button>
-    </div>
+<button id="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
 
-    <div id="sec-inicio" class="section active">
-        <div class="search-container">
-            <input type="text" class="search-input" placeholder="¿Qué buscas hoy?..." onkeyup="buscadorGlobal(this.value)">
-            <span style="position:absolute; right:15px; top:15px; opacity:0.5;">🔍</span>
-        </div>
-        <div class="menu-grid">
-            <div class="menu-item" onclick="showSection('sec-notas')"><i>📝</i><span>Notas</span></div>
-            <div class="menu-item" onclick="showSection('sec-stock')"><i>📦</i><span>Stock</span></div>
-            <div class="menu-item" onclick="showSection('sec-compras')"><i>🛒</i><span>Lista Compra</span></div>
-            <div class="menu-item" onclick="showSection('sec-calc')"><i>🧮</i><span>Calculadora</span></div>
-        </div>
-    </div>
-<div style="margin-top:30px; background: var(--b); padding: 20px; border-radius: 20px; border: 2px solid var(--br);">
-        <h3>📥 Ingreso de Material</h3>
-        <input type="text" id="st-nombre" placeholder="Nombre del material...">
-        <select id="st-categoria">
-            <option value="lana">Lana</option>
-            <option value="telas">Telas</option>
-            <option value="hilos">Hilos</option>
-            <option value="accesorios">Accesorios</option>
-            <option value="otros">Otros</option>
-        </select>
-        <input type="text" id="st-composicion" placeholder="Composición...">
-        <input type="text" id="st-tienda" placeholder="Tienda donde se compró...">
-        <input type="text" id="st-grosor" placeholder="Grosor (mm, fingering...)">
-        <input type="text" id="st-longitud" placeholder="Longitud (metros/gramos)">
-        <textarea id="st-notas" placeholder="Notas adicionales sobre el material..."></textarea>
-        <input type="text" id="st-foto" placeholder="URL de la foto del material...">
-        <button class="btn-principal" onclick="guardarStock()">💾 Guardar Stock</button>
-    </div>
+<div class="menu-secciones">
+    <button class="btn-nav active" id="nav-INICIO" onclick="cambiarVista('INICIO')">🏠 INICIO</button>
+    <button class="btn-nav" id="nav-STOCK" onclick="cambiarVista('STOCK')">📦 STOCK</button>
+    <button class="btn-nav" id="nav-CAPRICHOS" onclick="cambiarVista('CAPRICHOS')">💸 Mis Caprichos</button>
+    <button class="btn-nav" id="nav-COMPRAS" onclick="cambiarVista('COMPRAS')">🛒 COMPRAS</button>
+    <button class="btn-nav" id="nav-PROYECTOS" onclick="cambiarVista('PROYECTOS')">🎨 PROYECTOS</button>
+    <button class="btn-nav" id="nav-PDFS" onclick="cambiarVista('PDFS')">📂 PDFs</button>
+    <button class="btn-nav" id="nav-REGALOS" onclick="cambiarVista('REGALOS')">🎁 REGALOS</button>
+    <button class="btn-nav" id="nav-NOTAS" onclick="cambiarVista('NOTAS')">📝 NOTAS</button>
+    <button class="btn-nav" id="nav-LLAVES" onclick="cambiarVista('LLAVES')">🔑 LLAVES</button>
+</div>
 
-    <div id="sec-stock" class="section">
-        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <button class="btn-icon" onclick="showSection('sec-inicio')">⬅️</button>
-            <h2 style="margin:0;">📦 Mi Stock</h2>
-            <div></div>
-        </div>
-
-        <div style="display:flex; gap:10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px;">
-            <button class="btn-icon" style="font-size:0.8rem; white-space:nowrap;" onclick="cargarStock('todos')">Todo</button>
-            <button class="btn-icon" style="font-size:0.8rem; white-space:nowrap;" onclick="cargarStock('lana')">Lanas</button>
-            <button class="btn-icon" style="font-size:0.8rem; white-space:nowrap;" onclick="cargarStock('telas')">Telas</button>
-            <button class="btn-icon" style="font-size:0.8rem; white-space:nowrap;" onclick="cargarStock('hilos')">Hilos</button>
-            <button class="btn-icon" style="font-size:0.8rem; white-space:nowrap;" onclick="cargarStock('accesorios')">Accesorios</button>
-            <button class="btn-icon" style="font-size:0.8rem; white-space:nowrap;" onclick="cargarStock('otros')">Otros</button>
-        </div>
-
-        <div id="lista-stock">
-            </div>
-    </div>
-
-    <div id="sec-caprichos" class="section">
-        <button class="btn-icon" onclick="showSection('sec-inicio')">⬅️ Volver al Inicio</button>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:20px;">
-            <button class="btn-principal" onclick="abrirSubSeccion('cap-añadir')">➕ Añadir</button>
-            <button class="btn-principal" onclick="abrirSubSeccion('cap-historial')">📜 Mi Historial</button>
-            <button class="btn-principal" onclick="abrirSubSeccion('cap-termometro')">🌡️ El Termómetro</button>
-            <button class="btn-principal" onclick="abrirSubSeccion('cap-felicidad')">😊 Resumen Felicidad</button>
-        </div>
-<div id="cap-añadir" class="sub-seccion-cap" style="display:none; margin-top:20px; background:var(--b); padding:20px; border-radius:20px; border:2px solid var(--br);">
-            <h3>🛍️ Registrar Nueva Compra</h3>
-            <select id="cap-tipo" onchange="actualizarSubcategorias()">
-                <option value="material">Material</option>
-                <option value="herramientas">Herramientas</option>
-                <option value="formacion">Formación</option>
-            </select>
-            <div id="div-subcategoria">
-                <select id="cap-subcategoria">
-                    <option value="lanas">Lanas</option>
-                    <option value="telas">Telas</option>
-                    <option value="hilos">Hilos</option>
-                    <option value="accesorios">Accesorios</option>
-                    <option value="otros">Otros</option>
+<div id="vista-INICIO">
+    <div class="card-form">
+        <h2 id="titulo-formulario" style="color:var(--s); text-align:center; margin-top:0;">📦 Añadir Material</h2>
+        <input type="hidden" id="m-id">
+        <label>NOMBRE DEL MATERIAL</label>
+        <input type="text" id="m-nombre" placeholder="Ej: Lana Merino Azul">
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label>CATEGORÍA</label>
+                <select id="m-categoria">
+                    <option value="Lana">🧶 Lana</option>
+                    <option value="Telas">👗 Telas</option>
+                    <option value="Hilos">🧵 Hilos</option>
+                    <option value="Accesorios">🎀 Accesorios</option>
+                    <option value="Otros">🧸 Otros</option>
                 </select>
             </div>
-            <input type="text" id="cap-nombre" placeholder="Nombre del producto...">
-            <input type="number" id="cap-precio" placeholder="Precio por unidad/ovillo...">
-            <input type="date" id="cap-fecha">
-            <input type="text" id="cap-composicion" placeholder="Composición (solo material)...">
-            <input type="text" id="cap-grosor" placeholder="Grosor (solo material)...">
-            <input type="text" id="cap-foto" placeholder="URL de la foto...">
-            <button class="btn-principal" onclick="registrarCompraCapricho()">💖 Registrar y sincronizar</button>
-        </div>
-
-        <div id="cap-historial" class="sub-seccion-cap" style="display:none; margin-top:20px;">
-            </div>
-
-        <div id="cap-termometro" class="sub-seccion-cap" style="display:none; margin-top:20px;">
-            <div style="background:var(--b); padding:20px; border-radius:20px; border:2px solid var(--br);">
-                <h3>🌡️ Termómetro Mensual</h3>
-                <div id="cont-termometro" style="width:100%; background:#eee; height:30px; border-radius:15px; overflow:hidden;">
-                    <div id="bar-termometro" style="width:0%; height:100%; background:var(--p); transition:0.5s;"></div>
-                </div>
-                <p id="info-gastos" style="text-align:center; margin-top:10px; font-weight:bold;"></p>
+            <div style="width:80px;">
+                <label>CANTIDAD</label>
+                <input type="number" id="m-cantidad" value="1">
             </div>
         </div>
+        <label>🧵 COMPOSICIÓN</label>
+        <input type="text" id="m-composicion" placeholder="Ej: 100% Algodón">
+        <label>📍 TIENDA DONDE SE COMPRÓ</label>
+        <input type="text" id="m-tienda" placeholder="Ej: Mercería del Barrio">
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label>🪡 GROSOR / WPI</label>
+                <input type="text" id="m-grosor" placeholder="Ej: Fingering, 3mm...">
+            </div>
+            <div style="flex:1;">
+                <label>📏 LONGITUD</label>
+                <input type="text" id="m-longitud" placeholder="Ej: 120m / 50g">
+            </div>
+        </div>
+        <label>NOTAS ADICIONALES</label>
+        <textarea id="m-notas" placeholder="Nº de lote, etc..."></textarea>
+        <label>FOTO DEL MATERIAL</label>
+        <input type="file" id="m-archivo" accept="image/*">
+        <button id="btn-accion-stock" class="btn-grande" onclick="guardarNuevo('stock')">GUARDAR EN STOCK</button>
+        <button id="btn-cancelar-edit" class="btn-grande" style="display:none; background:#888" onclick="limpiarFormulario()">CANCELAR EDICIÓN</button>
     </div>
+</div>
 
-    <div id="sec-compras" class="section">
-        <button class="btn-icon" onclick="showSection('sec-inicio')">⬅️</button>
-        <h2>🛒 Lista de la Compra</h2>
-        <div style="background:var(--b); padding:15px; border-radius:20px; border:2px solid var(--br);">
-            <input type="text" id="li-nombre" placeholder="¿Qué necesitas comprar?">
-            <input type="text" id="li-tienda" placeholder="¿En qué tienda?">
-            <select id="li-prioridad">
-                <option value="baja">Prioridad Baja</option>
-                <option value="media">Prioridad Media</option>
-                <option value="alta">¡Urgente! 🔥</option>
+<div id="vista-STOCK" style="display:none;">
+    <div class="filtros-container">
+        <button class="btn-filtro active" id="filtro-Todo" onclick="filtrar('Todo')">✨ Todo</button>
+        <button class="btn-filtro" id="filtro-Lana" onclick="filtrar('Lana')">🧶 Lana</button>
+        <button class="btn-filtro" id="filtro-Telas" onclick="filtrar('Telas')">👗 Telas</button>
+        <button class="btn-filtro" id="filtro-Hilos" onclick="filtrar('Hilos')">🧵 Hilos</button>
+        <button class="btn-filtro" id="filtro-Accesorios" onclick="filtrar('Accesorios')">🎀 Accesorios</button>
+        <button class="btn-filtro" id="filtro-Otros" onclick="filtrar('Otros')">🧸 Otros</button>
+    </div>
+    <div id="lista-stock" class="grid-estudio"></div>
+</div>
+
+<div id="vista-CAPRICHOS" class="vista" style="display:none;">
+    <div class="card">
+        <h2 style="color:var(--p); text-align:center; margin-bottom:20px;">💸 Mis Caprichos</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <button class="btn-nav" onclick="cambiarVistaInterna('AÑADIR_CAPRICHO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                <span style="font-size:2.2em; margin-bottom:5px;">🛍️</span>
+                <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Añadir</span>
+            </button>
+
+            <button class="btn-nav" onclick="cambiarVistaInterna('LISTA_GASTOS')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                <span style="font-size:2.2em; margin-bottom:5px;">📖</span>
+                <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Mi Historial</span>
+            </button>
+
+            <button class="btn-nav" onclick="cambiarVistaInterna('TERMOMETRO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                <span style="font-size:2.2em; margin-bottom:5px;">🌡️</span>
+                <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase; text-align:center;">El Termómetro<br>Rosa</span>
+            </button>
+
+            <button class="btn-nav" onclick="cambiarVistaInterna('FELICIDAD')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                <span style="font-size:2.2em; margin-bottom:5px;">✨</span>
+                <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Felicidad</span>
+            </button>
+        </div>
+
+        <button class="btn-nav" onclick="cambiarVista('INICIO')" style="width:100%; margin-top:25px; background:var(--p); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; cursor:pointer;">
+            🏠 Volver al Inicio principal
+        </button>
+    </div>
+</div>
+
+<div id="vista-AÑADIR_CAPRICHO" class="vista" style="display:none;">
+    <div class="card" style="padding: 20px; max-width: 450px; margin: auto; border: 1px solid var(--br); border-radius: 25px;">
+        <h2 style="color:var(--s); text-align:center; margin-top:0; font-size: 1.4em;">🛍️ Registrar Compra</h2>
+        
+        <div style="display: flex; gap: 10px; margin-bottom:12px;">
+            <select id="capricho-tipo-general" onchange="mostrarSubcategorias(this.value)" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px; background:var(--pc); font-size:0.9em; outline:none;">
+                <option value="">✨ Categoría...</option>
+                <option value="Material">🧶 Material</option>
+                <option value="Herramienta">🛠️ Herramienta</option>
+                <option value="Formacion">📚 Formación</option>
             </select>
-            <button class="btn-principal" onclick="añadirALista()">➕ Añadir a la lista</button>
-        </div>
-        <div id="contenedor-lista-compra" style="margin-top:20px;"></div>
-    </div>
-
-    <div id="sec-notas" class="section">
-        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <button class="btn-icon" onclick="showSection('sec-inicio')">⬅️</button>
-            <h2 style="margin:0;">📝 Mural de Ideas</h2>
-            <button class="btn-icon" onclick="abrirModalNota()" style="background:var(--p); color:white;">➕</button>
-        </div>
-        <div id="muro-notas" class="muro">
-            </div>
-    </div>
-<div id="sec-calc" class="section">
-        <button class="btn-icon" onclick="showSection('sec-inicio')">⬅️ Volver</button>
-        <div style="max-width:320px; margin: 20px auto; background:var(--b); padding:20px; border-radius:25px; border:2px solid var(--br);">
-            <div id="calc-display">0</div>
-            <div class="calc-grid">
-                <button class="calc-btn" onclick="clearCalc()" style="grid-column: span 2; background:#ffcdd2;">C</button>
-                <button class="calc-btn op" onclick="appendCalc('/')">÷</button>
-                <button class="calc-btn op" onclick="appendCalc('*')">×</button>
-                <button class="calc-btn" onclick="appendCalc('7')">7</button>
-                <button class="calc-btn" onclick="appendCalc('8')">8</button>
-                <button class="calc-btn" onclick="appendCalc('9')">9</button>
-                <button class="calc-btn op" onclick="appendCalc('-')">-</button>
-                <button class="calc-btn" onclick="appendCalc('4')">4</button>
-                <button class="calc-btn" onclick="appendCalc('5')">5</button>
-                <button class="calc-btn" onclick="appendCalc('6')">6</button>
-                <button class="calc-btn op" onclick="appendCalc('+')">+</button>
-                <button class="calc-btn" onclick="appendCalc('1')">1</button>
-                <button class="calc-btn" onclick="appendCalc('2')">2</button>
-                <button class="calc-btn" onclick="appendCalc('3')">3</button>
-                <button class="calc-btn op" onclick="calculate()">=</button>
-                <button class="calc-btn" style="grid-column: span 2;" onclick="appendCalc('0')">0</button>
-                <button class="calc-btn" onclick="appendCalc('.')">.</button>
+            <div id="div-subcategoria" style="flex:1; display:none;">
+                <select id="capricho-subtipo" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; font-size:0.9em;">
+                    <option value="Lanas">🧶 Lanas</option>
+                    <option value="Telas">👗 Telas</option>
+                    <option value="Hilos">🧵 Hilos</option>
+                    <option value="Accesorios">🎀 Accesorios</option>
+                    <option value="Otros">🧸 Otros</option>
+                </select>
             </div>
         </div>
-    </div>
 
-    <div class="nav-bottom">
-        <div class="nav-item active" onclick="showSection('sec-inicio')"><i>🏠</i><span>Inicio</span></div>
-        <div class="nav-item" onclick="showSection('sec-stock')"><i>📦</i><span>Stock</span></div>
-        <div class="nav-item" onclick="showSection('sec-notas')"><i>📝</i><span>Notas</span></div>
-        <div class="nav-item" onclick="showSection('sec-calc')"><i>🧮</i><span>Calc</span></div>
-    </div>
+        <div style="margin-bottom:12px;">
+            <input type="text" id="capricho-nombre" placeholder="✏️ Nombre del material" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; box-sizing: border-box;">
+        </div>
 
-    <div id="modal-nota" class="modal">
-        <div class="modal-content">
-            <h3 id="modal-nota-titulo">📌 Pegar Nota</h3>
-            <input type="hidden" id="nota-id-edit">
-            <input type="text" id="n-titulo" placeholder="Título (opcional)">
-            <textarea id="n-contenido" rows="5" placeholder="Escribe tu nota aquí..."></textarea>
-            <input type="text" id="n-url" placeholder="URL (YouTube, Instagram...)">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button class="btn-principal" onclick="guardarNota()">💾 Pegar</button>
-                <button class="btn-principal" style="background:#ccc; color:#333;" onclick="cerrarModalNota()">Cancelar</button>
-            </div>
+        <div style="display: flex; gap: 10px; margin-bottom:12px;">
+            <input type="text" id="capricho-grosor" placeholder="🪡 Grosor" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px;">
+            <input type="text" id="capricho-longitud" placeholder="📏 Longitud" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px;">
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom:12px;">
+            <input type="text" id="capricho-tienda" placeholder="📍 Tienda" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px;">
+            <input type="text" id="capricho-composicion" placeholder="🧵 Composición" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px;">
+        </div>
+
+<div style="background: var(--pc); padding: 12px; border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--p);">
+    <div style="display: flex; gap: 8px; align-items: flex-end;">
+        <div style="flex:1;">
+            <label style="display:block; font-size:0.7em; font-weight:bold; color:var(--s); margin-bottom:4px;">Precio Total €</label>
+            <input type="number" id="capricho-precio" step="0.01" placeholder="0.00" style="width:100%; padding:8px; border:none; border-radius:8px; background: var(--b); color: var(--txt);">
+        </div>
+        <div style="flex:0.7;">
+            <label style="display:block; font-size:0.7em; font-weight:bold; color:var(--s); margin-bottom:4px;">Cant.</label>
+            <input type="number" id="capricho-cantidad" value="1" style="width:100%; padding:8px; border:none; border-radius:8px; background: var(--b); color: var(--txt);">
+        </div>
+        <div style="flex:1.3;">
+            <label style="display:block; font-size:0.7em; font-weight:bold; color:var(--s); margin-bottom:4px;">Fecha</label>
+            <input type="date" id="capricho-fecha" style="width:100%; padding:7px; border:none; border-radius:8px; background: var(--b); color: var(--txt); font-size:0.8em;">
         </div>
     </div>
+</div>
 
-    <script>
-        // CONFIGURACIÓN SUPABASE - USA TUS PROPIAS CLAVES
-        const supabaseUrl = 'TU_URL_AQUÍ';
-        const supabaseKey = 'TU_KEY_AQUÍ';
-        const client = supabase.createClient(supabaseUrl, supabaseKey);
+        <textarea id="capricho-notas" placeholder="📝 Notas adicionales..." rows="2" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; box-sizing: border-box; margin-bottom:15px; font-family:inherit;"></textarea>
 
-        function showSection(id) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+<div style="margin-top: 15px; margin-bottom: 20px;">
+            <label style="display: block; color: #f06292; font-weight: bold; font-size: 0.8em; margin-bottom: 8px; text-transform: uppercase; font-family: sans-serif;">
+                FOTO DEL MATERIAL
+            </label>
             
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            if(id === 'sec-inicio') document.querySelectorAll('.nav-item')[0].classList.add('active');
-            if(id === 'sec-stock') { document.querySelectorAll('.nav-item')[1].classList.add('active'); cargarStock('todos'); }
-            if(id === 'sec-notas') { document.querySelectorAll('.nav-item')[2].classList.add('active'); cargarNotas(); }
-            if(id === 'sec-calc') document.querySelectorAll('.nav-item')[3].classList.add('active');
-        }
+            <input type="file" id="capricho-foto" accept="image/*" onchange="previsualizarImagenCapricho(event)" 
+                   style="font-size: 0.9em; color: var(--txt); width: 100%; font-family: inherit; cursor: pointer;">
 
-        function toggleTheme() {
-            const current = document.documentElement.getAttribute('data-theme');
-            const target = current === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', target);
-            localStorage.setItem('tema-preferido', target);
-        }
-// --- LÓGICA DE NOTAS (CORREGIDA) ---
-        async function cargarNotas() {
-            const muro = document.getElementById('muro-notas');
-            if (!muro) return;
-            muro.innerHTML = '<p style="text-align:center; opacity:0.5;">Cargando mural...</p>';
+            <img id="capricho-img-preview" style="width: 100px; height: 100px; object-fit: cover; border-radius: 12px; margin-top: 10px; display: none; border: 1px solid var(--br);">
+        </div>
 
-            // Corregido: ordenamos por la columna 'fecha'
-            const { data, error } = await client.from('notas').select('*').order('fecha', { ascending: false });
+        <button class="btn-api" onclick="procesarGuardadoCapricho()" style="width:100%; background:var(--s); color:white; margin-bottom:10px; border:none; padding:14px; border-radius:12px; font-weight:bold; cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            💖 Registrar Capricho
+        </button>
+
+        <button class="btn-nav" onclick="volverMenuCaprichos()" style="width:100%; background:none; color:var(--s); border:1px solid var(--s); padding:10px; border-radius:12px; cursor:pointer; font-size:0.9em; font-weight:bold;">
+            ⬅️ Volver
+        </button>
+    </div>
+</div>
+    
+<div id="vista-COMPRAS" style="display:none;">
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">🛒 Lista de Compras</h2>
+        <input type="text" id="c-nombre" placeholder="¿Qué necesitas comprar?">
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label>TIENDA</label>
+                <input type="text" id="c-tienda" placeholder="Ej: Mercería Ana">
+            </div>
+            <div style="flex:1;">
+                <label>PRIORIDAD</label>
+                <select id="c-prioridad">
+                    <option value="Alta">🔴 Alta</option>
+                    <option value="Media">🟡 Media</option>
+                    <option value="Baja">🟢 Baja</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-grande" style="background:var(--s)" onclick="guardarCompra()">AÑADIR A LA LISTA</button>
+    </div>
+    <div class="filtros-container" id="filtros-tiendas-compras"></div>
+    <div id="lista-compras"></div>
+</div>
+
+<div id="vista-PROYECTOS" style="display:none;">
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">✨ Nuevo Proyecto</h2>
+        <label>NOMBRE DEL PROYECTO</label>
+        <input type="text" id="p-nombre" placeholder="Ej: Jersey de Invierno">
+        <label>ESTADO</label>
+        <select id="p-estado">
+            <option value="Idea">💡 Idea</option>
+            <option value="En proceso">⏳ En proceso</option>
+            <option value="Terminado">✅ Terminado</option>
+        </select>
+        <label>NOTAS DEL PROYECTO</label>
+        <textarea id="p-notas" placeholder="Patrón, agujas usadas..."></textarea>
+        <label>DIBUJO DEL PUNTO</label>
+        <div class="canvas-container"><canvas id="canvas-punto" class="canvas-base canvas-grid"></canvas></div>
+        <div class="canvas-tools">
+            <button class="btn-tool active" id="tool-pincel-punto" onclick="setTool('canvas-punto', 'pincel')">🖌️ Pincel</button>
+            <button class="btn-tool" id="tool-goma-punto" onclick="setTool('canvas-punto', 'goma')">🧽 Goma</button>
+            <button class="btn-tool" onclick="limpiarCanvas('canvas-punto')">🗑️</button>
+        </div>
+        <label>DISEÑO SOBRE CUERPOS (PLANTILLA TÉCNICA)</label>
+        <div class="canvas-container"><canvas id="canvas-cuerpos" class="canvas-base canvas-cuerpos canvas-largo"></canvas></div>
+        <div class="canvas-tools">
+            <button class="btn-tool active" id="tool-pincel-cuerpos" onclick="setTool('canvas-cuerpos', 'pincel')">🖌️ Pincel</button>
+            <button class="btn-tool" id="tool-goma-cuerpos" onclick="setTool('canvas-cuerpos', 'goma')">🧽 Goma</button>
+            <button class="btn-tool" onclick="limpiarCanvas('canvas-cuerpos')">🗑️</button>
+        </div>
+        <label>FOTO FINAL</label>
+        <input type="file" id="p-archivo" accept="image/*">
+        <button class="btn-grande" style="background:var(--p)" onclick="guardarNuevo('proyecto')">CREAR PROYECTO</button>
+    </div>
+    <div id="lista-proyectos" class="grid-estudio"></div>
+</div>
+
+<div id="vista-PDFS" style="display:none;">
+    <div class="card-form" style="border: 2px solid var(--p);">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">📝 Diseñador de Patrones</h2>
+        
+        <div class="contador-vueltas-mini">
+            <span>🔢 Vuelta: <span id="vueltas-editor">0</span></span>
+            <button onclick="cambiarVueltaEditor(-1)" style="border:none; background:white; border-radius:50%; width:20px; height:20px; cursor:pointer;">-</button>
+            <button onclick="cambiarVueltaEditor(1)" style="border:none; background:white; border-radius:50%; width:20px; height:20px; cursor:pointer;">+</button>
+        </div>
+
+        <label>TÍTULO DEL PATRÓN</label>
+        <input type="text" id="borrador-titulo" placeholder="Ej: Mi primera manta">
+        
+        <label>HERRAMIENTAS</label>
+        <div class="editor-toolbar">
+            <button class="btn-editor" onclick="document.execCommand('bold', false, null)"><b>B</b></button>
+            <button class="btn-editor" onclick="document.execCommand('italic', false, null)"><i>I</i></button>
+            <button class="btn-editor" onclick="document.execCommand('insertUnorderedList', false, null)">• Lista</button>
+            
+            <button class="btn-editor" onclick="document.getElementById('input-foto-editor').click()">🖼️ Subir Foto</button>
+            <input type="file" id="input-foto-editor" accept="image/*" style="display:none" onchange="insertarFotoEnEditor(this)">
+        </div>
+        
+        <div id="borrador-contenido" class="editor-rich" contenteditable="true"></div>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
+            <button class="btn-grande" style="background:#888; font-size:12px; margin-top:0;" onclick="guardarBorradorLocal()">💾 GUARDAR</button>
+            <button class="btn-grande" style="background:var(--p); font-size:12px; margin-top:0;" onclick="generarPDF()">📥 PDF</button>
+        </div>
+        <button class="btn-grande" style="background:#e74c3c; font-size:12px; margin-top:10px;" onclick="eliminarBorradorTotal()">🗑️ ELIMINAR TODO EL BORRADOR</button>
+    </div>
+
+    <div class="card-form">
+        <h2 style="color:var(--s); text-align:center; margin-top:0;">📂 Biblioteca de PDFs</h2>
+        <label>SUBIR ARCHIVO EXISTENTE</label>
+        <input type="text" id="pdf-nombre" placeholder="Nombre del patrón">
+        <input type="file" id="pdf-archivo" accept=".pdf" style="margin-top:10px;">
+        <button class="btn-grande" style="background:var(--s)" onclick="subirPDF()">SUBIR PDF</button>
+    </div>
+    <div id="lista-pdfs"></div>
+</div>
+
+<div id="vista-REGALOS" style="display:none;">
+    <div class="card-form">
+        <h2 id="titulo-regalo" style="color:var(--s); text-align:center; margin-top:0;">🎁 Regalos y Encargos</h2>
+        <label>¿PARA QUIÉN ES?</label>
+        <input type="text" id="reg-persona" placeholder="Nombre de la persona">
+        <label>¿QUÉ VAS A REGALAR/HACER?</label>
+        <input type="text" id="reg-detalle" placeholder="Ej: Manta de apego">
+        <label>GUSTOS Y PREFERENCIAS</label>
+        <textarea id="reg-preferencias" placeholder="Le gustan los colores pastel..."></textarea>
+        <label>ENLAZAR DISEÑO (PROYECTO)</label>
+        <select id="reg-enlace-proyecto"><option value="">Ninguno</option></select>
+        <label>ENLAZAR PATRÓN PDF</label>
+        <select id="reg-enlace-pdf"><option value="">Ninguno</option></select>
+        <button class="btn-grande" style="background:var(--p)" onclick="guardarRegalo()">AÑADIR AL MAPA</button>
+    </div>
+    <h3 style="color:var(--s); padding-left:10px;">📍 Mapa de Regalos Pendientes</h3>
+    <div id="lista-regalos-pendientes"></div>
+    <h3 style="color:var(--txt); padding-left:10px; margin-top:30px; opacity:0.6;">✅ Entregados (Historial)</h3>
+    <div id="lista-regalos-entregados" style="opacity:0.6;"></div>
+</div>
+
+<div id="vista-NOTAS" style="display:none; position: relative; min-height: 80vh;">
+    <div id="muro-notas" class="muro-grid"></div>
+
+    <button class="fab-nota" onclick="abrirModalNota()">+</button>
+
+    <div id="modal-nota" class="modal-overlay" style="display:none;">
+        <div id="modal-nota-content" class="card-form" style="width: 90%; max-width: 400px;">
+            <h2 id="modal-titulo-accion" style="color:var(--s); text-align:center; margin:0 0 15px 0;">Nueva Nota</h2>
+            <input type="hidden" id="nota-id-edit">
+            <label>TÍTULO (Opcional)</label>
+            <input type="text" id="n-titulo" placeholder="¿De qué trata?">
+            <label>CUERPO DE LA NOTA</label>
+            <textarea id="n-contenido" style="height:150px;" placeholder="Escribe aquí..."></textarea>
+            <label>URL (Youtube / Instagram / Web)</label>
+            <input type="url" id="n-url" placeholder="https://...">
+            
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-grande" style="background:#888; margin-top:0;" onclick="cerrarModalNota()">CANCELAR</button>
+                <button id="btn-guardar-nota" class="btn-grande" style="margin-top:0;" onclick="guardarNota()">PEGAR AL MURO</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="vista-LLAVES" class="view" style="display:none;">
+    <h2 style="color:var(--s); text-align:center;">🔑 Mis Llaves</h2>
+    
+    <div style="background:var(--b); padding:15px; border-radius:20px; border:1px solid var(--br); margin-bottom:20px;">
+        <input type="text" id="llave-nombre" placeholder="Sitio (Ej: Netflix)" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
+        <input type="text" id="llave-usuario" placeholder="Usuario / Email" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
+        <input type="text" id="llave-pass" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
+        <button onclick="guardarNuevaLlave()" style="width:100%; background:var(--p); color:white; border:none; padding:12px; border-radius:10px; font-weight:bold; cursor:pointer;">
+            ✨ Guardar Nueva Llave
+        </button>
+    </div>
+
+    <div id="lista-llaves"></div>
+</div>
+<script>
+    const supabaseUrl = 'https://etcdefyqqlmmdzroqilh.supabase.co';
+    const supabaseKey = 'sb_publishable_-swLbYwdrtw7xnWyTFHLnA_zapSeCSP'; 
+    const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    let lanasGlobal = [];
+    let proyectosGlobal = [];
+    let pdfsGlobal = [];
+    let regalosGlobal = [];
+    let comprasGlobal = [];
+    let tiendaFiltradaCompras = 'Todas';
+    let toolsState = { 'canvas-punto': 'pincel', 'canvas-cuerpos': 'pincel' };
+    let vueltasContador = 0;
+
+ function cambiarVista(v) {
+    // 1. Gestionar botones activos
+    document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
+    const navBtn = document.getElementById('nav-' + v);
+    if(navBtn) navBtn.classList.add('active');
+
+    // 2. Esconder todas las vistas principales
+    ['INICIO', 'STOCK', 'COMPRAS', 'PROYECTOS', 'PDFS', 'REGALOS', 'NOTAS', 'LLAVES', 'CAPRICHOS'].forEach(id => {
+        const vista = document.getElementById('vista-' + id);
+        if(vista) vista.style.display = 'none';
+    });
+
+    // 3. NUEVO: Esconder también la sub-vista de añadir de Caprichos para que no se solape
+    const vistaExtra = document.getElementById('vista-AÑADIR_CAPRICHO');
+    if (vistaExtra) vistaExtra.style.display = 'none';
+
+    // 4. Mostrar la vista activa
+    const vistaActiva = document.getElementById('vista-' + v);
+    if(vistaActiva) vistaActiva.style.display = 'block';
+
+    // 5. Cargas específicas de cada sección
+    if(v === 'STOCK') filtrar('Todo');
+    if(v === 'COMPRAS') cargarCompras();
+    if(v === 'PROYECTOS') setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
+    if(v === 'REGALOS') cargarRegalos();
+    if(v === 'PDFS') { cargarPDFs(); cargarBorradorLocal(); }
+    if(v === 'NOTAS') cargarNotas();
+    if(v === 'LLAVES') cargarLlaves();
+}
+
+    function filtrar(cat) {
+        document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('active'));
+        const fBtn = document.getElementById('filtro-' + cat);
+        if(fBtn) fBtn.classList.add('active');
+        if (cat === 'Todo') { renderizarStock(lanasGlobal); } 
+        else { const filtrados = lanasGlobal.filter(m => m.categoria === cat); renderizarStock(filtrados); }
+    }
+
+    async function cargarDatos() {
+        try {
+            const { data: stock } = await client.from('estudio_data').select('*').order('created_at', {ascending: false});
+            lanasGlobal = stock || [];
+            renderizarStock(lanasGlobal);
+            const { data: proy } = await client.from('proyectos_data').select('*').order('created_at', {ascending: false});
+            proyectosGlobal = proy || [];
+            renderizarProyectos(proyectosGlobal);
+            cargarPDFs();
+        } catch (e) { console.error(e); }
+    }
+
+    function renderizarStock(lista) {
+        document.getElementById('lista-stock').innerHTML = lista.map(m => `
+            <div class="item-card">
+                <button class="btn-delete-float" onclick="eliminarStock(${m.id})">✖</button>
+                <button class="btn-edit-float" onclick="cargarEdicion(${m.id})">✏️</button>
+                <img src="${m.contenido || 'https://via.placeholder.com/150?text=Material'}" class="foto-material">
+                <div class="info-material">
+                    <span class="info-titulo">${m.tipo_material}</span>
+                    <div class="info-detalle">🧵 ${m.composicion || 'n/a'}</div>
+                    <div class="info-detalle">🪡 ${m.grosor || 'n/a'}</div>
+                    <div class="info-detalle">📏 ${m.longitud || 'n/a'}</div>
+                    <div class="info-detalle">📍 ${m.tienda || 'n/a'}</div>
+                    ${m.notas ? `<div class="info-notas">📝 ${m.notas}</div>` : ''}
+                    <div class="controles-stock">
+                        <button class="btn-qty" onclick="cambiarStock(${m.id}, -1)">-</button>
+                        <span style="font-weight:bold; font-size:14px;">${m.cantidad}</span>
+                        <button class="btn-qty" onclick="cambiarStock(${m.id}, 1)">+</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function cargarEdicion(id) {
+        const item = lanasGlobal.find(m => m.id === id);
+        if(!item) return;
+        document.getElementById('m-id').value = item.id;
+        document.getElementById('m-nombre').value = item.tipo_material;
+        document.getElementById('m-categoria').value = item.categoria;
+        document.getElementById('m-cantidad').value = item.cantidad;
+        document.getElementById('m-composicion').value = item.composicion || "";
+        document.getElementById('m-tienda').value = item.tienda || "";
+        document.getElementById('m-grosor').value = item.grosor || "";
+        document.getElementById('m-longitud').value = item.longitud || "";
+        document.getElementById('m-notas').value = item.notas || "";
+        document.getElementById('titulo-formulario').innerText = "✏️ Editar Material";
+        document.getElementById('btn-accion-stock').innerText = "ACTUALIZAR MATERIAL";
+        document.getElementById('btn-cancelar-edit').style.display = "block";
+        cambiarVista('INICIO');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function limpiarFormulario() {
+        document.getElementById('m-id').value = "";
+        document.getElementById('m-nombre').value = "";
+        document.getElementById('m-cantidad').value = "1";
+        document.getElementById('m-composicion').value = "";
+        document.getElementById('m-tienda').value = "";
+        document.getElementById('m-grosor').value = "";
+        document.getElementById('m-longitud').value = "";
+        document.getElementById('m-notas').value = "";
+        document.getElementById('m-archivo').value = "";
+        document.getElementById('titulo-formulario').innerText = "📦 Añadir Material";
+        document.getElementById('btn-accion-stock').innerText = "GUARDAR EN STOCK";
+        document.getElementById('btn-cancelar-edit').style.display = "none";
+    }
+
+    async function guardarNuevo(tipo) {
+        const idEdit = document.getElementById('m-id').value;
+        const fileInput = document.getElementById(tipo === 'stock' ? 'm-archivo' : 'p-archivo');
+        let fotoUrl = "";
+
+        try {
+            if(fileInput && fileInput.files[0]) {
+                const f = fileInput.files[0];
+                const name = `${Date.now()}_${f.name}`;
+                const { error: uploadError } = await client.storage.from('fotos-lanas').upload(name, f);
+                if (uploadError) throw new Error("Error al subir foto: " + uploadError.message);
+                else fotoUrl = client.storage.from('fotos-lanas').getPublicUrl(name).data.publicUrl;
+            }
+
+            if(tipo === 'stock') {
+                const nombreVal = document.getElementById('m-nombre').value;
+                if(!nombreVal) throw new Error("Debes poner un nombre al material");
+                const datos = { 
+                    tipo_material: nombreVal, 
+                    categoria: document.getElementById('m-categoria').value, 
+                    cantidad: parseInt(document.getElementById('m-cantidad').value) || 0,
+                    composicion: document.getElementById('m-composicion').value || "",
+                    tienda: document.getElementById('m-tienda').value || "",
+                    grosor: document.getElementById('m-grosor').value || "",
+                    longitud: document.getElementById('m-longitud').value || "",
+                    notas: document.getElementById('m-notas').value || ""
+                };
+                if(fotoUrl) datos.contenido = fotoUrl;
+                if(idEdit) { await client.from('estudio_data').update(datos).eq('id', idEdit); } 
+                else { await client.from('estudio_data').insert([datos]); }
+                limpiarFormulario();
+            } else {
+                await client.from('proyectos_data').insert([{
+                    nombre: document.getElementById('p-nombre').value,
+                    estado: document.getElementById('p-estado').value,
+                    notas: document.getElementById('p-notas').value,
+                    foto: fotoUrl || null
+                }]);
+            }
+            alert("¡Guardado correctamente! 💖");
+            await cargarDatos();
+            cambiarVista(tipo === 'stock' ? 'STOCK' : 'PROYECTOS');
+        } catch (err) { alert("Error al guardar: " + err.message); }
+    }
+
+    async function guardarCompra() {
+        const nombre = document.getElementById('c-nombre').value;
+        const tienda = document.getElementById('c-tienda').value || 'General';
+        const prioridad = document.getElementById('c-prioridad').value;
+        if(!nombre) return alert("Escribe qué necesitas comprar 🎀");
+        await client.from('compras_data').insert([{ nombre, tienda, prioridad, completado: false }]);
+        document.getElementById('c-nombre').value = "";
+        cargarCompras();
+    }
+
+    async function cargarCompras() {
+        const { data } = await client.from('compras_data').select('*').order('created_at', {ascending: false});
+        comprasGlobal = data || [];
+        renderizarFiltrosCompras();
+        renderizarListaCompras();
+    }
+
+    function renderizarFiltrosCompras() {
+        const tiendas = ['Todas', ...new Set(comprasGlobal.map(c => c.tienda))];
+        document.getElementById('filtros-tiendas-compras').innerHTML = tiendas.map(t => `
+            <button class="btn-filtro ${tiendaFiltradaCompras === t ? 'active' : ''}" onclick="filtrarTiendaCompra('${t}')">${t}</button>
+        `).join('');
+    }
+
+    function filtrarTiendaCompra(t) {
+        tiendaFiltradaCompras = t;
+        renderizarFiltrosCompras();
+        renderizarListaCompras();
+    }
+
+    function renderizarListaCompras() {
+        const filtradas = tiendaFiltradaCompras === 'Todas' ? comprasGlobal : comprasGlobal.filter(c => c.tienda === tiendaFiltradaCompras);
+        document.getElementById('lista-compras').innerHTML = filtradas.map(c => `
+            <div class="compra-item prio-${c.prioridad}" style="${c.completado ? 'opacity:0.5; text-decoration:line-through;' : ''}">
+                <div>
+                    <strong style="color:var(--s);">${c.nombre}</strong><br>
+                    <small>📍 ${c.tienda}</small>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="toggleCompra(${c.id}, ${c.completado})" style="border:none; background:transparent; font-size:20px; cursor:pointer;">${c.completado ? '🔄' : '✅'}</button>
+                    <button onclick="eliminarCompra(${c.id})" style="border:none; background:transparent; font-size:20px; cursor:pointer;">🗑️</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function toggleCompra(id, estado) { await client.from('compras_data').update({ completado: !estado }).eq('id', id); cargarCompras(); }
+    async function eliminarCompra(id) { if(confirm("¿Borrar de la lista?")) { await client.from('compras_data').delete().eq('id', id); cargarCompras(); } }
+
+    function renderizarProyectos(lista) {
+        document.getElementById('lista-proyectos').innerHTML = lista.map(p => `
+            <div class="item-card">
+                <button class="btn-delete-float" onclick="eliminarProyecto(${p.id})">✖</button>
+                <img src="${p.foto || 'https://via.placeholder.com/150?text=Proyecto'}" class="foto-material">
+                <div class="info-material">
+                    <span class="info-titulo">${p.nombre}</span>
+                    <span class="badge badge-${p.estado.toLowerCase().replace(' ', '')}">${p.estado}</span>
+                    <div class="info-notas" style="margin-top:10px; border:none; padding:0;">${p.notas || ''}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function eliminarStock(id) { if(confirm("¿Eliminar material?")) { await client.from('estudio_data').delete().eq('id', id); cargarDatos(); } }
+    async function eliminarProyecto(id) { if(confirm("¿Eliminar proyecto?")) { await client.from('proyectos_data').delete().eq('id', id); cargarDatos(); } }
+    async function cambiarStock(id, cambio) {
+        const m = lanasGlobal.find(x => x.id === id);
+        const nuevaCant = Math.max(0, m.cantidad + cambio);
+        await client.from('estudio_data').update({ cantidad: nuevaCant }).eq('id', id);
+        cargarDatos();
+    }
+
+    // FUNCIÓN ACTUALIZADA CON MEMORIA
+    function toggleDarkMode() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        document.getElementById('dark-mode-toggle').innerText = newTheme === 'dark' ? '☀️' : '🌙';
+        localStorage.setItem('tema-preferido', newTheme);
+    }
+
+    function iniciarCanvas(id) {
+        const canvas = document.getElementById(id);
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+        const getPos = e => {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        };
+        const start = e => { drawing = true; const pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); e.preventDefault(); };
+        const end = () => drawing = false;
+        const draw = e => {
+            if (!drawing) return;
+            const pos = getPos(e);
+            if (toolsState[id] === 'goma') { ctx.globalCompositeOperation = 'destination-out'; ctx.lineWidth = 20; } 
+            else { ctx.globalCompositeOperation = 'source-over'; ctx.lineWidth = 3; ctx.strokeStyle = '#f06292'; }
+            ctx.lineCap = 'round'; ctx.lineTo(pos.x, pos.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); e.preventDefault();
+        };
+        canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+        canvas.addEventListener('mousedown', start); canvas.addEventListener('touchstart', start);
+        canvas.addEventListener('mouseup', end); canvas.addEventListener('touchend', end);
+        canvas.addEventListener('mousemove', draw); canvas.addEventListener('touchmove', draw);
+    }
+
+    function setTool(canvasId, tool) {
+        toolsState[canvasId] = tool;
+        const suffix = canvasId.split('-')[1];
+        document.getElementById(`tool-pincel-${suffix}`).classList.toggle('active', tool === 'pincel');
+        document.getElementById(`tool-goma-${suffix}`).classList.toggle('active', tool === 'goma');
+    }
+
+    function limpiarCanvas(id) { const canvas = document.getElementById(id); canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height); }
+
+    async function cargarPDFs() {
+        const { data } = await client.from('pdfs_data').select('*').order('created_at', {ascending: false});
+        pdfsGlobal = data || [];
+        document.getElementById('lista-pdfs').innerHTML = pdfsGlobal.map(p => `
+            <div style="position:relative">
+                <a href="${p.url}" target="_blank" class="pdf-item">
+                    <div class="pdf-icon">📄</div>
+                    <div class="pdf-info">
+                        <p class="pdf-nombre">${p.nombre}</p>
+                        <p class="pdf-fecha">${new Date(p.created_at).toLocaleDateString()}</p>
+                    </div>
+                </a>
+                <button onclick="eliminarPDF(${p.id})" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer;">🗑️</button>
+            </div>
+        `).join('');
+        actualizarSelectsRegalos();
+    }
+
+    async function subirPDF() {
+        const file = document.getElementById('pdf-archivo').files[0];
+        const nombre = document.getElementById('pdf-nombre').value;
+        if(!file || !nombre) return alert("Ponle un nombre y selecciona un PDF");
+        const fileName = `${Date.now()}_${file.name}`;
+        await client.storage.from('patrones_pdf').upload(fileName, file);
+        const { data: urlData } = client.storage.from('patrones_pdf').getPublicUrl(fileName);
+        await client.from('pdfs_data').insert([{ nombre, url: urlData.publicUrl }]);
+        document.getElementById('pdf-nombre').value = ""; document.getElementById('pdf-archivo').value = "";
+        cargarPDFs();
+    }
+
+    async function eliminarPDF(id) { if(confirm("¿Borrar PDF de la biblioteca?")) { await client.from('pdfs_data').delete().eq('id', id); cargarPDFs(); } }
+
+    function cambiarVueltaEditor(v) {
+        vueltasContador = Math.max(0, vueltasContador + v);
+        document.getElementById('vueltas-editor').innerText = vueltasContador;
+        const sel = window.getSelection();
+        if (sel.rangeCount) {
+            const range = sel.getRangeAt(0);
+            const span = document.createElement("span");
+            span.style.color = "var(--s)"; span.style.fontWeight = "bold";
+            span.innerHTML = ` (Vta ${vueltasContador}) `;
+            range.insertNode(span);
+            range.collapse(false);
+        }
+    }
+
+    function insertarFotoEnEditor(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgHtml = `<img src="${e.target.result}" style="max-width:100%; border-radius:10px; margin:10px 0;">`;
+                document.getElementById('borrador-contenido').focus();
+                document.execCommand('insertHTML', false, imgHtml);
+                input.value = "";
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function guardarBorradorLocal() {
+        localStorage.setItem('borrador_patron_titulo', document.getElementById('borrador-titulo').value);
+        localStorage.setItem('borrador_patron_cuerpo', document.getElementById('borrador-contenido').innerHTML);
+        alert("¡Progreso guardado! 💾");
+    }
+
+    function cargarBorradorLocal() {
+        const t = localStorage.getItem('borrador_patron_titulo');
+        const c = localStorage.getItem('borrador_patron_cuerpo');
+        if(t) document.getElementById('borrador-titulo').value = t;
+        if(c) document.getElementById('borrador-contenido').innerHTML = c;
+    }
+
+    function eliminarBorradorTotal() {
+        if(confirm("¿Estás segura? Se borrará todo el texto y el título del diseñador.")) {
+            document.getElementById('borrador-titulo').value = "";
+            document.getElementById('borrador-contenido').innerHTML = "";
+            localStorage.removeItem('borrador_patron_titulo');
+            localStorage.removeItem('borrador_patron_cuerpo');
+            vueltasContador = 0;
+            document.getElementById('vueltas-editor').innerText = "0";
+            alert("Borrador limpiado. ✨");
+        }
+    }
+
+    async function generarPDF() {
+        const titulo = document.getElementById('borrador-titulo').value || 'Sin titulo';
+        const contenido = document.getElementById('borrador-contenido').innerHTML;
+        if(!contenido) return alert("¡Escribe algo primero! 🧶");
+
+        const temp = document.createElement('div');
+        temp.innerHTML = `<div style="padding:40px; font-family:serif; color:#444;"><h1 style="color:#f06292; text-align:center; border-bottom:2px solid #fce4ec; padding-bottom:10px;">${titulo}</h1><div style="margin-top:20px; line-height:1.6;">${contenido}</div></div>`;
+        
+        const opt = { 
+            margin: 10, 
+            filename: `${titulo}.pdf`, 
+            image: { type: 'jpeg', quality: 0.98 }, 
+            html2canvas: { scale: 2 }, 
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+        };
+
+        try {
+            const pdfBlob = await html2pdf().set(opt).from(temp).output('blob');
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(pdfBlob); 
+            link.download = `${titulo}.pdf`; 
+            link.click();
+
+            const fileName = `${Date.now()}_${titulo.replace(/\s+/g, '_')}.pdf`;
+            await client.storage.from('patrones_pdf').upload(fileName, pdfBlob, { contentType: 'application/pdf' });
+            const { data: urlData } = client.storage.from('patrones_pdf').getPublicUrl(fileName);
+            await client.from('pdfs_data').insert([{ nombre: titulo, url: urlData.publicUrl }]);
+
+            alert("¡PDF generado y guardado en tu biblioteca! 💖✨");
+            cargarPDFs();
+        } catch (error) { 
+            console.error(error); 
+            alert("Hubo un error al procesar el PDF."); 
+        }
+    }
+
+    async function cargarRegalos() {
+        const { data } = await client.from('regalos_data').select('*').order('created_at', {ascending: false});
+        regalosGlobal = data || [];
+        renderizarRegalos();
+    }
+
+    function renderizarRegalos() {
+        const pend = regalosGlobal.filter(r => !r.entregado);
+        const entr = regalosGlobal.filter(r => r.entregado);
+        const html = r => `
+            <div class="regalo-item">
+                <div class="regalo-icon">${r.entregado ? '💝' : '🎁'}</div>
+                <div class="regalo-info">
+                    <p class="regalo-nombre">Para: ${r.persona}</p>
+                    <p class="regalo-meta">✨ ${r.detalle}</p>
+                    ${r.preferencias ? `<div class="preferencias-box">${r.preferencias}</div>` : ''}
+                    <div style="margin-top:5px;">
+                        ${r.proyecto_id ? `<span class="enlace-tag">🎨 Proyecto</span>` : ''}
+                        ${r.pdf_id ? `<span class="enlace-tag">📄 PDF</span>` : ''}
+                    </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                    <button onclick="toggleRegalo(${r.id}, ${r.entregado})" style="border:none; background:none; cursor:pointer; font-size:18px;">${r.entregado ? '🔄' : '✅'}</button>
+                    <button onclick="eliminarRegalo(${r.id})" style="border:none; background:none; cursor:pointer; font-size:18px;">🗑️</button>
+                </div>
+            </div>
+        `;
+        document.getElementById('lista-regalos-pendientes').innerHTML = pend.map(html).join('');
+        document.getElementById('lista-regalos-entregados').innerHTML = entr.map(html).join('');
+    }
+
+    async function guardarRegalo() {
+        const persona = document.getElementById('reg-persona').value;
+        const detalle = document.getElementById('reg-detalle').value;
+        if(!persona || !detalle) return alert("Mínimo dime para quién es y qué vas a hacer 🎀");
+        await client.from('regalos_data').insert([{
+            persona, detalle, 
+            preferencias: document.getElementById('reg-preferencias').value,
+            proyecto_id: document.getElementById('reg-enlace-proyecto').value || null,
+            pdf_id: document.getElementById('reg-enlace-pdf').value || null,
+            entregado: false
+        }]);
+        document.getElementById('reg-persona').value = ""; 
+        document.getElementById('reg-detalle').value = ""; 
+        document.getElementById('reg-preferencias').value = "";
+        cargarRegalos();
+    }
+
+    async function toggleRegalo(id, estado) { await client.from('regalos_data').update({ entregado: !estado }).eq('id', id); cargarRegalos(); }
+    async function eliminarRegalo(id) { if(confirm("¿Borrar este regalo?")) { await client.from('regalos_data').delete().eq('id', id); cargarRegalos(); } }
+    
+    function actualizarSelectsRegalos() {
+        const selProy = document.getElementById('reg-enlace-proyecto');
+        const selPdf = document.getElementById('reg-enlace-pdf');
+        selProy.innerHTML = '<option value="">Ninguno</option>' + proyectosGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+        selPdf.innerHTML = '<option value="">Ninguno</option>' + pdfsGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+    }
+
+    async function eliminarLlave(id) {
+        if (confirm("¿Estás segura de que quieres borrar esta llave?")) {
+            const { error } = await client
+                .from('llaves_data')
+                .delete()
+                .eq('id', id);
 
             if (error) {
-                console.error("Error cargando notas:", error);
-                return;
+                alert("Error al borrar: " + error.message);
+            } else {
+                cargarLlaves();
             }
+        }
+    }
+    // Función para mostrar/ocultar contraseña
+    function togglePass(id, claveReal) {
+        const el = document.getElementById('pass-' + id);
+        if (el.innerText === '••••••••') {
+            el.innerText = claveReal;
+        } else {
+            el.innerText = '••••••••';
+        }
+    }
+// --- INICIO DEL BLOQUE DE NOTAS ---
 
-            muro.innerHTML = '';
-            data.forEach((n, index) => {
-                const coloresPostIt = ['p-rosa', 'p-azul', 'p-verde', 'p-amarillo'];
-                const colorClass = coloresPostIt[index % coloresPostIt.length];
-                const div = document.createElement('div');
-                div.className = `post-it ${colorClass}`;
-                
-                // Corregido: lee de 'texto' o de 'contenido' para no perder nada
-                const elTexto = n.texto || n.contenido || '';
-                
-                div.onclick = () => abrirModalNota(n.id, n.titulo, elTexto, n.url);
-                
-                div.innerHTML = `
-                    ${n.titulo ? `<h3>${n.titulo}</h3>` : ''}
-                    <p>${elTexto}</p>
-                    <button onclick="event.stopPropagation(); eliminarNota('${n.id}')" style="position:absolute; top:5px; right:5px; background:none; border:none; opacity:0.2; cursor:pointer;">✕</button>
-                `;
-                muro.appendChild(div);
-            });
+function prepararEdicion(nota) {
+    // 1. Subimos los datos de la nota a los campos de texto
+    document.getElementById('n-titulo').value = nota.titulo;
+    document.getElementById('n-contenido').value = nota.contenido;
+    
+    // 2. Scroll suave hacia arriba para que veas el formulario relleno
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // 3. Gestión de botones
+    // Ocultamos el botón de GUARDAR normal
+    const btnGuardarOriginal = document.querySelector('#vista-NOTAS .btn-grande');
+    if (btnGuardarOriginal) btnGuardarOriginal.style.display = 'none';
+    
+    // Borramos cualquier botón rosa previo para que no se acumulen
+    const btnViejo = document.getElementById('btn-actualizar-nota');
+    if (btnViejo) btnViejo.remove();
+
+    // 4. Creamos el botón ROSA de MODIFICAR
+    const btnRosa = document.createElement('button');
+    btnRosa.id = 'btn-actualizar-nota';
+    btnRosa.className = 'btn-grande';
+    btnRosa.style.background = 'var(--s)'; // Tu rosa corporativo
+    btnRosa.style.marginBottom = '10px';
+    btnRosa.innerHTML = '💖 GUARDAR CAMBIOS ROSA';
+    
+    // Le asignamos la función de guardado real
+    btnRosa.onclick = () => ejecutarGuardadoReal(nota.id);
+
+    // Lo añadimos al formulario
+    document.querySelector('#vista-NOTAS .card-form').appendChild(btnRosa);
+}
+
+async function ejecutarGuardadoReal(id) {
+    const nuevoTit = document.getElementById('n-titulo').value;
+    const nuevoCont = document.getElementById('n-contenido').value;
+
+    if (!nuevoTit || !nuevoCont) {
+        alert('Por favor, rellena ambos campos');
+        return;
+    }
+
+    try {
+        const { error } = await _supabase
+            .from('notas')
+            .update({ titulo: nuevoTit, contenido: nuevoCont })
+            .eq('id', id);
+
+        if (error) throw error;
+
+        alert('✅ Nota modificada con éxito');
+        
+        // Limpiamos los cuadros de texto
+        document.getElementById('n-titulo').value = '';
+        document.getElementById('n-contenido').value = '';
+        
+        // Quitamos el botón rosa y volvemos a mostrar el botón de "Añadir"
+        const btnRosa = document.getElementById('btn-actualizar-nota');
+        if (btnRosa) btnRosa.remove();
+        
+        const btnGuardarNormal = document.querySelector('#vista-NOTAS .btn-grande');
+        if (btnGuardarNormal) btnGuardarNormal.style.display = 'block';
+        
+        // Refrescamos la lista de notas para ver los cambios
+        cargarNotas();
+        
+    } catch (error) {
+        console.error('Error al actualizar:', error);
+        alert('No se pudo guardar la modificación');
+    }
+}
+
+// --- FIN DEL BLOQUE DE NOTAS ---
+    function prepararEdicionLlave(id, nombre, usuario, clave) {
+        document.getElementById('llave-nombre').value = nombre;
+        document.getElementById('llave-usuario').value = usuario;
+        document.getElementById('llave-pass').value = clave;
+        
+        // Guardamos el ID en un lugar "invisible" para saber que estamos editando
+        window.editandoLlaveId = id;
+        
+        // Cambiamos el color y texto del botón rosa para saber que estamos en modo edición
+        const btn = document.querySelector('button[onclick="guardarNuevaLlave()"]');
+        if (btn) {
+            btn.innerText = "Actualizar Llave 🔄";
+            btn.style.background = "#4CAF50"; // Se pone verde para avisar
+        }
+        
+        // Sube la pantalla suavemente hasta el formulario
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- AQUÍ PEGAMOS LAS NUEVAS FUNCIONES ---
+
+    function togglePass(id, claveReal) {
+        const el = document.getElementById('pass-' + id);
+        if (el.innerText === '••••••••') {
+            el.innerText = claveReal;
+        } else {
+            el.innerText = '••••••••';
+        }
+    }
+
+    function prepararEdicionLlave(id, nombre, usuario, clave) {
+        document.getElementById('llave-nombre').value = nombre;
+        document.getElementById('llave-usuario').value = usuario;
+        document.getElementById('llave-pass').value = clave;
+        window.editandoLlaveId = id;
+        const btn = document.querySelector('button[onclick="guardarNuevaLlave()"]');
+        if (btn) {
+            btn.innerText = "Actualizar Llave 🔄";
+            btn.style.background = "#4CAF50"; 
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- AQUÍ EMPIEZA LA QUE YA TENÍAS ---
+
+async function guardarNuevaLlave() {
+        const nombre = document.getElementById('llave-nombre').value;
+        const usuario = document.getElementById('llave-usuario').value;
+        const clave = document.getElementById('llave-pass').value;
+
+        if (!nombre || !clave) {
+            alert("Por favor, rellena al menos el nombre y la contraseña");
+            return;
         }
 
-        async function guardarNota() {
-            const id = document.getElementById('nota-id-edit').value;
-            const valorContenido = document.getElementById('n-contenido').value;
+        let error;
+
+        // Aquí es donde el código decide qué hacer:
+        if (window.editandoLlaveId) {
+            // MODO EDICIÓN: Si hay un ID guardado, actualiza la existente
+            const { error: err } = await client
+                .from('llaves_data')
+                .update({ nombre, usuario, clave })
+                .eq('id', window.editandoLlaveId);
+            error = err;
+        } else {
+            // MODO NUEVO: Si no hay ID, crea una nueva (como hacía antes)
+            const { error: err } = await client
+                .from('llaves_data')
+                .insert([{ nombre, usuario, clave }]);
+            error = err;
+        }
+
+        if (error) {
+            alert("Error al guardar: " + error.message);
+        } else {
+            // Limpiamos las cajitas de texto
+            document.getElementById('llave-nombre').value = '';
+            document.getElementById('llave-usuario').value = '';
+            document.getElementById('llave-pass').value = '';
+
+            // IMPORTANTE: Quitamos el modo edición y devolvemos el botón a su estado original
+            window.editandoLlaveId = null;
+            const btn = document.querySelector('button[onclick="guardarNuevaLlave()"]');
+            if (btn) {
+                btn.innerText = "Guardar Llave 🔑";
+                btn.style.background = "var(--p)"; // Vuelve al rosa
+            }
+
+            cargarLlaves(); 
+        }
+    }
+  // Función para navegar DENTRO de la sección de Caprichos
+// Función para navegar a las sub-secciones
+function cambiarVistaInterna(subSeccion) {
+    document.getElementById('vista-CAPRICHOS').style.display = 'none';
+    const vistaDestino = document.getElementById('vista-' + subSeccion);
+    
+    if (vistaDestino) {
+        vistaDestino.style.display = 'block';
+        // Si es la vista de añadir, ponemos la fecha de hoy por defecto
+        if(subSeccion === 'AÑADIR_CAPRICHO') {
+            document.getElementById('capricho-fecha').valueAsDate = new Date();
+        }
+    } else {
+        alert("¡Próximamente! Estamos preparando " + subSeccion + " 🌸");
+        document.getElementById('vista-CAPRICHOS').style.display = 'block';
+    }
+}
+
+function volverMenuCaprichos() {
+    document.getElementById('vista-AÑADIR_CAPRICHO').style.display = 'none';
+    document.getElementById('vista-CAPRICHOS').style.display = 'block';
+}
+
+function mostrarSubcategorias(valor) {
+    document.getElementById('div-subcategoria').style.display = (valor === 'Material') ? 'block' : 'none';
+}
+
+function previsualizarImagenCapricho(event) {
+    const reader = new FileReader();
+    reader.onload = function() {
+        const output = document.getElementById('capricho-img-preview');
+        const placeholder = document.getElementById('capricho-placeholder');
+        output.src = reader.result;
+        output.style.display = 'block';
+        placeholder.style.display = 'none';
+    }
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+// Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
+async function procesarGuardadoCapricho() {
+    alert("¡Todo listo! En el próximo paso conectaremos esto con Supabase para que cree la tarjeta en Stock automáticamente con sus botones y emojis. 🚀🌸");
+}
+    // --- LÓGICA DEL MURO DE POST-ITS ---
+const coloresPostIt = ['p-rosa', 'p-crema', 'p-naranja'];
+
+function abrirModalNota(id = null, titulo = '', contenido = '', url = '') {
+    document.getElementById('modal-nota').style.display = 'flex';
+    document.getElementById('nota-id-edit').value = id || '';
+    document.getElementById('n-titulo').value = titulo || '';
+    document.getElementById('n-contenido').value = contenido || '';
+    document.getElementById('n-url').value = url || '';
+    document.getElementById('modal-titulo-accion').innerText = id ? 'Editar Nota' : 'Nueva Nota';
+    document.getElementById('btn-guardar-nota').innerText = id ? 'ACTUALIZAR' : 'PEGAR AL MURO';
+}
+
+function cerrarModalNota() {
+    document.getElementById('modal-nota').style.display = 'none';
+}
+
+async function cargarNotas() {
+    // Traemos todo sin filtros para que no haya errores de nombres
+    const { data, error } = await client.from('notas').select('*');
+    
+    if (error) {
+        console.error("Error cargando notas:", error.message);
+        return;
+    }
+
+    const muro = document.getElementById('muro-notas');
+    if (!muro) return;
+    muro.innerHTML = '';
+
+    if (data) {
+        data.forEach((n, index) => {
+            const colorClass = coloresPostIt[index % coloresPostIt.length];
+            const div = document.createElement('div');
+            div.className = `post-it ${colorClass}`;
             
-            const notaData = {
-                titulo: document.getElementById('n-titulo').value,
-                texto: valorContenido,
-                contenido: valorContenido, // Guardamos en ambos para evitar errores de columna
-                url: document.getElementById('n-url').value,
-                fecha: new Date().toISOString() // Añadimos la fecha para el orden
-            };
+            // Usamos 'contenido' o 'texto', lo que tenga datos
+            const contenidoNota = n.contenido || n.texto || '';
+            
+            div.onclick = () => abrirModalNota(n.id, n.titulo, contenidoNota, n.url);
+            
+            div.innerHTML = `
+                ${n.titulo ? `<h3>${n.titulo}</h3>` : ''}
+                <p>${contenidoNota}</p>
+                <button onclick="event.stopPropagation(); eliminarNota('${n.id}')" style="position:absolute; top:5px; right:5px; background:none; border:none; opacity:0.3; font-size:12px; cursor:pointer;">✕</button>
+            `;
+            muro.appendChild(div);
+        });
+    }
+}
+async function guardarNota() {
+    const id = document.getElementById('nota-id-edit').value;
+    const valorContenido = document.getElementById('n-contenido').value;
 
-            if (!notaData.titulo && !valorContenido && !notaData.url) return alert("¡No puedes pegar un post-it vacío!");
+    const notaData = {
+        titulo: document.getElementById('n-titulo').value,
+        contenido: valorContenido, // Guardamos en contenido
+        texto: valorContenido,     // Y también en texto (por si acaso)
+        url: document.getElementById('n-url').value
+    };
 
-            let res;
-            if (id) {
-                res = await client.from('notas').update(notaData).eq('id', id);
-            } else {
-                res = await client.from('notas').insert([notaData]);
-            }
+    if (!notaData.titulo && !valorContenido && !notaData.url) return alert("¡No puedes pegar un post-it vacío!");
 
-            if (!res.error) {
-                cerrarModalNota();
-                cargarNotas();
-            } else {
-                alert("Error al guardar: " + res.error.message);
-            }
+    let respuesta;
+    if (id) {
+        respuesta = await client.from('notas').update(notaData).eq('id', id);
+    } else {
+        respuesta = await client.from('notas').insert([notaData]);
+    }
+
+    if (!respuesta.error) {
+        cerrarModalNota();
+        cargarNotas();
+    } else {
+        alert("Error de Supabase: " + respuesta.error.message);
+    }
+}
+
+async function eliminarNota(id) {
+    if (confirm("¿Quieres arrancar este post-it del muro?")) {
+        const { error } = await client.from('notas').delete().eq('id', id);
+        if (!error) cargarNotas();
+    }
+}
+    // ONLOAD ACTUALIZADO PARA RECUPERAR TEMA
+    window.onload = function() {
+        const temaGuardado = localStorage.getItem('tema-preferido');
+        if (temaGuardado === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            const toggleBtn = document.getElementById('dark-mode-toggle');
+            if(toggleBtn) toggleBtn.innerText = '☀️';
         }
+        cargarDatos();
+    };
+</script>
 
-        function abrirModalNota(id='', tit='', cont='', url='') {
-            document.getElementById('nota-id-edit').value = id;
-            document.getElementById('n-titulo').value = tit;
-            document.getElementById('n-contenido').value = cont;
-            document.getElementById('n-url').value = url;
-            document.getElementById('modal-nota-titulo').innerText = id ? "✏️ Editar Nota" : "📌 Pegar Nota";
-            document.getElementById('modal-nota').style.display = 'flex';
-        }
-
-        function cerrarModalNota() {
-            document.getElementById('modal-nota').style.display = 'none';
-        }
-
-        async function eliminarNota(id) {
-            if (confirm("¿Quieres arrancar este post-it del mural?")) {
-                const { error } = await client.from('notas').delete().eq('id', id);
-                if (!error) cargarNotas();
-            }
-        }
-
-        // --- EL RESTO DE TUS FUNCIONES (SIN TOCAR) ---
-        // Aquí siguen tus funciones de guardarStock(), registrarCompraCapricho(), etc.
-        // Tal cual las tenías en tu archivo original.
-
-        window.onload = function() {
-            const temaGuardado = localStorage.getItem('tema-preferido');
-            if (temaGuardado) {
-                document.documentElement.setAttribute('data-theme', temaGuardado);
-            }
-        };
-    </script>
 </body>
 </html>
-        
