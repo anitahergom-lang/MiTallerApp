@@ -1191,12 +1191,18 @@ function cerrarModalNota() {
 }
 
 async function cargarNotas() {
-    const { data, error } = await client.from('notas').select('*').order('created_at', { ascending: false });
-    if (error) return console.error("Error cargando notas:", error);
+    // Cambiamos 'created_at' por 'fecha' que es la que tienes en Supabase
+    const { data, error } = await client.from('notas').select('*').order('fecha', { ascending: false });
+    
+    if (error) {
+        console.error("Error cargando notas:", error);
+        return;
+    }
 
     const muro = document.getElementById('muro-notas');
     if (!muro) return;
     muro.innerHTML = '';
+    // ... resto del código igual
 
     data.forEach((n, index) => {
         const colorClass = coloresPostIt[index % coloresPostIt.length];
@@ -1225,11 +1231,12 @@ async function guardarNota() {
     const id = document.getElementById('nota-id-edit').value;
     const notaData = {
         titulo: document.getElementById('n-titulo').value,
-        contenido: document.getElementById('n-contenido').value,
-        url: document.getElementById('n-url').value
+        texto: document.getElementById('n-contenido').value, // <-- CAMBIADO: 'texto' en lugar de 'contenido'
+        url: document.getElementById('n-url').value,
+        fecha: new Date().toISOString() // <-- AÑADIDO: para que se guarde la fecha actual
     };
 
-    if (!notaData.titulo && !notaData.contenido && !notaData.url) return alert("¡No puedes pegar un post-it vacío!");
+    if (!notaData.titulo && !notaData.texto && !notaData.url) return alert("¡No puedes pegar un post-it vacío!");
 
     let respuesta;
     if (id) {
