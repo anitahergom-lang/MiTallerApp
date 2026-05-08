@@ -78,12 +78,68 @@
         .preferencias-box { font-size: 12px; font-style: italic; color: var(--s); margin-top: 5px; padding: 5px; background: var(--pc); border-radius: 8px; }
         .enlace-tag { display: inline-block; padding: 2px 8px; background: var(--p); color: white; border-radius: 10px; font-size: 10px; margin-right: 5px; margin-top: 5px; }
 
-        /* ESTILOS RESCATADOS SECCIÓN NOTAS */
-        .editor-rich { background: var(--f); border: 1px solid var(--br); border-radius: 10px; min-height: 200px; padding: 12px; outline: none; margin-top: 5px; color: var(--txt); overflow-y: auto; }
-        .editor-rich img { max-width: 100%; border-radius: 10px; margin: 10px 0; }
-        .editor-toolbar { display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; background: var(--pc); padding: 5px; border-radius: 10px; }
-        .btn-editor { background: var(--b); border: 1px solid var(--br); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; color: var(--txt); }
-        
+       /* ESTILOS DEL MURO DE POST-ITS */
+.muro-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+    padding: 10px;
+}
+
+.post-it {
+    padding: 15px;
+    aspect-ratio: 1 / 1;
+    border-radius: 2px 2px 2px 25px; /* Esquina levantada */
+    position: relative;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    color: #444; /* Texto siempre legible en post-it */
+}
+
+.post-it:hover { transform: scale(1.03) rotate(-1deg); }
+
+/* Colores de Post-its */
+.p-rosa { background: #ffcfd2; }
+.p-crema { background: #fdfcf0; }
+.p-naranja { background: #fde4cf; }
+
+[data-theme="dark"] .post-it {
+    opacity: 0.85;
+    border: 1px solid rgba(255,133,162,0.3);
+}
+
+.post-it h3 { font-size: 14px; margin: 0 0 8px 0; font-weight: 700; text-transform: uppercase; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 5px; }
+.post-it p { font-size: 13px; line-height: 1.4; overflow: hidden; flex-grow: 1; margin: 0; }
+.post-it .url-icon { position: absolute; bottom: 10px; right: 10px; font-size: 18px; }
+
+.fab-nota {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--p);
+    color: white;
+    font-size: 30px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(255,133,162,0.4);
+    z-index: 99;
+    cursor: pointer;
+}
+
+.modal-overlay {
+    position: fixed;
+    top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}        
         .contador-vueltas-mini { display: flex; align-items: center; gap: 10px; background: var(--s); color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
     </style>
 </head>
@@ -389,16 +445,28 @@
     <div id="lista-regalos-entregados" style="opacity:0.6;"></div>
 </div>
 
-<div id="vista-NOTAS" style="display:none;">
-    <div class="card-form">
-        <h2 style="color:var(--s); text-align:center; margin-top:0;">📝 Notas y Recordatorios</h2>
-        <label>TÍTULO</label>
-        <input type="text" id="n-titulo" placeholder="Ej: Ideas para colcha">
-        <label>CONTENIDO</label>
-        <textarea id="n-contenido" style="height:120px;" placeholder="Escribe aquí tus ideas..."></textarea>
-        <button class="btn-grande" style="background:#2ecc71" onclick="guardarNota()">GUARDAR NOTA</button>
+<div id="vista-NOTAS" style="display:none; position: relative; min-height: 80vh;">
+    <div id="muro-notas" class="muro-grid"></div>
+
+    <button class="fab-nota" onclick="abrirModalNota()">+</button>
+
+    <div id="modal-nota" class="modal-overlay" style="display:none;">
+        <div class="card-form nota-modal-content">
+            <h2 id="modal-titulo-accion" style="color:var(--s); text-align:center; margin:0 0 15px 0;">Nueva Nota</h2>
+            <input type="hidden" id="nota-id-edit">
+            <label>TÍTULO (Opcional)</label>
+            <input type="text" id="n-titulo" placeholder="¿De qué trata?">
+            <label>CUERPO DE LA NOTA</label>
+            <textarea id="n-contenido" style="height:150px;" placeholder="Escribe aquí..."></textarea>
+            <label>URL (Youtube / Instagram / Web)</label>
+            <input type="url" id="n-url" placeholder="https://...">
+            
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-grande" style="background:#888; margin-top:0;" onclick="cerrarModalNota()">CANCELAR</button>
+                <button id="btn-guardar-nota" class="btn-grande" style="margin-top:0;" onclick="guardarNota()">PEGAR AL MURO</button>
+            </div>
+        </div>
     </div>
-    <div id="lista-notas"></div>
 </div>
 <div id="vista-LLAVES" class="view" style="display:none;">
     <h2 style="color:var(--s); text-align:center;">🔑 Mis Llaves</h2>
@@ -873,42 +941,6 @@
         selPdf.innerHTML = '<option value="">Ninguno</option>' + pdfsGlobal.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
     }
 
-// LÓGICA DE NOTAS RESCATADA AL 100%
-async function cargarNotas() {
-    const { data, error } = await client.from('notas').select('*').order('created_at', { ascending: false });
-    if (error) return;
-    const lista = document.getElementById('lista-notas');
-    lista.innerHTML = '';
-    data.forEach(n => {
-        const div = document.createElement('div');
-        div.className = 'compra-item'; // Usa la clase de item del código antiguo
-        div.innerHTML = `
-            <div style="flex:1;">
-                <h3 style="margin:0; font-size:14px; color:var(--s);">${n.titulo}</h3>
-                <p style="margin:5px 0 0 0; font-size:12px; white-space:pre-wrap;">${n.contenido}</p>
-                <small style="font-size:9px; color:#888;">${new Date(n.created_at).toLocaleDateString()}</small>
-            </div>
-            <button onclick="eliminarNota('${n.id}')" style="background:none; border:none; color:#e74c3c; cursor:pointer;">🗑️</button>
-        `;
-        lista.appendChild(div);
-    });
-}
-
-async function guardarNota() {
-    const titulo = document.getElementById('n-titulo').value;
-    const contenido = document.getElementById('n-contenido').value;
-
-    if (!titulo || !contenido) return alert("Rellena título y contenido");
-
-    const { error } = await client.from('notas').insert([{ titulo, contenido }]);
-    if (error) {
-        alert("Error al guardar nota");
-    } else {
-        document.getElementById('n-titulo').value = '';
-        document.getElementById('n-contenido').value = '';
-        cargarNotas();
-    }
-}
     async function eliminarLlave(id) {
         if (confirm("¿Estás segura de que quieres borrar esta llave?")) {
             const { error } = await client
@@ -1024,11 +1056,7 @@ async function ejecutarGuardadoReal(id) {
         // Sube la pantalla suavemente hasta el formulario
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-async function eliminarNota(id) {
-    if (!confirm("¿Eliminar esta nota?")) return;
-    const { error } = await client.from('notas').delete().eq('id', id);
-    if (!error) cargarNotas();
-}
+
     // --- AQUÍ PEGAMOS LAS NUEVAS FUNCIONES ---
 
     function togglePass(id, claveReal) {
@@ -1144,6 +1172,85 @@ function previsualizarImagenCapricho(event) {
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
 async function procesarGuardadoCapricho() {
     alert("¡Todo listo! En el próximo paso conectaremos esto con Supabase para que cree la tarjeta en Stock automáticamente con sus botones y emojis. 🚀🌸");
+}
+    // --- LÓGICA DEL MURO DE POST-ITS ---
+const coloresPostIt = ['p-rosa', 'p-crema', 'p-naranja'];
+
+function abrirModalNota(id = null, titulo = '', contenido = '', url = '') {
+    document.getElementById('modal-nota').style.display = 'flex';
+    document.getElementById('nota-id-edit').value = id || '';
+    document.getElementById('n-titulo').value = titulo || '';
+    document.getElementById('n-contenido').value = contenido || '';
+    document.getElementById('n-url').value = url || '';
+    document.getElementById('modal-titulo-accion').innerText = id ? 'Editar Nota' : 'Nueva Nota';
+    document.getElementById('btn-guardar-nota').innerText = id ? 'ACTUALIZAR' : 'PEGAR AL MURO';
+}
+
+function cerrarModalNota() {
+    document.getElementById('modal-nota').style.display = 'none';
+}
+
+async function cargarNotas() {
+    const { data, error } = await client.from('notas').select('*').order('created_at', { ascending: false });
+    if (error) return console.error("Error cargando notas:", error);
+
+    const muro = document.getElementById('muro-notas');
+    if (!muro) return;
+    muro.innerHTML = '';
+
+    data.forEach((n, index) => {
+        const colorClass = coloresPostIt[index % coloresPostIt.length];
+        let icon = '';
+        if (n.url) {
+            if (n.url.includes('youtube.com') || n.url.includes('youtu.be')) icon = '🎥';
+            else if (n.url.includes('instagram.com')) icon = '📸';
+            else icon = '🔗';
+        }
+        
+        const div = document.createElement('div');
+        div.className = `post-it ${colorClass}`;
+        div.onclick = () => abrirModalNota(n.id, n.titulo, n.contenido, n.url);
+        
+        div.innerHTML = `
+            ${n.titulo ? `<h3>${n.titulo}</h3>` : ''}
+            <p>${n.contenido || ''}</p>
+            ${icon ? `<div class="url-icon" onclick="event.stopPropagation(); window.open('${n.url}', '_blank')">${icon}</div>` : ''}
+            <button onclick="event.stopPropagation(); eliminarNota('${n.id}')" style="position:absolute; top:5px; right:5px; background:none; border:none; opacity:0.3; font-size:12px; cursor:pointer;">✕</button>
+        `;
+        muro.appendChild(div);
+    });
+}
+
+async function guardarNota() {
+    const id = document.getElementById('nota-id-edit').value;
+    const notaData = {
+        titulo: document.getElementById('n-titulo').value,
+        contenido: document.getElementById('n-contenido').value,
+        url: document.getElementById('n-url').value
+    };
+
+    if (!notaData.titulo && !notaData.contenido && !notaData.url) return alert("¡No puedes pegar un post-it vacío!");
+
+    let respuesta;
+    if (id) {
+        respuesta = await client.from('notas').update(notaData).eq('id', id);
+    } else {
+        respuesta = await client.from('notas').insert([notaData]);
+    }
+
+    if (!respuesta.error) {
+        cerrarModalNota();
+        cargarNotas();
+    } else {
+        alert("Fallo al guardar: " + respuesta.error.message);
+    }
+}
+
+async function eliminarNota(id) {
+    if (confirm("¿Quieres arrancar este post-it del muro?")) {
+        const { error } = await client.from('notas').delete().eq('id', id);
+        if (!error) cargarNotas();
+    }
 }
     // ONLOAD ACTUALIZADO PARA RECUPERAR TEMA
     window.onload = function() {
