@@ -141,37 +141,7 @@
     z-index: 1000;
 }        
         .contador-vueltas-mini { display: flex; align-items: center; gap: 10px; background: var(--s); color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
-/* ESTILO MURO DE POST-ITS (Mejorado) */
-#sec-notas { 
-    background-image: radial-gradient(var(--br) 1px, transparent 1px); 
-    background-size: 20px 20px; 
-    padding: 15px; 
-    border-radius: 20px;
-}
-.muro { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
-    gap: 15px; 
-}
-.post-it { 
-    padding: 15px; 
-    border-radius: 4px 4px 25px 4px; 
-    min-height: 140px; 
-    position: relative; 
-    cursor: pointer; 
-    box-shadow: 4px 4px 8px rgba(0,0,0,0.1); 
-    transition: 0.3s; 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: space-between;
-    border: 1px solid rgba(0,0,0,0.05);
-}
-.p-rosa { background: #ffd1dc !important; } 
-.p-crema { background: #fff4e0 !important; } 
-.p-melocoton { background: #ffe5d9 !important; }
-
-[data-theme="dark"] .post-it { opacity: 0.9; border: 1px solid var(--p); box-shadow: 0 0 10px rgba(255,133,162,0.2); }   
-</style>
+    </style>
 </head>
 <body>
 
@@ -1223,69 +1193,66 @@ function cerrarModalNota() {
 async function cargarNotas() {
     const muro = document.getElementById('muro-notas');
     if (!muro) return;
-    muro.innerHTML = '<p style="text-align:center; opacity:0.5;">Abriendo muro...</p>';
+    muro.innerHTML = '<p style="text-align:center; opacity:0.5;">Abriendo mural...</p>';
 
-    // Intentamos cargar con orden de fecha
-    let { data, error } = await client.from('notas').select('*').order('fecha', { ascending: false });
+    // Ahora que la tabla es nueva, el orden por fecha funcionará perfecto
+    const { data, error } = await client.from('notas').select('*').order('fecha', { ascending: false });
 
-    // Si da error por la columna "fecha", reintentamos sin el orden
-    if (error && error.message.includes("fecha")) {
-        console.warn("Columna fecha no detectada, cargando sin orden.");
-        const { data: dataAlt, error: errorAlt } = await client.from('notas').select('*');
-        data = dataAlt;
-        if (errorAlt) return console.error(errorAlt.message);
+    if (error) {
+        console.error("Error Supabase:", error.message);
+        muro.innerHTML = '<p>Error al conectar. Revisa la tabla.</p>';
+        return;
     }
 
     muro.innerHTML = '';
     const colores = ['p-rosa', 'p-crema', 'p-melocoton'];
 
-    if (data) {
-        data.forEach((n, index) => {
-            const colorClass = colores[index % colores.length];
-            const div = document.createElement('div');
-            div.className = `post-it ${colorClass}`;
-            div.style.transform = `rotate(${(index % 2 === 0 ? 1.5 : -1.5)}deg)`;
-            
-            div.onclick = () => abrirModalNota(n.id, n.titulo, n.texto || n.contenido, n.url);
-            
-            div.innerHTML = `
-                <div>
-                    <h3 style="margin:0 0 8px 0; font-size:1rem;">${n.titulo || '📌'}</h3>
-                    <p style="margin:0; font-size:0.85rem; line-height:1.2;">${n.texto || n.contenido || ''}</p>
-                </div>
-                <button onclick="event.stopPropagation(); eliminarNota('${n.id}')" style="position:absolute; top:5px; right:5px; background:none; border:none; opacity:0.2; cursor:pointer;">✕</button>
-            `;
-            muro.appendChild(div);
-        });
-    }
+    data.forEach((n, index) => {
+        const colorClass = colores[index % colores.length];
+        const div = document.createElement('div');
+        div.className = `post-it ${colorClass}`;
+        // Rotación para el efecto "pegado a mano"
+        div.style.transform = `rotate(${(index % 2 === 0 ? 2 : -2)}deg)`;
+        
+        div.onclick = () => abrirModalNota(n.id, n.titulo, n.contenido, n.url);
+        
+        div.innerHTML = `
+            <div>
+                <h3 style="margin:0 0 8px 0; font-size:1rem;">${n.titulo || '📌'}</h3>
+                <p style="margin:0; font-size:0.85rem; line-height:1.2;">${n.contenido || ''}</p>
+            </div>
+            <button onclick="event.stopPropagation(); eliminarNota('${n.id}')" style="position:absolute; top:5px; right:5px; background:none; border:none; opacity:0.2; cursor:pointer;">✕</button>
+        `;
+        muro.appendChild(div);
+    });
 }
+
 async function guardarNota() {
     const id = document.getElementById('nota-id-edit').value;
     const valorContenido = document.getElementById('n-contenido').value;
 
     const notaData = {
         titulo: document.getElementById('n-titulo').value,
-        texto: valorContenido,
         contenido: valorContenido,
+        texto: valorContenido, // Rellenamos ambos campos para máxima seguridad
         url: document.getElementById('n-url').value,
         fecha: new Date().toISOString()
     };
 
     if (!notaData.titulo && !valorContenido) return alert("Escribe algo antes de guardar.");
 
-    let res = id ? await client.from('notas').update(notaData).eq('id', id) : await client.from('notas').insert([notaData]);
-
-    // Si el error es por la columna fecha, la quitamos y reintentamos
-    if (res.error && res.error.message.includes("fecha")) {
-        delete notaData.fecha;
-        res = id ? await client.from('notas').update(notaData).eq('id', id) : await client.from('notas').insert([notaData]);
+    let res;
+    if (id) {
+        res = await client.from('notas').update(notaData).eq('id', id);
+    } else {
+        res = await client.from('notas').insert([notaData]);
     }
 
     if (!res.error) {
         cerrarModalNota();
         cargarNotas();
     } else {
-        alert("Error: " + res.error.message);
+        alert("Error al guardar: " + res.error.message);
     }
 }
 
