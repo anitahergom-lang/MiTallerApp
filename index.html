@@ -472,11 +472,15 @@
     
     <div style="background:var(--b); padding:15px; border-radius:20px; border:1px solid var(--br); margin-bottom:20px;">
         <input type="text" id="llave-nombre" placeholder="Sitio (Ej: Netflix)" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
+        
         <input type="text" id="llave-usuario" placeholder="Usuario / Email" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
-        <input type="password" id="llave-valor" placeholder="Contraseña">
+        
+        <input type="password" id="llave-valor" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
+        
         <input type="hidden" id="llave-id-edit">
-        <button onclick="guardarNuevaLlave()" style="width:100%; background:var(--p); color:white; border:none; padding:12px; border-radius:10px; font-weight:bold; cursor:pointer;">
-            ✨ Guardar Nueva Llave
+
+        <button onclick="guardarLlave()" style="width:100%; background:var(--p); color:white; border:none; padding:12px; border-radius:10px; font-weight:bold; cursor:pointer;">
+            ✨ Guardar Llave
         </button>
     </div>
 
