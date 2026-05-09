@@ -1312,14 +1312,20 @@ async function eliminarNota(id) {
 
 // --- LÓGICA DE CAPRICHOS: NAVEGACIÓN Y CIERRE ---
 
+// --- LÓGICA DE CAPRICHOS: NAVEGACIÓN, CIERRE Y CARGA (BLOQUE UNIFICADO) ---
+
 function cambiarVistaInterna(subVista) {
-    // 1. Escondemos todo el menú (los 4 botones + el botón de Volver al Inicio)
+    // 1. Escondemos todo el menú principal (los 4 botones + el botón de Volver al Inicio)
     const menu = document.getElementById('menu-caprichos');
     if (menu) menu.style.display = 'none';
 
-    // 2. Escondemos la lista de gastos por si estuviera abierta
+    // 2. Escondemos las posibles sub-vistas para que no se amontonen
     const vistaLista = document.getElementById('vista-LISTA_GASTOS');
     if (vistaLista) vistaLista.style.display = 'none';
+    
+    // También intentamos esconder la vista de añadir por su ID común
+    const vistaAnadir = document.getElementById('vista-AÑADIR_CAPRICHO');
+    if (vistaAnadir) vistaAnadir.style.display = 'none';
 
     // 3. Mostramos la sub-vista que hemos elegido
     const vistaDestino = document.getElementById('vista-' + subVista);
@@ -1333,14 +1339,14 @@ function cambiarVistaInterna(subVista) {
 }
 
 function cerrarHistorial() {
-    // 1. Escondemos la sección del historial
+    // 1. Escondemos TODAS las sub-vistas (Historial y Añadir)
     const vistaLista = document.getElementById('vista-LISTA_GASTOS');
-    if (vistaLista) {
-        vistaLista.style.display = 'none';
-    }
+    if (vistaLista) vistaLista.style.display = 'none';
+
+    const vistaAnadir = document.getElementById('vista-AÑADIR_CAPRICHO');
+    if (vistaAnadir) vistaAnadir.style.display = 'none';
     
     // 2. Volvemos a mostrar el menú completo (4 botones + botón inicio)
-    // Usamos 'block' para que el botón de inicio aparezca debajo de la cuadrícula
     const menu = document.getElementById('menu-caprichos');
     if (menu) {
         menu.style.display = 'block'; 
