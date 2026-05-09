@@ -1232,7 +1232,10 @@ async function procesarGuardadoCapricho() {
     const notas = document.getElementById('capricho-notas').value;
     const fotoFile = document.getElementById('capricho-foto').files[0];
 
-    if (!nombreForm) { alert("El nombre es obligatorio"); return; }
+    if (!nombreForm) { 
+        alert("El nombre es obligatorio."); 
+        return; 
+    }
 
     try {
         let urlFoto = null;
@@ -1245,8 +1248,7 @@ async function procesarGuardadoCapricho() {
             }
         }
 
-        // --- 1. ACTUALIZAR SOLO INVENTARIO (Tabla: stock) ---
-        // Aquí NO mandamos nada de precios. Solo lo físico.
+        // 1. ACTUALIZAR STOCK (Solo inventario físico)
         if (tipoGeneral === "Material") {
             const { data: existente } = await _supabase.from('stock').select('*').eq('nombre', nombreForm).maybeSingle();
             
@@ -1269,12 +1271,11 @@ async function procesarGuardadoCapricho() {
             }
         }
 
-        // --- 2. REGISTRAR GASTO Y FELICIDAD (Tabla: finanzas) ---
-        // Aquí es donde mandamos el precio para el termómetro y el historial.
+        // 2. REGISTRAR EN FINANZAS (Confirmado: monto_total)
         const { error: errorFinanzas } = await _supabase.from('finanzas').insert([{
             tipo: tipoGeneral,
             concepto: nombreForm,
-            monto_total: precioUnit * cantidadCompra, // Esto alimenta el termómetro rosa
+            monto_total: precioUnit * cantidadCompra, // <--- Usando el nombre que me confirmas
             unidades: cantidadCompra,
             precio_unitario: precioUnit,
             categoria: subtipo,
@@ -1284,16 +1285,14 @@ async function procesarGuardadoCapricho() {
 
         if (errorFinanzas) throw errorFinanzas;
 
-        alert("💖 ¡Capricho registrado! Inventario actualizado y gasto anotado en tu historial.");
+        alert("💖 ¡Por fin! Todo guardado: Inventario actualizado y gasto registrado.");
         
         limpiarFormularioCapricho();
         cerrarHistorial();
         if (typeof cargarStock === 'function') cargarStock();
-        // Aquí podrías llamar a la función que actualiza tu termómetro rosa
-        if (typeof actualizarTermometro === 'function') actualizarTermometro();
         
     } catch (err) {
-        console.error("Error:", err);
+        console.error("Error detallado:", err);
         alert("Error al guardar: " + err.message);
     }
 }
