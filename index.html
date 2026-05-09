@@ -1219,12 +1219,11 @@ function previsualizarImagenCapricho(event) {
 
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
 async function procesarGuardadoCapricho() {
-    // 1. Recogida de datos del formulario
     const nombreForm = document.getElementById('capricho-nombre').value.trim();
     const tipoGeneral = document.getElementById('capricho-tipo-general').value;
     const subtipo = document.getElementById('capricho-subtipo').value;
-    const precioUnitario = parseFloat(document.getElementById('capricho-precio').value) || 0;
-    const cantidad = parseInt(document.getElementById('capricho-cantidad').value) || 1;
+    const precioUnit = parseFloat(document.getElementById('capricho-precio').value) || 0;
+    const cantidadCompra = parseInt(document.getElementById('capricho-cantidad').value) || 1;
     
     const grosor = document.getElementById('capricho-grosor').value;
     const longitud = document.getElementById('capricho-longitud').value;
@@ -1234,7 +1233,7 @@ async function procesarGuardadoCapricho() {
     const fotoFile = document.getElementById('capricho-foto').files[0];
 
     if (!nombreForm || !tipoGeneral) {
-        alert("Por favor, rellena el nombre y el tipo.");
+        alert("Por favor, rellena el nombre y la categoría.");
         return;
     }
 
@@ -1243,29 +1242,21 @@ async function procesarGuardadoCapricho() {
         if (fotoFile) {
             const fileExt = fotoFile.name.split('.').pop();
             const fileName = `${Math.random()}.${fileExt}`;
-            const { data: dataImg, error: errorImg } = await _supabase.storage
-                .from('materiales')
-                .upload(fileName, fotoFile);
-            if (!errorImg) {
-                const { data: dataUrl } = _supabase.storage.from('materiales').getPublicUrl(fileName);
-                urlFoto = dataUrl.publicUrl;
-            }
+            const { data: dataImg } = await _supabase.storage.from('materiales').upload(fileName, fotoFile);
+            const { data: dataUrl } = _supabase.storage.from('materiales').getPublicUrl(fileName);
+            urlFoto = dataUrl.publicUrl;
         }
 
-        // 2. LOGICA DE STOCK (Tabla: stock)
-        // Aquí enviamos todo porque la tabla stock suele ser completa
-        if (tipoGeneral === "Material") {
-            const { data: existente } = await _supabase
-                .from('stock')
-                .select('*')
-                .eq('nombre', nombreForm)
-                .maybeSingle();
+        let idCreadoStock = null;
 
+        // A. ACTUALIZAR STOCK (Tabla: stock)
+        if (tipoGeneral === "Material") {
+            const { data: existente } = await _supabase.from('stock').select('*').eq('nombre', nombreForm).maybeSingle();
             const datosStock = {
                 nombre: nombreForm,
                 categoria: subtipo,
-                cantidad: existente ? (existente.cantidad || 0) + cantidad : cantidad,
-                precio: precioUnitario,
+                cantidad: existente ? (existente.cantidad + cantidadCompra) : cantidadCompra,
+                precio: precioUnit,
                 grosor: grosor,
                 longitud: longitud,
                 tienda: tienda,
@@ -1276,34 +1267,40 @@ async function procesarGuardadoCapricho() {
 
             if (existente) {
                 await _supabase.from('stock').update(datosStock).eq('id', existente.id);
+                idCreadoStock = existente.id;
             } else {
-                await _supabase.from('stock').insert([datosStock]);
+                const { data: nuevoItem } = await _supabase.from('stock').insert([datosStock]).select().single();
+                if (nuevoItem) idCreadoStock = nuevoItem.id;
             }
         }
 
-        // 3. LOGICA DE FINANZAS (Tabla: finanzas)
-        // HEMOS QUITADO: monto_total, unidades, precio_unitario, grosor, longitud, composicion
-        // Solo dejamos los que NO han dado error en tus capturas
-        const { error: errorFinanzas } = await _supabase
-            .from('finanzas')
-            .insert([{
-                concepto: nombreForm,
-                tipo: tipoGeneral,
-                categoria: subtipo,
-                notas: notas,
-                foto: urlFoto // Si 'foto' da error, cámbialo por 'foto_url'
-            }]);
+        // B. GUARDAR EN FINANZAS (Nombres de columna limpios)
+        const { error: errorFinanzas } = await _supabase.from('finanzas').insert([{
+            tipo: tipoGeneral,
+            concepto: nombreForm,
+            monto_total: precioUnit * cantidadCompra,
+            unidades: cantidadCompra,
+            precio_unitario: precioUnit,
+            categoria: subtipo,
+            composicion: composicion,
+            grosor: grosor,
+            longitud: longitud,
+            tienda: tienda,
+            notas: notas,
+            foto: urlFoto,
+            id_stock_vinculado: idCreadoStock
+        }]);
 
         if (errorFinanzas) throw errorFinanzas;
 
-        alert("💖 ¡CONSEGUIDO! Registro guardado correctamente.");
+        alert("💖 ¡CONSEGUIDO! Tablas sincronizadas y datos guardados.");
         limpiarFormularioCapricho();
         cerrarHistorial();
         if (typeof cargarStock === 'function') cargarStock();
         
     } catch (err) {
-        console.error("Error en el envío:", err);
-        alert("Fallo de columna: " + err.message);
+        console.error("Error:", err);
+        alert("Error al guardar: " + err.message);
     }
 }
 function limpiarFormularioCapricho() {
