@@ -468,20 +468,22 @@
     </div>
 </div>
 
-<div id="vista-LISTA_GASTOS" class="view" style="display:none; margin-top:20px;">
+<div id="vista-LISTA_GASTOS" class="view" style="display:none; margin-top:20px; border-top: 2px dashed var(--br); padding-top: 20px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
         <h3 style="color:var(--s); margin:0;">📜 Mi Historial de Gastos</h3>
-        <button onclick="cerrarHistorial()" style="background:var(--pc); border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; color:var(--s); font-weight:bold;">✕</button>
+        <button onclick="cerrarHistorial()" style="background:var(--pc); border:none; padding:8px 15px; border-radius:12px; cursor:pointer; color:var(--s); font-weight:bold; font-size:0.75rem; display:flex; align-items:center; gap:5px;">
+            ⬅️ Volver a Mis Caprichos
+        </button>
     </div>
     
-    <div style="display:flex; gap:8px; margin-bottom:20px; overflow-x:auto; padding-bottom:10px; scrollbar-width: none;">
+    <div style="display:flex; gap:8px; margin-bottom:20px; overflow-x:auto; padding-bottom:10px; scrollbar-width: none; -webkit-overflow-scrolling: touch;">
         <button onclick="cargarHistorialGastos('TODOS')" style="background:var(--p); color:white; border:none; padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">🛍️ Todos</button>
         <button onclick="cargarHistorialGastos('Material')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">🧶 Material</button>
         <button onclick="cargarHistorialGastos('Herramientas')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">✂️ Herramientas</button>
         <button onclick="cargarHistorialGastos('Formación')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">📚 Formación</button>
     </div>
 
-    <div id="contenedor-lista-gastos">
+    <div id="contenedor-lista-gastos" style="min-height: 100px;">
         </div>
 </div>    
     
@@ -1326,14 +1328,25 @@ function cambiarVistaInterna(subVista) {
 }
 
 // ESTA ES LA QUE TE FALTABA:
+// --- FUNCIÓN PARA CERRAR EL HISTORIAL Y VOLVER AL MENÚ DE CAPRICHOS ---
 function cerrarHistorial() {
-    // 1. Escondemos la lista
+    // 1. Escondemos la sección del historial
     const vistaLista = document.getElementById('vista-LISTA_GASTOS');
-    if (vistaLista) vistaLista.style.display = 'none';
+    if (vistaLista) {
+        vistaLista.style.display = 'none';
+    }
     
-    // 2. Volvemos a mostrar el menú de los 4 botones
+    // 2. Volvemos a mostrar el menú de los 4 botones principales (Añadir, Historial, etc.)
     const menu = document.getElementById('menu-caprichos');
-    if (menu) menu.style.display = 'grid'; 
+    if (menu) {
+        menu.style.display = 'grid'; // Usamos grid para que mantenga las dos columnas
+    }
+
+    // 3. Por seguridad, nos aseguramos de que el contenedor padre de Caprichos esté visible
+    const vistaCaprichos = document.getElementById('vista-CAPRICHOS');
+    if (vistaCaprichos) {
+        vistaCaprichos.style.display = 'block';
+    }
 }
 
 async function cargarHistorialGastos(filtro) {
