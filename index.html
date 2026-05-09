@@ -247,23 +247,39 @@
                 🏠 Volver al Inicio principal
             </button>
         </div>
+    </div>
+</div>
 
-        <div id="vista-LISTA_GASTOS" style="display:none; margin-top:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 style="color:var(--s); margin:0;">📜 Mi Historial</h3>
-                <button onclick="cerrarHistorial()" style="background:var(--pc); border:none; padding:8px 15px; border-radius:10px; cursor:pointer; color:var(--s); font-weight:bold; font-size:0.8rem;">
-                    ⬅️ Volver
+<div id="vista-CAPRICHOS" class="vista" style="display:none;">
+    <div class="card">
+        <h2 style="color:var(--p); text-align:center; margin-bottom:20px;">💸 Mis Caprichos</h2>
+        
+        <div id="menu-caprichos">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <button class="btn-nav" onclick="cambiarVistaInterna('AÑADIR_CAPRICHO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                    <span style="font-size:2.2em; margin-bottom:5px;">🛍️</span>
+                    <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Añadir</span>
+                </button>
+
+                <button class="btn-nav" onclick="cambiarVistaInterna('LISTA_GASTOS')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                    <span style="font-size:2.2em; margin-bottom:5px;">📖</span>
+                    <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Mi Historial</span>
+                </button>
+
+                <button class="btn-nav" onclick="cambiarVistaInterna('TERMOMETRO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                    <span style="font-size:2.2em; margin-bottom:5px;">🌡️</span>
+                    <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase; text-align:center;">El Termómetro<br>Rosa</span>
+                </button>
+
+                <button class="btn-nav" onclick="cambiarVistaInterna('FELICIDAD')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                    <span style="font-size:2.2em; margin-bottom:5px;">✨</span>
+                    <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Felicidad</span>
                 </button>
             </div>
-            
-            <div style="display:flex; gap:8px; margin-bottom:20px; overflow-x:auto; padding-bottom:10px; scrollbar-width: none;">
-                <button onclick="cargarHistorialGastos('TODOS')" style="background:var(--p); color:white; border:none; padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">🛍️ Todos</button>
-                <button onclick="cargarHistorialGastos('Material')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">🧶 Material</button>
-                <button onclick="cargarHistorialGastos('Herramientas')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">✂️ Herramientas</button>
-            </div>
 
-            <div id="contenedor-lista-gastos">
-                </div>
+            <button class="btn-nav" onclick="cambiarVista('INICIO')" style="width:100%; margin-top:25px; background:var(--p); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; cursor:pointer;">
+                🏠 Volver al Inicio principal
+            </button>
         </div>
     </div>
 </div>
