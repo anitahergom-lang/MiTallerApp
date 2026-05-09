@@ -1219,7 +1219,120 @@ function previsualizarImagenCapricho(event) {
 
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
 async function procesarGuardadoCapricho() {
-    alert("¡Todo listo! En el próximo paso conectaremos esto con Supabase para que cree la tarjeta en Stock automáticamente con sus botones y emojis. 🚀🌸");
+    // 1. Captura de datos del formulario
+    const nombre = document.getElementById('capricho-nombre').value.trim();
+    const tipoGeneral = document.getElementById('capricho-tipo-general').value;
+    const subtipo = document.getElementById('capricho-subtipo').value;
+    const precio = parseFloat(document.getElementById('capricho-precio').value) || 0;
+    const cantidad = parseInt(document.getElementById('capricho-cantidad').value) || 1;
+    const fecha = document.getElementById('capricho-fecha').value || new Date().toISOString().split('T')[0];
+    
+    // Datos técnicos
+    const grosor = document.getElementById('capricho-grosor').value;
+    const longitud = document.getElementById('capricho-longitud').value;
+    const tienda = document.getElementById('capricho-tienda').value;
+    const composicion = document.getElementById('capricho-composicion').value;
+    const notas = document.getElementById('capricho-notas').value;
+    const fotoFile = document.getElementById('capricho-foto').files[0];
+
+    if (!nombre || !tipoGeneral || precio <= 0) {
+        alert("Por favor, rellena nombre, categoría y precio.");
+        return;
+    }
+
+    try {
+        let urlFoto = null;
+
+        // A. Subida de foto (Opcional)
+        if (fotoFile) {
+            const fileExt = fotoFile.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const { data: dataImg, error: errorImg } = await _supabase.storage
+                .from('materiales')
+                .upload(fileName, fotoFile);
+            if (errorImg) throw errorImg;
+            const { data: dataUrl } = _supabase.storage.from('materiales').getPublicUrl(fileName);
+            urlFoto = dataUrl.publicUrl;
+        }
+
+        // B. LÓGICA DE STOCK (Doble entrada)
+        // Solo sincronizamos con Stock si es "Material"
+        if (tipoGeneral === "Material") {
+            // Paso 1: Buscar si ya existe por nombre exacto
+            const { data: existente, error: errorBusqueda } = await _supabase
+                .from('stock')
+                .select('*')
+                .eq('nombre', nombre)
+                .maybeSingle();
+
+            if (existente) {
+                // Paso 2: UPDATE (Existe) -> Sumamos cantidad y refrescamos datos
+                const nuevaCantidad = (existente.cantidad || 0) + cantidad;
+                await _supabase.from('stock').update({
+                    cantidad: nuevaCantidad,
+                    categoria: subtipo,
+                    grosor: grosor || existente.grosor,
+                    longitud: longitud || existente.longitud,
+                    tienda: tienda || existente.tienda,
+                    composicion: composicion || existente.composicion,
+                    notas: notas || existente.notas,
+                    foto_url: urlFoto || existente.foto_url // Si no hay foto nueva, deja la vieja
+                }).eq('id', existente.id);
+            } else {
+                // Paso 2: INSERT (No existe) -> Creamos tarjeta nueva
+                await _supabase.from('stock').insert([{
+                    nombre: nombre,
+                    categoria: subtipo,
+                    cantidad: cantidad,
+                    grosor: grosor,
+                    longitud: longitud,
+                    tienda: tienda,
+                    composicion: composicion,
+                    notas: notas,
+                    foto_url: urlFoto
+                }]);
+            }
+        }
+
+        // C. GUARDAR EN HISTORIAL DE CAPRICHOS (Finanzas)
+        // Esto se guarda SIEMPRE para tener el registro de precios
+        const { error: errorCapricho } = await _supabase
+            .from('caprichos')
+            .insert([{
+                nombre: nombre,
+                tipo: tipoGeneral,
+                subtipo: subtipo,
+                precio: precio,
+                cantidad: cantidad,
+                fecha: fecha,
+                notas: notas,
+                foto_url: urlFoto
+            }]);
+
+        if (errorCapricho) throw errorCapricho;
+
+        alert("💖 Registro completado: Gasto anotado y Stock actualizado.");
+        
+        // Limpiar formulario y refrescar vistas
+        limpiarFormularioCapricho();
+        cerrarHistorial();
+        if (typeof cargarStock === 'function') cargarStock();
+        
+    } catch (err) {
+        console.error("Error en el proceso:", err);
+        alert("Hubo un error al guardar.");
+    }
+}
+
+function limpiarFormularioCapricho() {
+    const ids = ['capricho-nombre', 'capricho-precio', 'capricho-grosor', 'capricho-longitud', 'capricho-tienda', 'capricho-composicion', 'capricho-notas', 'capricho-foto'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.value = '';
+    });
+    document.getElementById('capricho-cantidad').value = 1;
+    document.getElementById('capricho-tipo-general').value = '';
+    document.getElementById('div-subcategoria').style.display = 'none';
 }
     // --- LÓGICA DEL MURO DE POST-ITS ---
 const coloresPostIt = ['p-rosa', 'p-crema', 'p-naranja'];
