@@ -1232,31 +1232,28 @@ async function procesarGuardadoCapricho() {
     const notas = document.getElementById('capricho-notas').value;
     const fotoFile = document.getElementById('capricho-foto').files[0];
 
-    if (!nombreForm || !tipoGeneral) {
-        alert("Por favor, rellena el nombre y la categoría.");
-        return;
-    }
+    if (!nombreForm) { alert("El nombre es obligatorio"); return; }
 
     try {
         let urlFoto = null;
         if (fotoFile) {
-            const fileExt = fotoFile.name.split('.').pop();
-            const fileName = `${Math.random()}.${fileExt}`;
+            const fileName = `${Date.now()}-${fotoFile.name}`;
             const { data: dataImg } = await _supabase.storage.from('materiales').upload(fileName, fotoFile);
-            const { data: dataUrl } = _supabase.storage.from('materiales').getPublicUrl(fileName);
-            urlFoto = dataUrl.publicUrl;
+            if (dataImg) {
+                const { data: dataUrl } = _supabase.storage.from('materiales').getPublicUrl(fileName);
+                urlFoto = dataUrl.publicUrl;
+            }
         }
 
-        let idCreadoStock = null;
-
-        // A. ACTUALIZAR STOCK (Tabla: stock)
+        // --- 1. ACTUALIZAR SOLO INVENTARIO (Tabla: stock) ---
+        // Aquí NO mandamos nada de precios. Solo lo físico.
         if (tipoGeneral === "Material") {
             const { data: existente } = await _supabase.from('stock').select('*').eq('nombre', nombreForm).maybeSingle();
+            
             const datosStock = {
                 nombre: nombreForm,
                 categoria: subtipo,
                 cantidad: existente ? (existente.cantidad + cantidadCompra) : cantidadCompra,
-                precio: precioUnit,
                 grosor: grosor,
                 longitud: longitud,
                 tienda: tienda,
@@ -1267,36 +1264,33 @@ async function procesarGuardadoCapricho() {
 
             if (existente) {
                 await _supabase.from('stock').update(datosStock).eq('id', existente.id);
-                idCreadoStock = existente.id;
             } else {
-                const { data: nuevoItem } = await _supabase.from('stock').insert([datosStock]).select().single();
-                if (nuevoItem) idCreadoStock = nuevoItem.id;
+                await _supabase.from('stock').insert([datosStock]);
             }
         }
 
-        // B. GUARDAR EN FINANZAS (Nombres de columna limpios)
+        // --- 2. REGISTRAR GASTO Y FELICIDAD (Tabla: finanzas) ---
+        // Aquí es donde mandamos el precio para el termómetro y el historial.
         const { error: errorFinanzas } = await _supabase.from('finanzas').insert([{
             tipo: tipoGeneral,
             concepto: nombreForm,
-            monto_total: precioUnit * cantidadCompra,
+            monto_total: precioUnit * cantidadCompra, // Esto alimenta el termómetro rosa
             unidades: cantidadCompra,
             precio_unitario: precioUnit,
             categoria: subtipo,
-            composicion: composicion,
-            grosor: grosor,
-            longitud: longitud,
-            tienda: tienda,
             notas: notas,
-            foto: urlFoto,
-            id_stock_vinculado: idCreadoStock
+            foto: urlFoto
         }]);
 
         if (errorFinanzas) throw errorFinanzas;
 
-        alert("💖 ¡CONSEGUIDO! Tablas sincronizadas y datos guardados.");
+        alert("💖 ¡Capricho registrado! Inventario actualizado y gasto anotado en tu historial.");
+        
         limpiarFormularioCapricho();
         cerrarHistorial();
         if (typeof cargarStock === 'function') cargarStock();
+        // Aquí podrías llamar a la función que actualiza tu termómetro rosa
+        if (typeof actualizarTermometro === 'function') actualizarTermometro();
         
     } catch (err) {
         console.error("Error:", err);
