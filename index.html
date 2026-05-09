@@ -1219,7 +1219,6 @@ function previsualizarImagenCapricho(event) {
 
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
 async function procesarGuardadoCapricho() {
-    // 1. Captura de datos del formulario
     const nombre = document.getElementById('capricho-nombre').value.trim();
     const tipoGeneral = document.getElementById('capricho-tipo-general').value;
     const subtipo = document.getElementById('capricho-subtipo').value;
@@ -1227,7 +1226,6 @@ async function procesarGuardadoCapricho() {
     const cantidad = parseInt(document.getElementById('capricho-cantidad').value) || 1;
     const fecha = document.getElementById('capricho-fecha').value || new Date().toISOString().split('T')[0];
     
-    // Datos técnicos
     const grosor = document.getElementById('capricho-grosor').value;
     const longitud = document.getElementById('capricho-longitud').value;
     const tienda = document.getElementById('capricho-tienda').value;
@@ -1242,8 +1240,6 @@ async function procesarGuardadoCapricho() {
 
     try {
         let urlFoto = null;
-
-        // A. Subida de foto (Opcional)
         if (fotoFile) {
             const fileExt = fotoFile.name.split('.').pop();
             const fileName = `${Math.random()}.${fileExt}`;
@@ -1255,7 +1251,6 @@ async function procesarGuardadoCapricho() {
             urlFoto = dataUrl.publicUrl;
         }
 
-        // B. LÓGICA DE STOCK (Doble entrada)
         if (tipoGeneral === "Material") {
             const { data: existente, error: errorBusqueda } = await _supabase
                 .from('stock')
@@ -1264,12 +1259,12 @@ async function procesarGuardadoCapricho() {
                 .maybeSingle();
 
             if (existente) {
-                // UPDATE: Añadimos 'precio' para que Supabase no dé error
+                // UPDATE: Usamos 'categoria' porque 'subtipo' no existe en la tabla stock
                 const nuevaCantidad = (existente.cantidad || 0) + cantidad;
                 await _supabase.from('stock').update({
                     cantidad: nuevaCantidad,
-                    precio: precio, // <--- ESTO ARREGLA TU ERROR
-                    categoria: subtipo,
+                    precio: precio,
+                    categoria: subtipo, // <--- CAMBIADO: Antes decía subtipo: subtipo
                     grosor: grosor || existente.grosor,
                     longitud: longitud || existente.longitud,
                     tienda: tienda || existente.tienda,
@@ -1278,12 +1273,12 @@ async function procesarGuardadoCapricho() {
                     foto_url: urlFoto || existente.foto_url
                 }).eq('id', existente.id);
             } else {
-                // INSERT: Añadimos 'precio' para que Supabase no dé error
+                // INSERT: Usamos 'categoria' porque 'subtipo' no existe en la tabla stock
                 await _supabase.from('stock').insert([{
                     nombre: nombre,
-                    categoria: subtipo,
+                    categoria: subtipo, // <--- CAMBIADO: Antes decía subtipo: subtipo
                     cantidad: cantidad,
-                    precio: precio, // <--- ESTO ARREGLA TU ERROR
+                    precio: precio,
                     grosor: grosor,
                     longitud: longitud,
                     tienda: tienda,
@@ -1294,7 +1289,7 @@ async function procesarGuardadoCapricho() {
             }
         }
 
-        // C. GUARDAR EN HISTORIAL DE CAPRICHOS
+        // En la tabla 'caprichos' SÍ existe la columna 'subtipo', así que aquí se queda igual
         const { error: errorCapricho } = await _supabase
             .from('caprichos')
             .insert([{
@@ -1310,15 +1305,14 @@ async function procesarGuardadoCapricho() {
 
         if (errorCapricho) throw errorCapricho;
 
-        alert("💖 Registro completado: Gasto anotado y Stock actualizado.");
-        
+        alert("💖 Registro completado con éxito.");
         limpiarFormularioCapricho();
         cerrarHistorial();
         if (typeof cargarStock === 'function') cargarStock();
         
     } catch (err) {
-        console.error("Error en el proceso:", err);
-        alert("Hubo un error al guardar.");
+        console.error("Error detallado:", err);
+        alert("Error al guardar. Revisa la consola.");
     }
 }
 function limpiarFormularioCapricho() {
