@@ -217,147 +217,96 @@
 </div>
 
 <div id="vista-CAPRICHOS" class="vista" style="display:none;">
-    <div class="card" style="padding: 15px; max-width: 500px; margin: 0 auto;">
-        <h2 style="color:var(--p); text-align:center; margin: 0 0 15px 0; font-size: 1.5rem;">💸 Mis Caprichos</h2>
+    <div class="card">
+        <h2 style="color:var(--p); text-align:center; margin-bottom:20px;">💸 Mis Caprichos</h2>
         
         <div id="menu-caprichos">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <button class="btn-nav" onclick="cambiarVistaInterna('AÑADIR_CAPRICHO')" style="height:90px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:20px; cursor:pointer;">
-                    <span style="font-size:1.8em;">🛍️</span>
-                    <span style="font-size:0.75em; font-weight:bold; color:var(--p);">AÑADIR</span>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <button class="btn-nav" onclick="cambiarVistaInterna('AÑADIR_CAPRICHO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                    <span style="font-size:2.2em; margin-bottom:5px;">🛍️</span>
+                    <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Añadir</span>
                 </button>
-                <button class="btn-nav" onclick="cambiarVistaInterna('LISTA_GASTOS')" style="height:90px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:20px; cursor:pointer;">
-                    <span style="font-size:1.8em;">📖</span>
-                    <span style="font-size:0.75em; font-weight:bold; color:var(--p);">HISTORIAL</span>
+                <button class="btn-nav" onclick="cambiarVistaInterna('LISTA_GASTOS')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                    <span style="font-size:2.2em; margin-bottom:5px;">📖</span>
+                    <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Mi Historial</span>
                 </button>
-                <button class="btn-nav" onclick="cambiarVistaInterna('TERMOMETRO')" style="height:90px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:20px; cursor:pointer;">
-                    <span style="font-size:1.8em;">🌡️</span>
-                    <span style="font-size:0.75em; font-weight:bold; color:var(--p);">TERMÓMETRO</span>
+                <button class="btn-nav" onclick="cambiarVistaInterna('TERMOMETRO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                    <span style="font-size:2.2em; margin-bottom:5px;">🌡️</span>
+                    <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase; text-align:center;">El Termómetro</span>
                 </button>
-                <button class="btn-nav" onclick="cambiarVistaInterna('FELICIDAD')" style="height:90px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:20px; cursor:pointer;">
-                    <span style="font-size:1.8em;">✨</span>
-                    <span style="font-size:0.75em; font-weight:bold; color:var(--p);">FELICIDAD</span>
+                <button class="btn-nav" onclick="cambiarVistaInterna('FELICIDAD')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                    <span style="font-size:2.2em; margin-bottom:5px;">✨</span>
+                    <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Felicidad</span>
                 </button>
             </div>
-            <button class="btn-nav" onclick="cambiarVista('INICIO')" style="width:100%; margin-top:20px; background:var(--p); color:white; border:none; padding:12px; border-radius:15px; font-weight:bold; cursor:pointer;">🏠 Volver al Inicio</button>
+            <button class="btn-nav" onclick="cambiarVista('INICIO')" style="width:100%; margin-top:25px; background:var(--p); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; cursor:pointer;">🏠 Volver al Inicio principal</button>
         </div>
-
-        <div id="vista-AÑADIR_CAPRICHO" style="display:none; max-width: 400px; margin: 0 auto;">
-            <div style="background: var(--f); padding: 18px; border-radius: 25px; border: 1px solid var(--br); box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                <h3 style="color:var(--s); text-align:center; margin: 0 0 15px 0; font-size: 1.2em;">🛍️ Registrar Compra</h3>
-                
-                <div style="display: flex; gap: 8px; margin-bottom:10px;">
-                    <select id="capricho-tipo-general" onchange="mostrarSubcategorias(this.value)" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px; font-size:0.85em; background: var(--b);">
-                        <option value="">Categoría...</option>
-                        <option value="Material">🧶 Material</option>
-                        <option value="Herramienta">🛠️ Herra.</option>
-                        <option value="Formacion">📚 Form.</option>
-                    </select>
-                    <div id="div-subcategoria" style="flex:1; display:none;">
-                        <select id="capricho-subtipo" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; font-size:0.85em; background: var(--b);">
-                            <option value="Lanas">Lanas</option>
-                            <option value="Telas">Telas</option>
-                            <option value="Hilos">Hilos</option>
-                            <option value="Accesorios">Access.</option>
-                            <option value="Otros">Otros</option>
-                        </select>
-                    </div>
-                </div>
-
-                <input type="text" id="capricho-nombre" placeholder="Nombre del producto" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:12px; margin-bottom:10px; box-sizing:border-box; background: var(--b);">
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom:10px;">
-                    <input type="text" id="capricho-grosor" placeholder="🪡 Grosor" style="padding:10px; border:1px solid var(--br); border-radius:12px; font-size:0.85em; background: var(--b);">
-                    <input type="text" id="capricho-longitud" placeholder="📏 Longitud" style="padding:10px; border:1px solid var(--br); border-radius:12px; font-size:0.85em; background: var(--b);">
-                    <input type="text" id="capricho-tienda" placeholder="📍 Tienda" style="padding:10px; border:1px solid var(--br); border-radius:12px; font-size:0.85em; background: var(--b);">
-                    <input type="text" id="capricho-composicion" placeholder="🧵 Comp." style="padding:10px; border:1px solid var(--br); border-radius:12px; font-size:0.85em; background: var(--b);">
-                </div>
-
-                <div style="background: var(--pc); padding: 12px; border-radius: 15px; margin-bottom: 12px; display: grid; grid-template-columns: 1fr 0.6fr; gap: 8px;">
-                    <input type="number" id="capricho-precio" step="0.01" placeholder="Precio €" style="padding:10px; border:none; border-radius:10px; font-size:0.9em; background: var(--b);">
-                    <input type="number" id="capricho-cantidad" value="1" style="padding:10px; border:none; border-radius:10px; font-size:0.9em; background: var(--b);">
-                    <input type="date" id="capricho-fecha" style="grid-column: span 2; padding:10px; border:none; border-radius:10px; font-size:0.9em; background: var(--b);">
-                </div>
-
-                <textarea id="capricho-notas" placeholder="Notas adicionales..." rows="2" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; margin-bottom:10px; font-family:inherit; box-sizing:border-box; background: var(--b);"></textarea>
-                
-                <div style="margin-bottom: 15px; text-align: center;">
-                    <label style="font-size: 0.75em; font-weight: bold; color: var(--s); display: block; margin-bottom: 5px;">🖼️ ADJUNTAR FOTO (OPCIONAL)</label>
-                    <input type="file" id="capricho-foto" accept="image/*" style="font-size:0.7em; width: 100%;">
-                </div>
-
-                <button class="btn-grande" onclick="procesarGuardadoCapricho()" style="background:var(--s); color:white; width:100%; padding:14px; margin-bottom:8px; border-radius:15px; font-size:1em;">💖 Guardar y Sincronizar</button>
-                <button onclick="cerrarHistorial()" style="width:100%; background:none; color:var(--s); border:none; padding:5px; font-size:0.85em; font-weight:bold; text-decoration: underline; cursor:pointer;">Cancelar</button>
-            </div>
-        </div>
-
-        <div id="vista-LISTA_GASTOS" style="display:none; margin-top:10px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <h3 style="color:var(--s); margin:0; font-size:1.1em;">📜 Historial</h3>
-                <button onclick="cerrarHistorial()" style="background:var(--pc); border:none; padding:5px 10px; border-radius:8px; color:var(--s); font-size:0.8em; font-weight:bold;">⬅️ Volver</button>
-            </div>
-            <div id="contenedor-lista-gastos"></div>
-        </div>
-    </div>
-</div>
 
         <div id="vista-AÑADIR_CAPRICHO" style="display:none;">
-            <div style="background: var(--f); padding: 15px; border-radius: 20px; border: 1px solid var(--br);">
-                <h3 style="color:var(--s); text-align:center; margin: 0 0 12px 0; font-size: 1.1em;">🛍️ Nueva Compra</h3>
-                
-                <div style="display: flex; gap: 8px; margin-bottom:10px;">
-                    <select id="capricho-tipo-general" onchange="mostrarSubcategorias(this.value)" style="flex:1; padding:8px; border:1px solid var(--br); border-radius:10px; font-size:0.85em;">
-                        <option value="">Categoría...</option>
-                        <option value="Material">🧶 Material</option>
-                        <option value="Herramienta">🛠️ Herra.</option>
-                        <option value="Formacion">📚 Form.</option>
+            <h2 style="color:var(--s); text-align:center; margin-top:0; font-size: 1.4em;">🛍️ Registrar Compra</h2>
+            
+            <div style="display: flex; gap: 10px; margin-bottom:12px;">
+                <select id="capricho-tipo-general" onchange="mostrarSubcategorias(this.value)" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px; background:var(--pc); color:var(--txt);">
+                    <option value="">✨ Categoría...</option>
+                    <option value="Material">🧶 Material</option>
+                    <option value="Herramienta">🛠️ Herramienta</option>
+                    <option value="Formacion">📚 Formación</option>
+                </select>
+                <div id="div-subcategoria" style="flex:1; display:none;">
+                    <select id="capricho-subtipo" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; background:var(--pc); color:var(--txt);">
+                        <option value="Lanas">🧶 Lanas</option>
+                        <option value="Telas">👗 Telas</option>
+                        <option value="Hilos">🧵 Hilos</option>
+                        <option value="Accesorios">🎀 Accesorios</option>
+                        <option value="Otros">🧸 Otros</option>
                     </select>
-                    <div id="div-subcategoria" style="flex:1; display:none;">
-                        <select id="capricho-subtipo" style="width:100%; padding:8px; border:1px solid var(--br); border-radius:10px; font-size:0.85em;">
-                            <option value="Lanas">Lanas</option>
-                            <option value="Telas">Telas</option>
-                            <option value="Hilos">Hilos</option>
-                            <option value="Accesorios">Access.</option>
-                            <option value="Otros">Otros</option>
-                        </select>
-                    </div>
                 </div>
+            </div>
 
-                <input type="text" id="capricho-nombre" placeholder="Nombre del producto" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:10px; margin-bottom:10px; box-sizing:border-box;">
+            <input type="text" id="capricho-nombre" placeholder="✏️ Nombre del material/producto" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; margin-bottom:12px; box-sizing:border-box; background:var(--b); color:var(--txt);">
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom:10px;">
-                    <input type="text" id="capricho-grosor" placeholder="🪡 Grosor" style="padding:8px; border:1px solid var(--br); border-radius:10px; font-size:0.85em;">
-                    <input type="text" id="capricho-longitud" placeholder="📏 Longitud" style="padding:8px; border:1px solid var(--br); border-radius:10px; font-size:0.85em;">
-                    <input type="text" id="capricho-tienda" placeholder="📍 Tienda" style="padding:8px; border:1px solid var(--br); border-radius:10px; font-size:0.85em;">
-                    <input type="text" id="capricho-composicion" placeholder="🧵 Comp." style="padding:8px; border:1px solid var(--br); border-radius:10px; font-size:0.85em;">
-                </div>
+            <div style="display: flex; gap: 10px; margin-bottom:12px;">
+                <input type="text" id="capricho-grosor" placeholder="🪡 Grosor" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px; background:var(--b); color:var(--txt);">
+                <input type="text" id="capricho-longitud" placeholder="📏 Longitud" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px; background:var(--b); color:var(--txt);">
+            </div>
 
-                <div style="display: flex; gap: 6px; margin-bottom: 10px; background: var(--pc); padding: 8px; border-radius: 12px;">
+            <div style="display: flex; gap: 10px; margin-bottom:12px;">
+                <input type="text" id="capricho-tienda" placeholder="📍 Tienda" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px; background:var(--b); color:var(--txt);">
+                <input type="text" id="capricho-composicion" placeholder="🧵 Composición" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px; background:var(--b); color:var(--txt);">
+            </div>
+
+            <div style="background: var(--pc); padding: 12px; border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--p);">
+                <div style="display: flex; gap: 8px;">
                     <div style="flex:1;">
-                        <input type="number" id="capricho-precio" step="0.01" placeholder="Precio €" style="width:100%; padding:6px; border:none; border-radius:6px; font-size:0.85em;">
+                        <label style="display:block; font-size:0.7em; font-weight:bold; color:var(--s);">Precio Total €</label>
+                        <input type="number" id="capricho-precio" step="0.01" placeholder="0.00" style="width:100%; padding:8px; border-radius:8px; border:none; background:var(--b); color:var(--txt);">
                     </div>
-                    <div style="flex:0.5;">
-                        <input type="number" id="capricho-cantidad" value="1" style="width:100%; padding:6px; border:none; border-radius:6px; font-size:0.85em;">
+                    <div style="flex:0.6;">
+                        <label style="display:block; font-size:0.7em; font-weight:bold; color:var(--s);">Cant.</label>
+                        <input type="number" id="capricho-cantidad" value="1" style="width:100%; padding:8px; border-radius:8px; border:none; background:var(--b); color:var(--txt);">
                     </div>
                     <div style="flex:1.2;">
-                        <input type="date" id="capricho-fecha" style="width:100%; padding:5px; border:none; border-radius:6px; font-size:0.8em;">
+                        <label style="display:block; font-size:0.7em; font-weight:bold; color:var(--s);">Fecha</label>
+                        <input type="date" id="capricho-fecha" style="width:100%; padding:7px; border-radius:8px; border:none; background:var(--b); color:var(--txt); font-size:0.8em;">
                     </div>
                 </div>
-
-                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
-                    <label style="font-size: 0.75em; font-weight: bold; color: var(--s);">🖼️ FOTO:</label>
-                    <input type="file" id="capricho-foto" accept="image/*" style="font-size:0.7em; flex:1;">
-                </div>
-
-                <button class="btn-grande" onclick="procesarGuardadoCapricho()" style="background:var(--s); color:white; width:100%; padding:12px; margin-bottom:8px; font-size:0.9em;">💖 Guardar y Sincronizar</button>
-                <button onclick="cerrarHistorial()" style="width:100%; background:none; color:var(--s); border:1px solid var(--s); padding:8px; border-radius:10px; font-size:0.8em; font-weight:bold;">⬅️ Cancelar</button>
             </div>
+
+            <textarea id="capricho-notas" placeholder="📝 Notas adicionales..." rows="2" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; margin-bottom:12px; font-family:inherit; box-sizing:border-box; background:var(--b); color:var(--txt);"></textarea>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; color: var(--s); font-weight: bold; font-size: 0.8em; margin-bottom: 8px;">🖼️ FOTO (OPCIONAL)</label>
+                <input type="file" id="capricho-foto" accept="image/*" style="width:100%; font-size:0.8em; color:var(--txt);">
+            </div>
+
+            <button class="btn-grande" onclick="procesarGuardadoCapricho()" style="background:var(--s); color:white; width:100%; margin-bottom:10px;">💖 Registrar Capricho</button>
+            <button class="btn-nav" onclick="cerrarHistorial()" style="width:100%; background:none; color:var(--s); border:1px solid var(--s); padding:10px; border-radius:12px; font-weight:bold; cursor:pointer;">⬅️ Volver</button>
         </div>
 
-        <div id="vista-LISTA_GASTOS" style="display:none; margin-top:10px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <h3 style="color:var(--s); margin:0; font-size:1.1em;">📜 Historial</h3>
-                <button onclick="cerrarHistorial()" style="background:var(--pc); border:none; padding:5px 10px; border-radius:8px; color:var(--s); font-size:0.8em; font-weight:bold;">⬅️ Volver</button>
+        <div id="vista-LISTA_GASTOS" style="display:none; margin-top:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="color:var(--s); margin:0;">📜 Historial de Gastos</h3>
+                <button onclick="cerrarHistorial()" style="background:var(--pc); border:none; padding:8px 12px; border-radius:10px; color:var(--s); font-weight:bold; cursor:pointer;">⬅️ Volver</button>
             </div>
             <div id="contenedor-lista-gastos"></div>
         </div>
