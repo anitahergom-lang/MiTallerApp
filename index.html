@@ -1224,7 +1224,6 @@ async function procesarGuardadoCapricho() {
     const subtipo = document.getElementById('capricho-subtipo').value;
     const precioUnitario = parseFloat(document.getElementById('capricho-precio').value) || 0;
     const cantidad = parseInt(document.getElementById('capricho-cantidad').value) || 1;
-    const montoTotal = precioUnitario * cantidad;
     
     const grosor = document.getElementById('capricho-grosor').value;
     const longitud = document.getElementById('capricho-longitud').value;
@@ -1251,7 +1250,7 @@ async function procesarGuardadoCapricho() {
             urlFoto = dataUrl.publicUrl;
         }
 
-        // A. ACTUALIZAR STOCK
+        // 1. ACTUALIZAR STOCK (Tabla: stock)
         if (tipoGeneral === "Material") {
             const { data: existente } = await _supabase
                 .from('stock')
@@ -1264,11 +1263,11 @@ async function procesarGuardadoCapricho() {
                     cantidad: (existente.cantidad || 0) + cantidad,
                     precio: precioUnitario,
                     categoria: subtipo,
-                    grosor: grosor || existente.grosor,
-                    longitud: longitud || existente.longitud,
-                    tienda: tienda || existente.tienda,
-                    composicion: composicion || existente.composicion,
-                    notas: notas || existente.notas,
+                    grosor: grosor,
+                    longitud: longitud,
+                    tienda: tienda,
+                    composicion: composicion,
+                    notas: notas,
                     foto_url: urlFoto || existente.foto_url
                 }).eq('id', existente.id);
             } else {
@@ -1287,15 +1286,14 @@ async function procesarGuardadoCapricho() {
             }
         }
 
-        // B. GUARDAR EN FINANZAS (Sin columnas dudosas)
-        // He quitado 'id_stock_vinculado' y ajustado a lo básico que suele tener tu tabla
+        // 2. GUARDAR EN FINANZAS (Versión ultra-segura)
+        // He quitado 'monto_total' y 'id_stock_vinculado'
         const { error: errorFinanzas } = await _supabase
             .from('finanzas')
             .insert([{
                 concepto: nombreForm,
                 tipo: tipoGeneral,
                 categoria: subtipo,
-                monto_total: montoTotal,
                 notas: notas,
                 foto: urlFoto,
                 tienda: tienda,
@@ -1306,14 +1304,14 @@ async function procesarGuardadoCapricho() {
 
         if (errorFinanzas) throw errorFinanzas;
 
-        alert("💖 ¡Conseguido! Guardado en Finanzas y Stock.");
+        alert("✨ ¡Por fin! Guardado correctamente.");
         limpiarFormularioCapricho();
         cerrarHistorial();
         if (typeof cargarStock === 'function') cargarStock();
         
     } catch (err) {
-        console.error("Error crítico:", err);
-        alert("Error al guardar: " + err.message);
+        console.error("Error detectado:", err);
+        alert("Fallo al guardar: " + err.message);
     }
 }
 function limpiarFormularioCapricho() {
