@@ -1068,46 +1068,48 @@ async function ejecutarGuardadoReal(id) {
     }
 
 function prepararEdicionLlave(id, nombre, usuario, clave) {
-    document.getElementById('llave-id-edit').value = id;
+    document.getElementById('llave-id-edit').value = id; // Esto es vital
     document.getElementById('llave-nombre').value = nombre;
-    document.getElementById('llave-usuario').value = (usuario === 'null' || !usuario) ? '' : usuario;
+    document.getElementById('llave-usuario').value = usuario;
     document.getElementById('llave-valor').value = clave;
     
-    // Cambiamos el texto del botón para saber que estamos editando
-    const btn = document.querySelector('button[onclick="guardarLlave()"]');
-    if(btn) btn.innerText = "🔄 Actualizar Llave";
-    
+    // Opcional: Subir al formulario para ver que se ha cargado
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
     // --- AQUÍ EMPIEZA LA QUE YA TENÍAS ---
 
 async function guardarNuevaLlave() {
+    // 1. Añadimos el ID para saber si estamos editando
+    const id = document.getElementById('llave-id-edit').value;
     const n = document.getElementById('llave-nombre').value;
     const u = document.getElementById('llave-usuario').value;
     const c = document.getElementById('llave-valor').value;
 
     if (!n || !c) return alert("Rellena Sitio y Contraseña");
 
-    console.log("Intentando guardar en tabla limpia...");
+    const datos = { nombre: n, usuario: u, clave: c };
 
-    const { error } = await client.from('llaves').insert([
-        { 
-            nombre: n, 
-            usuario: u, 
-            clave: c 
-        }
-    ]);
-
-   if (error) {
-        alert("Error de Supabase: " + error.message);
+    let res;
+    if (id) {
+        // SI HAY ID: Actualizamos la existente
+        res = await client.from('llaves').update(datos).eq('id', id);
     } else {
-        alert("¡POR FIN! Guardado con éxito.");
+        // NO HAY ID: Insertamos una nueva
+        res = await client.from('llaves').insert([datos]);
+    }
+
+    if (res.error) {
+        alert("Error de Supabase: " + res.error.message);
+    } else {
+        alert(id ? "¡Actualizada con éxito!" : "¡Guardada con éxito!");
+        
+        // Limpiamos TODO, incluido el ID de edición
+        document.getElementById('llave-id-edit').value = '';
         document.getElementById('llave-nombre').value = '';
         document.getElementById('llave-usuario').value = '';
         document.getElementById('llave-valor').value = '';
         
-        // ESTA ES LA LÍNEA QUE FALTA:
         cargarLlaves(); 
     }
 }
