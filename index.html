@@ -524,9 +524,10 @@
     if(v === 'REGALOS') cargarRegalos();
     if(v === 'PDFS') { cargarPDFs(); cargarBorradorLocal(); }
     if(v === 'NOTAS') cargarNotas();
-    if(v === 'LLAVES') cargarLlaves();
+    if (id === 'LLAVES') {
+        cargarLlaves();
+    }
 }
-
     function filtrar(cat) {
         document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('active'));
         const fBtn = document.getElementById('filtro-' + cat);
@@ -1097,13 +1098,16 @@ async function guardarNuevaLlave() {
         }
     ]);
 
-    if (error) {
+   if (error) {
         alert("Error de Supabase: " + error.message);
     } else {
-        alert("¡POR FIN! Guardado con éxito en la tabla nueva.");
+        alert("¡POR FIN! Guardado con éxito.");
         document.getElementById('llave-nombre').value = '';
         document.getElementById('llave-usuario').value = '';
         document.getElementById('llave-valor').value = '';
+        
+        // ESTA ES LA LÍNEA QUE FALTA:
+        cargarLlaves(); 
     }
 }
     async function cargarLlaves() {
