@@ -1082,44 +1082,35 @@ function prepararEdicionLlave(id, nombre, usuario, clave) {
     // --- AQUÍ EMPIEZA LA QUE YA TENÍAS ---
 
 async function guardarLlave() {
-    // 1. Miramos si estamos editando (ID oculto) o creando nueva
     const id = document.getElementById('llave-id-edit').value;
     const nombre = document.getElementById('llave-nombre').value;
     const usuario = document.getElementById('llave-usuario').value;
-    const clave = document.getElementById('llave-valor').value; // Usamos el ID de tu input
+    const valorPassword = document.getElementById('llave-valor').value;
 
-    if (!nombre || !clave) {
-        alert("Por favor, rellena al menos el sitio y la contraseña");
-        return;
-    }
+    if (!nombre || !valorPassword) return alert("Rellena Sitio y Contraseña");
 
-    // 2. Preparamos los datos para tu tabla 'llaves'
-    const datos = { nombre, usuario, clave };
+    // "clave" es el nombre exacto de tu columna en Supabase
+    const datos = { 
+        nombre: nombre, 
+        usuario: usuario, 
+        clave: valorPassword 
+    };
+
     let res;
-
     if (id) {
-        // Modo Edición: Actualizar la que ya existe
         res = await client.from('llaves').update(datos).eq('id', id);
     } else {
-        // Modo Nuevo: Insertar una fila nueva
         res = await client.from('llaves').insert([datos]);
     }
 
-    if (res.error) {
-        alert("Error al guardar: " + res.error.message);
-    } else {
-        alert(id ? "✅ Llave actualizada" : "✅ Llave guardada");
-        
-        // 3. Limpiamos los cuadros de texto
+    if (!res.error) {
         document.getElementById('llave-id-edit').value = '';
         document.getElementById('llave-nombre').value = '';
         document.getElementById('llave-usuario').value = '';
         document.getElementById('llave-valor').value = '';
-
-        // 4. Llamamos a la función de cargar (la haremos en el siguiente paso)
-        if (typeof cargarLlaves === "function") {
-            cargarLlaves();
-        }
+        cargarLlaves();
+    } else {
+        alert("Error al guardar: " + res.error.message);
     }
 }
 async function cargarLlaves() {
@@ -1128,14 +1119,10 @@ async function cargarLlaves() {
 
     lista.innerHTML = '<p style="text-align:center; opacity:0.5;">Abriendo el llavero...</p>';
 
-    // HEMOS QUITADO EL .order(...) PARA EVITAR EL ERROR
-    const { data, error } = await client
-        .from('llaves')
-        .select('*'); 
+    // Pedimos los datos a la tabla 'llaves'
+    const { data, error } = await client.from('llaves').select('*');
 
     if (error) {
-        console.error("Error Supabase:", error);
-        // Ahora el mensaje de error será más específico para nosotros
         lista.innerHTML = `<p style="text-align:center; color:red;">Error: ${error.message}</p>`;
         return;
     }
@@ -1151,6 +1138,7 @@ async function cargarLlaves() {
         const div = document.createElement('div');
         div.className = 'compra-item'; 
         div.style.marginBottom = '12px';
+        
         div.innerHTML = `
             <div style="flex:1;">
                 <strong style="color:var(--s); font-size:1.1rem; display:block;">${llave.nombre}</strong>
