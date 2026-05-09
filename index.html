@@ -1304,32 +1304,43 @@ async function eliminarNota(id) {
         if (!error) cargarNotas();
     }
 }
- // --- LÓGICA DE NAVEGACIÓN INTERNA DE CAPRICHOS ---
-function cambiarVistaInterna(subVista) {
-    // Escondemos la vista de LISTA_GASTOS (y otras que hagamos luego)
-    const vistas = ['vista-LISTA_GASTOS']; 
-    vistas.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-    });
+// --- LÓGICA DE CAPRICHOS (Sustituye lo que tengas de esto por este bloque) ---
 
-    // Mostramos la que hemos pulsado
+function cambiarVistaInterna(subVista) {
+    // 1. Escondemos el menú de los 4 botones
+    const menu = document.getElementById('menu-caprichos');
+    if (menu) menu.style.display = 'none';
+
+    // 2. Escondemos la lista de gastos
+    const vistaLista = document.getElementById('vista-LISTA_GASTOS');
+    if (vistaLista) vistaLista.style.display = 'none';
+
+    // 3. Mostramos la que queremos ver
     const vistaDestino = document.getElementById('vista-' + subVista);
     if (vistaDestino) {
         vistaDestino.style.display = 'block';
-        // Si entramos en el historial, cargamos los datos
         if (subVista === 'LISTA_GASTOS') {
             cargarHistorialGastos('TODOS');
         }
     }
 }
 
-// --- FUNCIÓN PARA LEER LOS GASTOS DE SUPABASE ---
+// ESTA ES LA QUE TE FALTABA:
+function cerrarHistorial() {
+    // 1. Escondemos la lista
+    const vistaLista = document.getElementById('vista-LISTA_GASTOS');
+    if (vistaLista) vistaLista.style.display = 'none';
+    
+    // 2. Volvemos a mostrar el menú de los 4 botones
+    const menu = document.getElementById('menu-caprichos');
+    if (menu) menu.style.display = 'grid'; 
+}
+
 async function cargarHistorialGastos(filtro) {
     const contenedor = document.getElementById('contenedor-lista-gastos');
     if (!contenedor) return;
 
-    contenedor.innerHTML = '<p style="text-align:center; opacity:0.6;">Consultando tu armario rosa...</p>';
+    contenedor.innerHTML = '<p style="text-align:center; opacity:0.6; padding:20px;">Consultando tu armario rosa...</p>';
 
     let query = client.from('stock').select('*').order('created_at', { ascending: false });
 
@@ -1340,12 +1351,11 @@ async function cargarHistorialGastos(filtro) {
     const { data, error } = await query;
 
     if (error) {
-        contenedor.innerHTML = '<p>Error: ' + error.message + '</p>';
+        contenedor.innerHTML = '<p style="color:red; text-align:center;">Error: ' + error.message + '</p>';
         return;
     }
 
     contenedor.innerHTML = ''; 
-
     data.forEach(item => {
         const div = document.createElement('div');
         div.style.cssText = 'background:var(--b); padding:12px; border-radius:15px; border:1px solid var(--br); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;';
@@ -1356,13 +1366,13 @@ async function cargarHistorialGastos(filtro) {
                 <small style="opacity:0.7;">🏷️ ${item.categoria} ${item.subcategoria ? '('+item.subcategoria+')' : ''}</small>
             </div>
             <div style="text-align:right;">
-                <span style="color:var(--p); font-weight:bold;">${item.precio || 0}€</span><br>
+                <span style="color:var(--p); font-weight:bold; font-size:1.1rem;">${item.precio || 0}€</span><br>
                 <small style="opacity:0.5; font-size:0.7rem;">${new Date(item.created_at).toLocaleDateString()}</small>
             </div>
         `;
         contenedor.appendChild(div);
     });
-}   
+}
     // ONLOAD ACTUALIZADO PARA RECUPERAR TEMA
     window.onload = function() {
         const temaGuardado = localStorage.getItem('tema-preferido');
