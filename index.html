@@ -1272,49 +1272,47 @@ async function eliminarNota(id) {
 
 // --- LÓGICA DE CAPRICHOS: NAVEGACIÓN, CIERRE Y CARGA (BLOQUE UNIFICADO) ---
 
+// --- LÓGICA DE CAPRICHOS: NAVEGACIÓN Y CIERRE (BLOQUE UNIFICADO) ---
+
 function cambiarVistaInterna(subVista) {
-    // 1. Escondemos todo el menú principal (los 4 botones + el botón de Volver al Inicio)
+    // 1. Escondemos el menú completo (los 4 botones y el botón inicio)
     const menu = document.getElementById('menu-caprichos');
     if (menu) menu.style.display = 'none';
 
-    // 2. Escondemos las posibles sub-vistas para que no se amontonen
+    // 2. Escondemos sub-vistas para que no se amontonen
     const vistaLista = document.getElementById('vista-LISTA_GASTOS');
     if (vistaLista) vistaLista.style.display = 'none';
     
-    // También intentamos esconder la vista de añadir por su ID común
     const vistaAnadir = document.getElementById('vista-AÑADIR_CAPRICHO');
     if (vistaAnadir) vistaAnadir.style.display = 'none';
 
-    // 3. Mostramos la sub-vista que hemos elegido
-    const vistaDestino = document.getElementById('vista-' + subVista);
-    if (vistaDestino) {
-        vistaDestino.style.display = 'block';
-        // Si entramos al Historial, cargamos los datos de Supabase
+    // 3. Mostramos la que hemos elegido
+    const destino = document.getElementById('vista-' + subVista);
+    if (destino) {
+        destino.style.display = 'block';
         if (subVista === 'LISTA_GASTOS') {
             cargarHistorialGastos('TODOS');
         }
     }
 }
 
+// Función para cerrar el Historial
 function cerrarHistorial() {
-    // 1. Escondemos TODAS las sub-vistas (Historial y Añadir)
-    const vistaLista = document.getElementById('vista-LISTA_GASTOS');
-    if (vistaLista) vistaLista.style.display = 'none';
-
-    const vistaAnadir = document.getElementById('vista-AÑADIR_CAPRICHO');
-    if (vistaAnadir) vistaAnadir.style.display = 'none';
+    // Escondemos sub-vistas
+    if (document.getElementById('vista-LISTA_GASTOS')) document.getElementById('vista-LISTA_GASTOS').style.display = 'none';
+    if (document.getElementById('vista-AÑADIR_CAPRICHO')) document.getElementById('vista-AÑADIR_CAPRICHO').style.display = 'none';
     
-    // 2. Volvemos a mostrar el menú completo (4 botones + botón inicio)
+    // Mostramos de nuevo el menú principal
     const menu = document.getElementById('menu-caprichos');
-    if (menu) {
-        menu.style.display = 'block'; 
-    }
+    if (menu) menu.style.display = 'block';
 
-    // 3. Nos aseguramos de que la vista de Caprichos esté activa
     const vistaCaprichos = document.getElementById('vista-CAPRICHOS');
-    if (vistaCaprichos) {
-        vistaCaprichos.style.display = 'block';
-    }
+    if (vistaCaprichos) vistaCaprichos.style.display = 'block';
+}
+
+// ESTA ES LA FUNCIÓN QUE TE FALTABA PARA EL BOTÓN DE AÑADIR
+function volverMenuCaprichos() {
+    cerrarHistorial();
 }
 
 async function cargarHistorialGastos(filtro) {
@@ -1324,13 +1322,9 @@ async function cargarHistorialGastos(filtro) {
     contenedor.innerHTML = '<p style="text-align:center; opacity:0.6; padding:20px;">Consultando tu armario rosa...</p>';
 
     let query = client.from('stock').select('*').order('created_at', { ascending: false });
-
-    if (filtro !== 'TODOS') {
-        query = query.eq('categoria', filtro);
-    }
+    if (filtro !== 'TODOS') query = query.eq('categoria', filtro);
 
     const { data, error } = await query;
-
     if (error) {
         contenedor.innerHTML = '<p style="color:red; text-align:center;">Error: ' + error.message + '</p>';
         return;
@@ -1340,7 +1334,6 @@ async function cargarHistorialGastos(filtro) {
     data.forEach(item => {
         const div = document.createElement('div');
         div.style.cssText = 'background:var(--b); padding:12px; border-radius:15px; border:1px solid var(--br); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;';
-        
         div.innerHTML = `
             <div>
                 <strong style="color:var(--s);">${item.nombre}</strong><br>
