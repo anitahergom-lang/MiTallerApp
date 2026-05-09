@@ -469,14 +469,15 @@
 </div>
 <div id="vista-LLAVES" class="view" style="display:none;">
     <h2 style="color:var(--s); text-align:center;">🔑 Mis Llaves</h2>
+    
     <div style="background:var(--b); padding:15px; border-radius:20px; border:1px solid var(--br); margin-bottom:20px;">
+        <input type="hidden" id="llave-id-edit">
+        
         <input type="text" id="llave-nombre" placeholder="Sitio (Ej: Netflix)" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
         <input type="text" id="llave-usuario" placeholder="Usuario / Email" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
         <input type="password" id="llave-valor" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
         
-        <input type="hidden" id="llave-id-edit">
-
-        <button onclick="guardarLlave()" style="width:100%; background:var(--p); color:white; border:none; padding:12px; border-radius:10px; font-weight:bold; cursor:pointer;">
+        <button id="btn-guardar-llave" onclick="guardarLlave()" style="width:100%; background:var(--p); color:white; border:none; padding:12px; border-radius:10px; font-weight:bold; cursor:pointer;">
             ✨ Guardar Llave
         </button>
     </div>
@@ -1121,48 +1122,43 @@ async function guardarLlave() {
         }
     }
 }
-    async function cargarLlaves() {
+async function cargarLlaves() {
     const lista = document.getElementById('lista-llaves');
     if (!lista) return;
 
-    lista.innerHTML = '<p style="text-align:center; opacity:0.5;">Buscando en el llavero...</p>';
+    lista.innerHTML = '<p style="text-align:center; opacity:0.5;">Abriendo el llavero...</p>';
 
-    // Pedimos a Supabase los datos de tu tabla 'llaves'
+    // Consultamos la tabla 'llaves'
     const { data, error } = await client
         .from('llaves')
         .select('*')
         .order('created_at', { ascending: false });
 
     if (error) {
-        console.error("Error al cargar llaves:", error);
-        lista.innerHTML = '<p style="text-align:center; color:red;">Error al conectar con el llavero.</p>';
+        console.error("Error Supabase:", error);
         return;
     }
 
-    lista.innerHTML = ''; 
+    lista.innerHTML = ''; // Limpiamos el texto de carga
 
     if (data.length === 0) {
-        lista.innerHTML = '<p style="text-align:center; opacity:0.5; padding:20px;">No hay llaves guardadas aún.</p>';
+        lista.innerHTML = '<p style="text-align:center; opacity:0.5;">No hay llaves guardadas.</p>';
         return;
     }
 
-    // Dibujamos las tarjetas
     data.forEach(llave => {
         const div = document.createElement('div');
-        div.className = 'compra-item'; 
+        div.className = 'compra-item'; // Usamos tu estilo rosa
         div.style.marginBottom = '12px';
-        
         div.innerHTML = `
             <div style="flex:1;">
-                <strong style="color:var(--s); font-size:1.1rem; display:block;">${llave.nombre}</strong>
-                <div style="font-size:0.9rem; opacity:0.7; margin-top:2px;">👤 ${llave.usuario || 'Sin usuario'}</div>
-                <div style="margin-top:8px;">
-                    <code style="background:var(--pc); padding:4px 8px; border-radius:6px; font-weight:bold; color:var(--s); font-family:monospace;">${llave.clave}</code>
-                </div>
+                <strong style="color:var(--s);">${llave.nombre}</strong>
+                <div style="font-size:0.8rem; opacity:0.7;">👤 ${llave.usuario || '---'}</div>
+                <code style="background:var(--pc); padding:2px 5px; border-radius:4px; font-size:0.9rem;">${llave.clave}</code>
             </div>
-            <div style="display:flex; gap:15px; margin-left:10px;">
-                <button onclick="prepararEdicionLlave('${llave.id}', '${llave.nombre}', '${llave.usuario}', '${llave.clave}')" style="background:none; border:none; cursor:pointer; font-size:18px;">✏️</button>
-                <button onclick="eliminarLlave('${llave.id}')" style="background:none; border:none; cursor:pointer; font-size:18px;">🗑️</button>
+            <div style="display:flex; gap:10px;">
+                <button onclick="prepararEdicionLlave('${llave.id}', '${llave.nombre}', '${llave.usuario}', '${llave.clave}')" style="background:none; border:none; cursor:pointer;">✏️</button>
+                <button onclick="eliminarLlave('${llave.id}')" style="background:none; border:none; cursor:pointer;">🗑️</button>
             </div>
         `;
         lista.appendChild(div);
