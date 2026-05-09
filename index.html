@@ -1219,6 +1219,7 @@ function previsualizarImagenCapricho(event) {
 
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
 async function procesarGuardadoCapricho() {
+    // 1. Recogida de datos del formulario
     const nombreForm = document.getElementById('capricho-nombre').value.trim();
     const tipoGeneral = document.getElementById('capricho-tipo-general').value;
     const subtipo = document.getElementById('capricho-subtipo').value;
@@ -1233,7 +1234,7 @@ async function procesarGuardadoCapricho() {
     const fotoFile = document.getElementById('capricho-foto').files[0];
 
     if (!nombreForm || !tipoGeneral) {
-        alert("Faltan datos básicos (Nombre o Categoría)");
+        alert("Por favor, rellena el nombre y el tipo.");
         return;
     }
 
@@ -1251,7 +1252,8 @@ async function procesarGuardadoCapricho() {
             }
         }
 
-        // 1. ACTUALIZAR STOCK (Esto suele funcionar porque la tabla stock es más completa)
+        // 2. LOGICA DE STOCK (Tabla: stock)
+        // Aquí enviamos todo porque la tabla stock suele ser completa
         if (tipoGeneral === "Material") {
             const { data: existente } = await _supabase
                 .from('stock')
@@ -1279,27 +1281,29 @@ async function procesarGuardadoCapricho() {
             }
         }
 
-        // 2. GUARDAR EN FINANZAS (SOLO LO IMPRESCINDIBLE PARA EVITAR ERRORES)
-        // Solo enviamos 4 campos que todas las tablas suelen tener
+        // 3. LOGICA DE FINANZAS (Tabla: finanzas)
+        // HEMOS QUITADO: monto_total, unidades, precio_unitario, grosor, longitud, composicion
+        // Solo dejamos los que NO han dado error en tus capturas
         const { error: errorFinanzas } = await _supabase
             .from('finanzas')
             .insert([{
                 concepto: nombreForm,
                 tipo: tipoGeneral,
                 categoria: subtipo,
-                notas: notas
+                notas: notas,
+                foto: urlFoto // Si 'foto' da error, cámbialo por 'foto_url'
             }]);
 
         if (errorFinanzas) throw errorFinanzas;
 
-        alert("✅ ¡POR FIN! Guardado con éxito.");
+        alert("💖 ¡CONSEGUIDO! Registro guardado correctamente.");
         limpiarFormularioCapricho();
         cerrarHistorial();
         if (typeof cargarStock === 'function') cargarStock();
         
     } catch (err) {
-        console.error("Error final:", err);
-        alert("Error de Supabase: " + err.message);
+        console.error("Error en el envío:", err);
+        alert("Fallo de columna: " + err.message);
     }
 }
 function limpiarFormularioCapricho() {
