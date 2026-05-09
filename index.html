@@ -1081,40 +1081,16 @@ function prepararEdicionLlave(id, nombre, usuario, clave) {
     // --- AQUÍ EMPIEZA LA QUE YA TENÍAS ---
 
 async function guardarNuevaLlave() {
-    console.log("Iniciando guardado con columnas: nombre, usuario, clave");
+    console.log("--- TEST DE COLUMNAS ---");
+    // Intentamos traer solo una fila para ver cómo se llaman las columnas
+    const { data, error } = await client.from('llaves').select('*').limit(1);
 
-    const nombreSitio = document.getElementById('llave-nombre').value;
-    const usuarioSitio = document.getElementById('llave-usuario').value;
-    const passwordSitio = document.getElementById('llave-valor').value;
-
-    if (!nombreSitio || !passwordSitio) {
-        alert("Por favor, rellena el Sitio y la Contraseña");
-        return;
-    }
-
-    try {
-        const { error } = await client.from('llaves').insert([
-            { 
-                nombre: nombreSitio, 
-                usuario: usuarioSitio, 
-                clave: passwordSitio 
-            }
-        ]);
-
-        if (error) {
-            console.error("Error de Supabase:", error);
-            alert("Hubo un error al guardar: " + error.message);
-        } else {
-            alert("¡Llave guardada correctamente!");
-            
-            // Limpiar campos
-            document.getElementById('llave-nombre').value = '';
-            document.getElementById('llave-usuario').value = '';
-            document.getElementById('llave-valor').value = '';
-        }
-    } catch (err) {
-        console.error("Error inesperado:", err);
-        alert("Ocurrió un fallo inesperado.");
+    if (error) {
+        console.error("Error al leer la tabla:", error);
+        alert("Error al conectar: " + error.message);
+    } else {
+        console.log("Columnas detectadas en la tabla 'llaves':", Object.keys(data[0] || {}));
+        alert("Mira la consola F12, allí nos dirá los nombres reales de tus columnas.");
     }
 }
     async function cargarLlaves() {
