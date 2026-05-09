@@ -1219,15 +1219,13 @@ function previsualizarImagenCapricho(event) {
 
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
 async function procesarGuardadoCapricho() {
-    // 1. Captura de datos del formulario (IDs del HTML)
     const nombreForm = document.getElementById('capricho-nombre').value.trim();
     const tipoGeneral = document.getElementById('capricho-tipo-general').value;
     const subtipo = document.getElementById('capricho-subtipo').value;
     const precioUnitario = parseFloat(document.getElementById('capricho-precio').value) || 0;
     const cantidad = parseInt(document.getElementById('capricho-cantidad').value) || 1;
-    const montoTotal = precioUnitario * cantidad; // Calculamos el total
+    const montoTotal = precioUnitario * cantidad;
     
-    // Datos técnicos
     const grosor = document.getElementById('capricho-grosor').value;
     const longitud = document.getElementById('capricho-longitud').value;
     const tienda = document.getElementById('capricho-tienda').value;
@@ -1253,21 +1251,17 @@ async function procesarGuardadoCapricho() {
             urlFoto = dataUrl.publicUrl;
         }
 
-        let idStock = null;
-
-        // A. LÓGICA DE STOCK (Tabla: stock)
+        // A. ACTUALIZAR STOCK
         if (tipoGeneral === "Material") {
-            const { data: existente, error: errorBusqueda } = await _supabase
+            const { data: existente } = await _supabase
                 .from('stock')
                 .select('*')
                 .eq('nombre', nombreForm)
                 .maybeSingle();
 
             if (existente) {
-                idStock = existente.id;
-                const nuevaCantidad = (existente.cantidad || 0) + cantidad;
                 await _supabase.from('stock').update({
-                    cantidad: nuevaCantidad,
+                    cantidad: (existente.cantidad || 0) + cantidad,
                     precio: precioUnitario,
                     categoria: subtipo,
                     grosor: grosor || existente.grosor,
@@ -1278,54 +1272,48 @@ async function procesarGuardadoCapricho() {
                     foto_url: urlFoto || existente.foto_url
                 }).eq('id', existente.id);
             } else {
-                const { data: nuevoItem, error: errorInsertStock } = await _supabase
-                    .from('stock')
-                    .insert([{
-                        nombre: nombreForm,
-                        categoria: subtipo,
-                        cantidad: cantidad,
-                        precio: precioUnitario,
-                        grosor: grosor,
-                        longitud: longitud,
-                        tienda: tienda,
-                        composicion: composicion,
-                        notas: notas,
-                        foto_url: urlFoto
-                    }]).select().single();
-                
-                if (nuevoItem) idStock = nuevoItem.id;
+                await _supabase.from('stock').insert([{
+                    nombre: nombreForm,
+                    categoria: subtipo,
+                    cantidad: cantidad,
+                    precio: precioUnitario,
+                    grosor: grosor,
+                    longitud: longitud,
+                    tienda: tienda,
+                    composicion: composicion,
+                    notas: notas,
+                    foto_url: urlFoto
+                }]);
             }
         }
 
-        // B. LÓGICA DE GASTOS (Tabla: finanzas) - USANDO TUS COLUMNAS EXACTAS
+        // B. GUARDAR EN FINANZAS (Sin columnas dudosas)
+        // He quitado 'id_stock_vinculado' y ajustado a lo básico que suele tener tu tabla
         const { error: errorFinanzas } = await _supabase
             .from('finanzas')
             .insert([{
-                concepto: nombreForm,           // Mapeado de tu lista
-                tipo: tipoGeneral,             // Mapeado de tu lista
-                categoria: subtipo,            // Mapeado de tu lista
-                monto_total: montoTotal,       // Mapeado de tu lista
-                unidades: cantidad,            // Mapeado de tu lista
-                precio_unitario: precioUnitario, // Mapeado de tu lista
-                id_stock_vinculado: idStock,   // Mapeado de tu lista
-                composicion: composicion,      // Mapeado de tu lista
-                grosor: grosor,                // Mapeado de tu lista
-                longitud: longitud,            // Mapeado de tu lista
-                tienda: tienda,                // Mapeado de tu lista
-                notas: notas,                  // Mapeado de tu lista
-                foto: urlFoto                  // Mapeado de tu lista
+                concepto: nombreForm,
+                tipo: tipoGeneral,
+                categoria: subtipo,
+                monto_total: montoTotal,
+                notas: notas,
+                foto: urlFoto,
+                tienda: tienda,
+                grosor: grosor,
+                longitud: longitud,
+                composicion: composicion
             }]);
 
         if (errorFinanzas) throw errorFinanzas;
 
-        alert("💖 Registro completado con éxito en Finanzas y Stock.");
+        alert("💖 ¡Conseguido! Guardado en Finanzas y Stock.");
         limpiarFormularioCapricho();
         cerrarHistorial();
         if (typeof cargarStock === 'function') cargarStock();
         
     } catch (err) {
-        console.error("Error detallado:", err);
-        alert("Error al guardar. Revisa la consola.");
+        console.error("Error crítico:", err);
+        alert("Error al guardar: " + err.message);
     }
 }
 function limpiarFormularioCapricho() {
