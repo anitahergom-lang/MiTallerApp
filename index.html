@@ -1256,9 +1256,7 @@ async function procesarGuardadoCapricho() {
         }
 
         // B. LÓGICA DE STOCK (Doble entrada)
-        // Solo sincronizamos con Stock si es "Material"
         if (tipoGeneral === "Material") {
-            // Paso 1: Buscar si ya existe por nombre exacto
             const { data: existente, error: errorBusqueda } = await _supabase
                 .from('stock')
                 .select('*')
@@ -1266,24 +1264,26 @@ async function procesarGuardadoCapricho() {
                 .maybeSingle();
 
             if (existente) {
-                // Paso 2: UPDATE (Existe) -> Sumamos cantidad y refrescamos datos
+                // UPDATE: Añadimos 'precio' para que Supabase no dé error
                 const nuevaCantidad = (existente.cantidad || 0) + cantidad;
                 await _supabase.from('stock').update({
                     cantidad: nuevaCantidad,
+                    precio: precio, // <--- ESTO ARREGLA TU ERROR
                     categoria: subtipo,
                     grosor: grosor || existente.grosor,
                     longitud: longitud || existente.longitud,
                     tienda: tienda || existente.tienda,
                     composicion: composicion || existente.composicion,
                     notas: notas || existente.notas,
-                    foto_url: urlFoto || existente.foto_url // Si no hay foto nueva, deja la vieja
+                    foto_url: urlFoto || existente.foto_url
                 }).eq('id', existente.id);
             } else {
-                // Paso 2: INSERT (No existe) -> Creamos tarjeta nueva
+                // INSERT: Añadimos 'precio' para que Supabase no dé error
                 await _supabase.from('stock').insert([{
                     nombre: nombre,
                     categoria: subtipo,
                     cantidad: cantidad,
+                    precio: precio, // <--- ESTO ARREGLA TU ERROR
                     grosor: grosor,
                     longitud: longitud,
                     tienda: tienda,
@@ -1294,8 +1294,7 @@ async function procesarGuardadoCapricho() {
             }
         }
 
-        // C. GUARDAR EN HISTORIAL DE CAPRICHOS (Finanzas)
-        // Esto se guarda SIEMPRE para tener el registro de precios
+        // C. GUARDAR EN HISTORIAL DE CAPRICHOS
         const { error: errorCapricho } = await _supabase
             .from('caprichos')
             .insert([{
@@ -1313,7 +1312,6 @@ async function procesarGuardadoCapricho() {
 
         alert("💖 Registro completado: Gasto anotado y Stock actualizado.");
         
-        // Limpiar formulario y refrescar vistas
         limpiarFormularioCapricho();
         cerrarHistorial();
         if (typeof cargarStock === 'function') cargarStock();
@@ -1323,7 +1321,6 @@ async function procesarGuardadoCapricho() {
         alert("Hubo un error al guardar.");
     }
 }
-
 function limpiarFormularioCapricho() {
     const ids = ['capricho-nombre', 'capricho-precio', 'capricho-grosor', 'capricho-longitud', 'capricho-tienda', 'capricho-composicion', 'capricho-notas', 'capricho-foto'];
     ids.forEach(id => {
