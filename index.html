@@ -1080,45 +1080,35 @@ function prepararEdicionLlave(id, nombre, usuario, clave) {
 
     // --- AQUÍ EMPIEZA LA QUE YA TENÍAS ---
 
-async function guardarLlave() {
-    // 1. Miramos si estamos editando (ID oculto) o creando nueva
-    const id = document.getElementById('llave-id-edit').value;
+async function guardarNuevaLlave() {
     const nombre = document.getElementById('llave-nombre').value;
     const usuario = document.getElementById('llave-usuario').value;
-    const clave = document.getElementById('llave-valor').value; // Usamos el ID de tu input
+    const valorClave = document.getElementById('llave-valor').value;
 
-    if (!nombre || !clave) {
-        alert("Por favor, rellena al menos el sitio y la contraseña");
-        return;
+    if (!nombre || !valorClave) {
+        return alert("Por favor, rellena al menos el Nombre y la Contraseña");
     }
 
-    // 2. Preparamos los datos para tu tabla 'llaves'
-    const datos = { nombre, usuario, clave };
-    let res;
+    // IMPORTANTE: Los nombres de la izquierda deben ser IGUALES a tus columnas de Supabase
+    const { error } = await client.from('llaves').insert([
+        { 
+            nombre: nombre, 
+            usuario: usuario, 
+            clave: valorClave 
+        }
+    ]);
 
-    if (id) {
-        // Modo Edición: Actualizar la que ya existe
-        res = await client.from('llaves').update(datos).eq('id', id);
+    if (error) {
+        alert("Error al guardar: " + error.message);
     } else {
-        // Modo Nuevo: Insertar una fila nueva
-        res = await client.from('llaves').insert([datos]);
-    }
-
-    if (res.error) {
-        alert("Error al guardar: " + res.error.message);
-    } else {
-        alert(id ? "✅ Llave actualizada" : "✅ Llave guardada");
-        
-        // 3. Limpiamos los cuadros de texto
-        document.getElementById('llave-id-edit').value = '';
+        alert("¡Llave guardada con éxito!");
+        // Limpiamos los campos
         document.getElementById('llave-nombre').value = '';
         document.getElementById('llave-usuario').value = '';
         document.getElementById('llave-valor').value = '';
-
-        // 4. Llamamos a la función de cargar (la haremos en el siguiente paso)
-        if (typeof cargarLlaves === "function") {
-            cargarLlaves();
-        }
+        
+        // Refrescamos la lista para ver la nueva llave
+        cargarLlaves();
     }
 }
 async function cargarLlaves() {
