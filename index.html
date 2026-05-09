@@ -1081,41 +1081,29 @@ function prepararEdicionLlave(id, nombre, usuario, clave) {
     // --- AQUÍ EMPIEZA LA QUE YA TENÍAS ---
 
 async function guardarNuevaLlave() {
-    // 1. Recogemos lo que has escrito en la pantalla
-    const valorNombre = document.getElementById('llave-nombre').value;
-    const valorUsuario = document.getElementById('llave-usuario').value;
-    const valorClave = document.getElementById('llave-valor').value;
+    const n = document.getElementById('llave-nombre').value;
+    const u = document.getElementById('llave-usuario').value;
+    const c = document.getElementById('llave-valor').value;
 
-    // 2. Comprobación básica
-    if (!valorNombre || !valorClave) {
-        alert("Por favor, rellena el nombre del sitio y la contraseña.");
-        return;
-    }
+    if (!n || !c) return alert("Rellena Sitio y Contraseña");
 
-    try {
-        // 3. Enviamos a Supabase con los nombres de columna que me has dado
-        const { error } = await client.from('llaves').insert([
-            { 
-                nombre: valorNombre, 
-                usuario: valorUsuario, 
-                clave: valorClave 
-            }
-        ]);
+    console.log("Intentando guardar en tabla limpia...");
 
-        if (error) {
-            // Si Supabase dice que algo está mal, nos lo dirá aquí
-            alert("Error de Supabase: " + error.message);
-        } else {
-            // ¡ÉXITO!
-            alert("¡Llave guardada correctamente!");
-            
-            // Limpiamos los cuadritos para la siguiente
-            document.getElementById('llave-nombre').value = '';
-            document.getElementById('llave-usuario').value = '';
-            document.getElementById('llave-valor').value = '';
+    const { error } = await client.from('llaves').insert([
+        { 
+            nombre: n, 
+            usuario: u, 
+            clave: c 
         }
-    } catch (err) {
-        alert("Error inesperado en el código.");
+    ]);
+
+    if (error) {
+        alert("Error de Supabase: " + error.message);
+    } else {
+        alert("¡POR FIN! Guardado con éxito en la tabla nueva.");
+        document.getElementById('llave-nombre').value = '';
+        document.getElementById('llave-usuario').value = '';
+        document.getElementById('llave-valor').value = '';
     }
 }
     async function cargarLlaves() {
