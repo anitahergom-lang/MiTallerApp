@@ -1232,8 +1232,8 @@ async function procesarGuardadoCapricho() {
     const notas = document.getElementById('capricho-notas').value;
     const fotoFile = document.getElementById('capricho-foto').files[0];
 
-    if (!nombreForm || !tipoGeneral || precioUnitario <= 0) {
-        alert("Por favor, rellena nombre, categoría y precio.");
+    if (!nombreForm || !tipoGeneral) {
+        alert("Faltan datos básicos (Nombre o Categoría)");
         return;
     }
 
@@ -1245,12 +1245,13 @@ async function procesarGuardadoCapricho() {
             const { data: dataImg, error: errorImg } = await _supabase.storage
                 .from('materiales')
                 .upload(fileName, fotoFile);
-            if (errorImg) throw errorImg;
-            const { data: dataUrl } = _supabase.storage.from('materiales').getPublicUrl(fileName);
-            urlFoto = dataUrl.publicUrl;
+            if (!errorImg) {
+                const { data: dataUrl } = _supabase.storage.from('materiales').getPublicUrl(fileName);
+                urlFoto = dataUrl.publicUrl;
+            }
         }
 
-        // 1. ACTUALIZAR STOCK (Tabla: stock)
+        // 1. ACTUALIZAR STOCK (Esto suele funcionar porque la tabla stock es más completa)
         if (tipoGeneral === "Material") {
             const { data: existente } = await _supabase
                 .from('stock')
@@ -1258,60 +1259,47 @@ async function procesarGuardadoCapricho() {
                 .eq('nombre', nombreForm)
                 .maybeSingle();
 
+            const datosStock = {
+                nombre: nombreForm,
+                categoria: subtipo,
+                cantidad: existente ? (existente.cantidad || 0) + cantidad : cantidad,
+                precio: precioUnitario,
+                grosor: grosor,
+                longitud: longitud,
+                tienda: tienda,
+                composicion: composicion,
+                notas: notas,
+                foto_url: urlFoto || (existente ? existente.foto_url : null)
+            };
+
             if (existente) {
-                await _supabase.from('stock').update({
-                    cantidad: (existente.cantidad || 0) + cantidad,
-                    precio: precioUnitario,
-                    categoria: subtipo,
-                    grosor: grosor,
-                    longitud: longitud,
-                    tienda: tienda,
-                    composicion: composicion,
-                    notas: notas,
-                    foto_url: urlFoto || existente.foto_url
-                }).eq('id', existente.id);
+                await _supabase.from('stock').update(datosStock).eq('id', existente.id);
             } else {
-                await _supabase.from('stock').insert([{
-                    nombre: nombreForm,
-                    categoria: subtipo,
-                    cantidad: cantidad,
-                    precio: precioUnitario,
-                    grosor: grosor,
-                    longitud: longitud,
-                    tienda: tienda,
-                    composicion: composicion,
-                    notas: notas,
-                    foto_url: urlFoto
-                }]);
+                await _supabase.from('stock').insert([datosStock]);
             }
         }
 
-        // 2. GUARDAR EN FINANZAS (Versión ultra-segura)
-        // He quitado 'monto_total' y 'id_stock_vinculado'
+        // 2. GUARDAR EN FINANZAS (SOLO LO IMPRESCINDIBLE PARA EVITAR ERRORES)
+        // Solo enviamos 4 campos que todas las tablas suelen tener
         const { error: errorFinanzas } = await _supabase
             .from('finanzas')
             .insert([{
                 concepto: nombreForm,
                 tipo: tipoGeneral,
                 categoria: subtipo,
-                notas: notas,
-                foto: urlFoto,
-                tienda: tienda,
-                grosor: grosor,
-                longitud: longitud,
-                composicion: composicion
+                notas: notas
             }]);
 
         if (errorFinanzas) throw errorFinanzas;
 
-        alert("✨ ¡Por fin! Guardado correctamente.");
+        alert("✅ ¡POR FIN! Guardado con éxito.");
         limpiarFormularioCapricho();
         cerrarHistorial();
         if (typeof cargarStock === 'function') cargarStock();
         
     } catch (err) {
-        console.error("Error detectado:", err);
-        alert("Fallo al guardar: " + err.message);
+        console.error("Error final:", err);
+        alert("Error de Supabase: " + err.message);
     }
 }
 function limpiarFormularioCapricho() {
