@@ -469,12 +469,9 @@
 </div>
 <div id="vista-LLAVES" class="view" style="display:none;">
     <h2 style="color:var(--s); text-align:center;">🔑 Mis Llaves</h2>
-    
     <div style="background:var(--b); padding:15px; border-radius:20px; border:1px solid var(--br); margin-bottom:20px;">
         <input type="text" id="llave-nombre" placeholder="Sitio (Ej: Netflix)" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
-        
         <input type="text" id="llave-usuario" placeholder="Usuario / Email" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
-        
         <input type="password" id="llave-valor" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
         
         <input type="hidden" id="llave-id-edit">
@@ -946,19 +943,15 @@
     }
 
     async function eliminarLlave(id) {
-        if (confirm("¿Estás segura de que quieres borrar esta llave?")) {
-            const { error } = await client
-                .from('llaves_data')
-                .delete()
-                .eq('id', id);
-
-            if (error) {
-                alert("Error al borrar: " + error.message);
-            } else {
-                cargarLlaves();
-            }
+    if (confirm("¿Seguro que quieres borrar esta llave?")) {
+        const { error } = await client.from('llaves').delete().eq('id', id);
+        if (!error) {
+            cargarLlaves();
+        } else {
+            alert("Error al borrar: " + error.message);
         }
     }
+}
     // Función para mostrar/ocultar contraseña
     function togglePass(id, claveReal) {
         const el = document.getElementById('pass-' + id);
@@ -1072,68 +1065,109 @@ async function ejecutarGuardadoReal(id) {
         }
     }
 
-    function prepararEdicionLlave(id, nombre, usuario, clave) {
-        document.getElementById('llave-nombre').value = nombre;
-        document.getElementById('llave-usuario').value = usuario;
-        document.getElementById('llave-pass').value = clave;
-        window.editandoLlaveId = id;
-        const btn = document.querySelector('button[onclick="guardarNuevaLlave()"]');
-        if (btn) {
-            btn.innerText = "Actualizar Llave 🔄";
-            btn.style.background = "#4CAF50"; 
-        }
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+function prepararEdicionLlave(id, nombre, usuario, clave) {
+    document.getElementById('llave-id-edit').value = id;
+    document.getElementById('llave-nombre').value = nombre;
+    document.getElementById('llave-usuario').value = (usuario === 'null' || !usuario) ? '' : usuario;
+    document.getElementById('llave-valor').value = clave;
+    
+    // Cambiamos el texto del botón para saber que estamos editando
+    const btn = document.querySelector('button[onclick="guardarLlave()"]');
+    if(btn) btn.innerText = "🔄 Actualizar Llave";
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
     // --- AQUÍ EMPIEZA LA QUE YA TENÍAS ---
 
-async function guardarNuevaLlave() {
-        const nombre = document.getElementById('llave-nombre').value;
-        const usuario = document.getElementById('llave-usuario').value;
-        const clave = document.getElementById('llave-pass').value;
+async function guardarLlave() {
+    // 1. Miramos si estamos editando (ID oculto) o creando nueva
+    const id = document.getElementById('llave-id-edit').value;
+    const nombre = document.getElementById('llave-nombre').value;
+    const usuario = document.getElementById('llave-usuario').value;
+    const clave = document.getElementById('llave-valor').value; // Usamos el ID de tu input
 
-        if (!nombre || !clave) {
-            alert("Por favor, rellena al menos el nombre y la contraseña");
-            return;
-        }
+    if (!nombre || !clave) {
+        alert("Por favor, rellena al menos el sitio y la contraseña");
+        return;
+    }
 
-        let error;
+    // 2. Preparamos los datos para tu tabla 'llaves'
+    const datos = { nombre, usuario, clave };
+    let res;
 
-        // Aquí es donde el código decide qué hacer:
-        if (window.editandoLlaveId) {
-            // MODO EDICIÓN: Si hay un ID guardado, actualiza la existente
-            const { error: err } = await client
-                .from('llaves_data')
-                .update({ nombre, usuario, clave })
-                .eq('id', window.editandoLlaveId);
-            error = err;
-        } else {
-            // MODO NUEVO: Si no hay ID, crea una nueva (como hacía antes)
-            const { error: err } = await client
-                .from('llaves_data')
-                .insert([{ nombre, usuario, clave }]);
-            error = err;
-        }
+    if (id) {
+        // Modo Edición: Actualizar la que ya existe
+        res = await client.from('llaves').update(datos).eq('id', id);
+    } else {
+        // Modo Nuevo: Insertar una fila nueva
+        res = await client.from('llaves').insert([datos]);
+    }
 
-        if (error) {
-            alert("Error al guardar: " + error.message);
-        } else {
-            // Limpiamos las cajitas de texto
-            document.getElementById('llave-nombre').value = '';
-            document.getElementById('llave-usuario').value = '';
-            document.getElementById('llave-pass').value = '';
+    if (res.error) {
+        alert("Error al guardar: " + res.error.message);
+    } else {
+        alert(id ? "✅ Llave actualizada" : "✅ Llave guardada");
+        
+        // 3. Limpiamos los cuadros de texto
+        document.getElementById('llave-id-edit').value = '';
+        document.getElementById('llave-nombre').value = '';
+        document.getElementById('llave-usuario').value = '';
+        document.getElementById('llave-valor').value = '';
 
-            // IMPORTANTE: Quitamos el modo edición y devolvemos el botón a su estado original
-            window.editandoLlaveId = null;
-            const btn = document.querySelector('button[onclick="guardarNuevaLlave()"]');
-            if (btn) {
-                btn.innerText = "Guardar Llave 🔑";
-                btn.style.background = "var(--p)"; // Vuelve al rosa
-            }
-
-            cargarLlaves(); 
+        // 4. Llamamos a la función de cargar (la haremos en el siguiente paso)
+        if (typeof cargarLlaves === "function") {
+            cargarLlaves();
         }
     }
+}
+    async function cargarLlaves() {
+    const lista = document.getElementById('lista-llaves');
+    if (!lista) return;
+
+    lista.innerHTML = '<p style="text-align:center; opacity:0.5;">Buscando en el llavero...</p>';
+
+    // Pedimos a Supabase los datos de tu tabla 'llaves'
+    const { data, error } = await client
+        .from('llaves')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Error al cargar llaves:", error);
+        lista.innerHTML = '<p style="text-align:center; color:red;">Error al conectar con el llavero.</p>';
+        return;
+    }
+
+    lista.innerHTML = ''; 
+
+    if (data.length === 0) {
+        lista.innerHTML = '<p style="text-align:center; opacity:0.5; padding:20px;">No hay llaves guardadas aún.</p>';
+        return;
+    }
+
+    // Dibujamos las tarjetas
+    data.forEach(llave => {
+        const div = document.createElement('div');
+        div.className = 'compra-item'; 
+        div.style.marginBottom = '12px';
+        
+        div.innerHTML = `
+            <div style="flex:1;">
+                <strong style="color:var(--s); font-size:1.1rem; display:block;">${llave.nombre}</strong>
+                <div style="font-size:0.9rem; opacity:0.7; margin-top:2px;">👤 ${llave.usuario || 'Sin usuario'}</div>
+                <div style="margin-top:8px;">
+                    <code style="background:var(--pc); padding:4px 8px; border-radius:6px; font-weight:bold; color:var(--s); font-family:monospace;">${llave.clave}</code>
+                </div>
+            </div>
+            <div style="display:flex; gap:15px; margin-left:10px;">
+                <button onclick="prepararEdicionLlave('${llave.id}', '${llave.nombre}', '${llave.usuario}', '${llave.clave}')" style="background:none; border:none; cursor:pointer; font-size:18px;">✏️</button>
+                <button onclick="eliminarLlave('${llave.id}')" style="background:none; border:none; cursor:pointer; font-size:18px;">🗑️</button>
+            </div>
+        `;
+        lista.appendChild(div);
+    });
+}
   // Función para navegar DENTRO de la sección de Caprichos
 // Función para navegar a las sub-secciones
 function cambiarVistaInterna(subSeccion) {
