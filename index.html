@@ -1083,18 +1083,18 @@ function prepararEdicionLlave(id, nombre, usuario, clave) {
 async function guardarNuevaLlave() {
     const nombre = document.getElementById('llave-nombre').value;
     const usuario = document.getElementById('llave-usuario').value;
-    const valorClave = document.getElementById('llave-valor').value;
+    const clave = document.getElementById('llave-valor').value; // Aquí estaba el fallo de nombre
 
-    if (!nombre || !valorClave) {
+    if (!nombre || !clave) {
         return alert("Por favor, rellena al menos el Nombre y la Contraseña");
     }
 
-    // IMPORTANTE: Los nombres de la izquierda deben ser IGUALES a tus columnas de Supabase
+    // Enviamos a Supabase
     const { error } = await client.from('llaves').insert([
         { 
             nombre: nombre, 
             usuario: usuario, 
-            clave: valorClave 
+            clave: clave 
         }
     ]);
 
@@ -1102,12 +1102,12 @@ async function guardarNuevaLlave() {
         alert("Error al guardar: " + error.message);
     } else {
         alert("¡Llave guardada con éxito!");
-        // Limpiamos los campos
+        // Limpiar campos
         document.getElementById('llave-nombre').value = '';
         document.getElementById('llave-usuario').value = '';
         document.getElementById('llave-valor').value = '';
         
-        // Refrescamos la lista para ver la nueva llave
+        // Recargar la lista para que aparezca la nueva
         cargarLlaves();
     }
 }
