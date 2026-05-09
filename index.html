@@ -220,31 +220,33 @@
     <div class="card">
         <h2 style="color:var(--p); text-align:center; margin-bottom:20px;">💸 Mis Caprichos</h2>
         
-        <div id="menu-caprichos" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <button class="btn-nav" onclick="cambiarVistaInterna('AÑADIR_CAPRICHO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
-                <span style="font-size:2.2em; margin-bottom:5px;">🛍️</span>
-                <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Añadir</span>
-            </button>
+        <div id="menu-caprichos">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <button class="btn-nav" onclick="cambiarVistaInterna('AÑADIR_CAPRICHO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                    <span style="font-size:2.2em; margin-bottom:5px;">🛍️</span>
+                    <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Añadir</span>
+                </button>
 
-            <button class="btn-nav" onclick="cambiarVistaInterna('LISTA_GASTOS')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
-                <span style="font-size:2.2em; margin-bottom:5px;">📖</span>
-                <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Mi Historial</span>
-            </button>
+                <button class="btn-nav" onclick="cambiarVistaInterna('LISTA_GASTOS')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                    <span style="font-size:2.2em; margin-bottom:5px;">📖</span>
+                    <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Mi Historial</span>
+                </button>
 
-            <button class="btn-nav" onclick="cambiarVistaInterna('TERMOMETRO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
-                <span style="font-size:2.2em; margin-bottom:5px;">🌡️</span>
-                <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase; text-align:center;">El Termómetro<br>Rosa</span>
-            </button>
+                <button class="btn-nav" onclick="cambiarVistaInterna('TERMOMETRO')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                    <span style="font-size:2.2em; margin-bottom:5px;">🌡️</span>
+                    <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase; text-align:center;">El Termómetro<br>Rosa</span>
+                </button>
 
-            <button class="btn-nav" onclick="cambiarVistaInterna('FELICIDAD')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
-                <span style="font-size:2.2em; margin-bottom:5px;">✨</span>
-                <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Felicidad</span>
+                <button class="btn-nav" onclick="cambiarVistaInterna('FELICIDAD')" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--pc); border:1px solid var(--br); border-radius:15px; cursor:pointer;">
+                    <span style="font-size:2.2em; margin-bottom:5px;">✨</span>
+                    <span style="font-size:0.8em; font-weight:bold; color:var(--p); text-transform: uppercase;">Felicidad</span>
+                </button>
+            </div>
+
+            <button class="btn-nav" onclick="cambiarVista('INICIO')" style="width:100%; margin-top:25px; background:var(--p); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; cursor:pointer;">
+                🏠 Volver al Inicio principal
             </button>
         </div>
-
-        <button class="btn-nav" onclick="cambiarVista('INICIO')" style="width:100%; margin-top:25px; background:var(--p); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; cursor:pointer;">
-            🏠 Volver al Inicio principal
-        </button>
     </div>
 </div>
 
@@ -1308,27 +1310,28 @@ async function eliminarNota(id) {
 }
 // --- LÓGICA DE CAPRICHOS (Sustituye lo que tengas de esto por este bloque) ---
 
+// --- LÓGICA DE CAPRICHOS: NAVEGACIÓN Y CIERRE ---
+
 function cambiarVistaInterna(subVista) {
-    // 1. Escondemos el menú de los 4 botones
+    // 1. Escondemos todo el menú (los 4 botones + el botón de Volver al Inicio)
     const menu = document.getElementById('menu-caprichos');
     if (menu) menu.style.display = 'none';
 
-    // 2. Escondemos la lista de gastos
+    // 2. Escondemos la lista de gastos por si estuviera abierta
     const vistaLista = document.getElementById('vista-LISTA_GASTOS');
     if (vistaLista) vistaLista.style.display = 'none';
 
-    // 3. Mostramos la que queremos ver
+    // 3. Mostramos la sub-vista que hemos elegido
     const vistaDestino = document.getElementById('vista-' + subVista);
     if (vistaDestino) {
         vistaDestino.style.display = 'block';
+        // Si entramos al Historial, cargamos los datos de Supabase
         if (subVista === 'LISTA_GASTOS') {
             cargarHistorialGastos('TODOS');
         }
     }
 }
 
-// ESTA ES LA QUE TE FALTABA:
-// --- FUNCIÓN PARA CERRAR EL HISTORIAL Y VOLVER AL MENÚ DE CAPRICHOS ---
 function cerrarHistorial() {
     // 1. Escondemos la sección del historial
     const vistaLista = document.getElementById('vista-LISTA_GASTOS');
@@ -1336,13 +1339,14 @@ function cerrarHistorial() {
         vistaLista.style.display = 'none';
     }
     
-    // 2. Volvemos a mostrar el menú de los 4 botones principales (Añadir, Historial, etc.)
+    // 2. Volvemos a mostrar el menú completo (4 botones + botón inicio)
+    // Usamos 'block' para que el botón de inicio aparezca debajo de la cuadrícula
     const menu = document.getElementById('menu-caprichos');
     if (menu) {
-        menu.style.display = 'grid'; // Usamos grid para que mantenga las dos columnas
+        menu.style.display = 'block'; 
     }
 
-    // 3. Por seguridad, nos aseguramos de que el contenedor padre de Caprichos esté visible
+    // 3. Nos aseguramos de que la vista de Caprichos esté activa
     const vistaCaprichos = document.getElementById('vista-CAPRICHOS');
     if (vistaCaprichos) {
         vistaCaprichos.style.display = 'block';
