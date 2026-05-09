@@ -472,13 +472,14 @@
     <div style="background:var(--b); padding:15px; border-radius:20px; border:1px solid var(--br); margin-bottom:20px;">
         <input type="text" id="llave-nombre" placeholder="Sitio (Ej: Netflix)" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
         <input type="text" id="llave-usuario" placeholder="Usuario / Email" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
-        <input type="password" id="llave-valor" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
+        
+        <input type="text" id="llave-valor" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid var(--br); box-sizing:border-box;">
         
         <input type="hidden" id="llave-id-edit">
 
-<button onclick="guardarNuevaLlave()" style="width:100%; background:var(--p); color:white; border:none; padding:12px; border-radius:10px; font-weight:bold; cursor:pointer;">
-    ✨ Guardar Llave
-</button>
+        <button onclick="guardarNuevaLlave()" style="width:100%; background:var(--p); color:white; border:none; padding:12px; border-radius:10px; font-weight:bold; cursor:pointer;">
+            ✨ Guardar Llave
+        </button>
     </div>
 
     <div id="lista-llaves"></div>
@@ -1135,7 +1136,7 @@ async function guardarNuevaLlave() {
         return;
     }
 
-    // Dibujamos las tarjetas
+// Dibujamos las tarjetas
     data.forEach(llave => {
         const div = document.createElement('div');
         div.className = 'compra-item'; 
@@ -1145,11 +1146,13 @@ async function guardarNuevaLlave() {
             <div style="flex:1;">
                 <strong style="color:var(--s); font-size:1.1rem; display:block;">${llave.nombre}</strong>
                 <div style="font-size:0.9rem; opacity:0.7; margin-top:2px;">👤 ${llave.usuario || 'Sin usuario'}</div>
-                <div style="margin-top:8px;">
-                    <code style="background:var(--pc); padding:4px 8px; border-radius:6px; font-weight:bold; color:var(--s); font-family:monospace;">${llave.clave}</code>
+                <div style="margin-top:8px; display:flex; align-items:center; gap:10px;">
+                    <code id="pass-${llave.id}" style="background:var(--pc); padding:4px 8px; border-radius:6px; font-weight:bold; color:var(--s); font-family:monospace;">••••••••</code>
+                    
+                    <button onclick="togglePass('${llave.id}', '${llave.clave}')" style="background:none; border:none; cursor:pointer; font-size:16px; padding:0;">👁️</button>
                 </div>
             </div>
-            <div style="display:flex; gap:15px; margin-left:10px;">
+            <div style="display:flex; gap:15px; margin-left:10px; align-items:center;">
                 <button onclick="prepararEdicionLlave('${llave.id}', '${llave.nombre}', '${llave.usuario}', '${llave.clave}')" style="background:none; border:none; cursor:pointer; font-size:18px;">✏️</button>
                 <button onclick="eliminarLlave('${llave.id}')" style="background:none; border:none; cursor:pointer; font-size:18px;">🗑️</button>
             </div>
