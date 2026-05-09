@@ -467,6 +467,24 @@
         </div>
     </div>
 </div>
+
+<div id="vista-LISTA_GASTOS" class="view" style="display:none; margin-top:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h3 style="color:var(--s); margin:0;">📜 Mi Historial de Gastos</h3>
+        <button onclick="cerrarHistorial()" style="background:var(--pc); border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; color:var(--s); font-weight:bold;">✕</button>
+    </div>
+    
+    <div style="display:flex; gap:8px; margin-bottom:20px; overflow-x:auto; padding-bottom:10px; scrollbar-width: none;">
+        <button onclick="cargarHistorialGastos('TODOS')" style="background:var(--p); color:white; border:none; padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">🛍️ Todos</button>
+        <button onclick="cargarHistorialGastos('Material')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">🧶 Material</button>
+        <button onclick="cargarHistorialGastos('Herramientas')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">✂️ Herramientas</button>
+        <button onclick="cargarHistorialGastos('Formación')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">📚 Formación</button>
+    </div>
+
+    <div id="contenedor-lista-gastos">
+        </div>
+</div>    
+    
 <div id="vista-LLAVES" class="view" style="display:none;">
     <h2 style="color:var(--s); text-align:center;">🔑 Mis Llaves</h2>
     <div style="background:var(--b); padding:15px; border-radius:20px; border:1px solid var(--br); margin-bottom:20px;">
@@ -1286,6 +1304,65 @@ async function eliminarNota(id) {
         if (!error) cargarNotas();
     }
 }
+ // --- LÓGICA DE NAVEGACIÓN INTERNA DE CAPRICHOS ---
+function cambiarVistaInterna(subVista) {
+    // Escondemos la vista de LISTA_GASTOS (y otras que hagamos luego)
+    const vistas = ['vista-LISTA_GASTOS']; 
+    vistas.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+
+    // Mostramos la que hemos pulsado
+    const vistaDestino = document.getElementById('vista-' + subVista);
+    if (vistaDestino) {
+        vistaDestino.style.display = 'block';
+        // Si entramos en el historial, cargamos los datos
+        if (subVista === 'LISTA_GASTOS') {
+            cargarHistorialGastos('TODOS');
+        }
+    }
+}
+
+// --- FUNCIÓN PARA LEER LOS GASTOS DE SUPABASE ---
+async function cargarHistorialGastos(filtro) {
+    const contenedor = document.getElementById('contenedor-lista-gastos');
+    if (!contenedor) return;
+
+    contenedor.innerHTML = '<p style="text-align:center; opacity:0.6;">Consultando tu armario rosa...</p>';
+
+    let query = client.from('stock').select('*').order('created_at', { ascending: false });
+
+    if (filtro !== 'TODOS') {
+        query = query.eq('categoria', filtro);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+        contenedor.innerHTML = '<p>Error: ' + error.message + '</p>';
+        return;
+    }
+
+    contenedor.innerHTML = ''; 
+
+    data.forEach(item => {
+        const div = document.createElement('div');
+        div.style.cssText = 'background:var(--b); padding:12px; border-radius:15px; border:1px solid var(--br); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;';
+        
+        div.innerHTML = `
+            <div>
+                <strong style="color:var(--s);">${item.nombre}</strong><br>
+                <small style="opacity:0.7;">🏷️ ${item.categoria} ${item.subcategoria ? '('+item.subcategoria+')' : ''}</small>
+            </div>
+            <div style="text-align:right;">
+                <span style="color:var(--p); font-weight:bold;">${item.precio || 0}€</span><br>
+                <small style="opacity:0.5; font-size:0.7rem;">${new Date(item.created_at).toLocaleDateString()}</small>
+            </div>
+        `;
+        contenedor.appendChild(div);
+    });
+}   
     // ONLOAD ACTUALIZADO PARA RECUPERAR TEMA
     window.onload = function() {
         const temaGuardado = localStorage.getItem('tema-preferido');
