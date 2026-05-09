@@ -1219,13 +1219,15 @@ function previsualizarImagenCapricho(event) {
 
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
 async function procesarGuardadoCapricho() {
-    const nombre = document.getElementById('capricho-nombre').value.trim();
-    const tipoGeneral = document.getElementById('capricho-tipo-general').value; // Esto es Material, Herramienta, etc.
-    const subtipo = document.getElementById('capricho-subtipo').value; // Esto es Lanas, Telas, etc.
-    const precio = parseFloat(document.getElementById('capricho-precio').value) || 0;
+    // 1. Captura de datos del formulario (IDs del HTML)
+    const nombreForm = document.getElementById('capricho-nombre').value.trim();
+    const tipoGeneral = document.getElementById('capricho-tipo-general').value;
+    const subtipo = document.getElementById('capricho-subtipo').value;
+    const precioUnitario = parseFloat(document.getElementById('capricho-precio').value) || 0;
     const cantidad = parseInt(document.getElementById('capricho-cantidad').value) || 1;
-    const fecha = document.getElementById('capricho-fecha').value || new Date().toISOString().split('T')[0];
+    const montoTotal = precioUnitario * cantidad; // Calculamos el total
     
+    // Datos técnicos
     const grosor = document.getElementById('capricho-grosor').value;
     const longitud = document.getElementById('capricho-longitud').value;
     const tienda = document.getElementById('capricho-tienda').value;
@@ -1233,7 +1235,7 @@ async function procesarGuardadoCapricho() {
     const notas = document.getElementById('capricho-notas').value;
     const fotoFile = document.getElementById('capricho-foto').files[0];
 
-    if (!nombre || !tipoGeneral || precio <= 0) {
+    if (!nombreForm || !tipoGeneral || precioUnitario <= 0) {
         alert("Por favor, rellena nombre, categoría y precio.");
         return;
     }
@@ -1251,20 +1253,23 @@ async function procesarGuardadoCapricho() {
             urlFoto = dataUrl.publicUrl;
         }
 
+        let idStock = null;
+
         // A. LÓGICA DE STOCK (Tabla: stock)
         if (tipoGeneral === "Material") {
             const { data: existente, error: errorBusqueda } = await _supabase
                 .from('stock')
                 .select('*')
-                .eq('nombre', nombre)
+                .eq('nombre', nombreForm)
                 .maybeSingle();
 
             if (existente) {
+                idStock = existente.id;
                 const nuevaCantidad = (existente.cantidad || 0) + cantidad;
                 await _supabase.from('stock').update({
                     cantidad: nuevaCantidad,
-                    precio: precio,
-                    categoria: subtipo, // En stock usamos 'categoria'
+                    precio: precioUnitario,
+                    categoria: subtipo,
                     grosor: grosor || existente.grosor,
                     longitud: longitud || existente.longitud,
                     tienda: tienda || existente.tienda,
@@ -1273,47 +1278,54 @@ async function procesarGuardadoCapricho() {
                     foto_url: urlFoto || existente.foto_url
                 }).eq('id', existente.id);
             } else {
-                await _supabase.from('stock').insert([{
-                    nombre: nombre,
-                    categoria: subtipo, // En stock usamos 'categoria'
-                    cantidad: cantidad,
-                    precio: precio,
-                    grosor: grosor,
-                    longitud: longitud,
-                    tienda: tienda,
-                    composicion: composicion,
-                    notas: notas,
-                    foto_url: urlFoto
-                }]);
+                const { data: nuevoItem, error: errorInsertStock } = await _supabase
+                    .from('stock')
+                    .insert([{
+                        nombre: nombreForm,
+                        categoria: subtipo,
+                        cantidad: cantidad,
+                        precio: precioUnitario,
+                        grosor: grosor,
+                        longitud: longitud,
+                        tienda: tienda,
+                        composicion: composicion,
+                        notas: notas,
+                        foto_url: urlFoto
+                    }]).select().single();
+                
+                if (nuevoItem) idStock = nuevoItem.id;
             }
         }
 
-        // B. LÓGICA DE GASTOS (Tabla: caprichos)
-        // CAMBIO CRUCIAL: Aquí usamos 'categoria' en lugar de 'tipo'
-        const { error: errorCapricho } = await _supabase
-            .from('caprichos')
+        // B. LÓGICA DE GASTOS (Tabla: finanzas) - USANDO TUS COLUMNAS EXACTAS
+        const { error: errorFinanzas } = await _supabase
+            .from('finanzas')
             .insert([{
-                nombre: nombre,
-                categoria: tipoGeneral, // <--- CAMBIADO: Antes decía 'tipo'
-                subtipo: subtipo,
-                precio: precio,
-                cantidad: cantidad,
-                fecha: fecha,
-                notas: notas,
-                foto_url: urlFoto
+                concepto: nombreForm,           // Mapeado de tu lista
+                tipo: tipoGeneral,             // Mapeado de tu lista
+                categoria: subtipo,            // Mapeado de tu lista
+                monto_total: montoTotal,       // Mapeado de tu lista
+                unidades: cantidad,            // Mapeado de tu lista
+                precio_unitario: precioUnitario, // Mapeado de tu lista
+                id_stock_vinculado: idStock,   // Mapeado de tu lista
+                composicion: composicion,      // Mapeado de tu lista
+                grosor: grosor,                // Mapeado de tu lista
+                longitud: longitud,            // Mapeado de tu lista
+                tienda: tienda,                // Mapeado de tu lista
+                notas: notas,                  // Mapeado de tu lista
+                foto: urlFoto                  // Mapeado de tu lista
             }]);
 
-        if (errorCapricho) throw errorCapricho;
+        if (errorFinanzas) throw errorFinanzas;
 
-        alert("💖 Registro completado con éxito.");
+        alert("💖 Registro completado con éxito en Finanzas y Stock.");
         limpiarFormularioCapricho();
         cerrarHistorial();
         if (typeof cargarStock === 'function') cargarStock();
-        if (typeof cargarGastos === 'function') cargarGastos();
         
     } catch (err) {
         console.error("Error detallado:", err);
-        alert("Error al guardar. Revisa que las columnas en Supabase sean correctas.");
+        alert("Error al guardar. Revisa la consola.");
     }
 }
 function limpiarFormularioCapricho() {
