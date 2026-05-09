@@ -1128,31 +1128,39 @@ async function cargarLlaves() {
 
     lista.innerHTML = '<p style="text-align:center; opacity:0.5;">Abriendo el llavero...</p>';
 
-    const { data, error } = await client.from('llaves').select('*');
+    // HEMOS QUITADO EL .order(...) PARA EVITAR EL ERROR
+    const { data, error } = await client
+        .from('llaves')
+        .select('*'); 
 
     if (error) {
+        console.error("Error Supabase:", error);
+        // Ahora el mensaje de error será más específico para nosotros
         lista.innerHTML = `<p style="text-align:center; color:red;">Error: ${error.message}</p>`;
         return;
     }
 
     lista.innerHTML = ''; 
 
+    if (!data || data.length === 0) {
+        lista.innerHTML = '<p style="text-align:center; opacity:0.5; padding:20px;">No hay llaves guardadas aún.</p>';
+        return;
+    }
+
     data.forEach(llave => {
         const div = document.createElement('div');
         div.className = 'compra-item'; 
         div.style.marginBottom = '12px';
-        
-        // CAMBIAMOS llave.clave POR llave.contraseña
         div.innerHTML = `
             <div style="flex:1;">
                 <strong style="color:var(--s); font-size:1.1rem; display:block;">${llave.nombre}</strong>
                 <div style="font-size:0.9rem; opacity:0.7; margin-top:2px;">👤 ${llave.usuario || '---'}</div>
                 <div style="margin-top:8px;">
-                    <code style="background:var(--pc); padding:4px 8px; border-radius:6px; font-weight:bold; color:var(--s);">${llave.contraseña}</code>
+                    <code style="background:var(--pc); padding:4px 8px; border-radius:6px; font-weight:bold; color:var(--s); font-family:monospace;">${llave.clave}</code>
                 </div>
             </div>
             <div style="display:flex; gap:15px; margin-left:10px;">
-                <button onclick="prepararEdicionLlave('${llave.id}', '${llave.nombre}', '${llave.usuario}', '${llave.contraseña}')" style="background:none; border:none; cursor:pointer; font-size:18px;">✏️</button>
+                <button onclick="prepararEdicionLlave('${llave.id}', '${llave.nombre}', '${llave.usuario}', '${llave.clave}')" style="background:none; border:none; cursor:pointer; font-size:18px;">✏️</button>
                 <button onclick="eliminarLlave('${llave.id}')" style="background:none; border:none; cursor:pointer; font-size:18px;">🗑️</button>
             </div>
         `;
