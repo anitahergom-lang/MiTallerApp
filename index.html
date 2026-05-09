@@ -1220,8 +1220,8 @@ function previsualizarImagenCapricho(event) {
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
 async function procesarGuardadoCapricho() {
     const nombre = document.getElementById('capricho-nombre').value.trim();
-    const tipoGeneral = document.getElementById('capricho-tipo-general').value;
-    const subtipo = document.getElementById('capricho-subtipo').value;
+    const tipoGeneral = document.getElementById('capricho-tipo-general').value; // Esto es Material, Herramienta, etc.
+    const subtipo = document.getElementById('capricho-subtipo').value; // Esto es Lanas, Telas, etc.
     const precio = parseFloat(document.getElementById('capricho-precio').value) || 0;
     const cantidad = parseInt(document.getElementById('capricho-cantidad').value) || 1;
     const fecha = document.getElementById('capricho-fecha').value || new Date().toISOString().split('T')[0];
@@ -1251,6 +1251,7 @@ async function procesarGuardadoCapricho() {
             urlFoto = dataUrl.publicUrl;
         }
 
+        // A. LÓGICA DE STOCK (Tabla: stock)
         if (tipoGeneral === "Material") {
             const { data: existente, error: errorBusqueda } = await _supabase
                 .from('stock')
@@ -1259,12 +1260,11 @@ async function procesarGuardadoCapricho() {
                 .maybeSingle();
 
             if (existente) {
-                // UPDATE: Usamos 'categoria' porque 'subtipo' no existe en la tabla stock
                 const nuevaCantidad = (existente.cantidad || 0) + cantidad;
                 await _supabase.from('stock').update({
                     cantidad: nuevaCantidad,
                     precio: precio,
-                    categoria: subtipo, // <--- CAMBIADO: Antes decía subtipo: subtipo
+                    categoria: subtipo, // En stock usamos 'categoria'
                     grosor: grosor || existente.grosor,
                     longitud: longitud || existente.longitud,
                     tienda: tienda || existente.tienda,
@@ -1273,10 +1273,9 @@ async function procesarGuardadoCapricho() {
                     foto_url: urlFoto || existente.foto_url
                 }).eq('id', existente.id);
             } else {
-                // INSERT: Usamos 'categoria' porque 'subtipo' no existe en la tabla stock
                 await _supabase.from('stock').insert([{
                     nombre: nombre,
-                    categoria: subtipo, // <--- CAMBIADO: Antes decía subtipo: subtipo
+                    categoria: subtipo, // En stock usamos 'categoria'
                     cantidad: cantidad,
                     precio: precio,
                     grosor: grosor,
@@ -1289,12 +1288,13 @@ async function procesarGuardadoCapricho() {
             }
         }
 
-        // En la tabla 'caprichos' SÍ existe la columna 'subtipo', así que aquí se queda igual
+        // B. LÓGICA DE GASTOS (Tabla: caprichos)
+        // CAMBIO CRUCIAL: Aquí usamos 'categoria' en lugar de 'tipo'
         const { error: errorCapricho } = await _supabase
             .from('caprichos')
             .insert([{
                 nombre: nombre,
-                tipo: tipoGeneral,
+                categoria: tipoGeneral, // <--- CAMBIADO: Antes decía 'tipo'
                 subtipo: subtipo,
                 precio: precio,
                 cantidad: cantidad,
@@ -1309,10 +1309,11 @@ async function procesarGuardadoCapricho() {
         limpiarFormularioCapricho();
         cerrarHistorial();
         if (typeof cargarStock === 'function') cargarStock();
+        if (typeof cargarGastos === 'function') cargarGastos();
         
     } catch (err) {
         console.error("Error detallado:", err);
-        alert("Error al guardar. Revisa la consola.");
+        alert("Error al guardar. Revisa que las columnas en Supabase sean correctas.");
     }
 }
 function limpiarFormularioCapricho() {
