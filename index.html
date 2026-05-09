@@ -1081,38 +1081,43 @@ function prepararEdicionLlave(id, nombre, usuario, clave) {
     // --- AQUÍ EMPIEZA LA QUE YA TENÍAS ---
 
 async function guardarNuevaLlave() {
-    // 1. Recogemos los datos que has escrito en los cuadritos rosa
+    console.log("Botón pulsado, iniciando guardado..."); // Esto nos dirá en el F12 si la función despierta
+
     const nombreSitio = document.getElementById('llave-nombre').value;
     const usuarioSitio = document.getElementById('llave-usuario').value;
     const passwordSitio = document.getElementById('llave-valor').value;
 
-    // 2. Comprobamos que no estén vacíos los importantes
     if (!nombreSitio || !passwordSitio) {
-        return alert("Por favor, rellena el Sitio y la Contraseña");
+        alert("Por favor, rellena el Sitio y la Contraseña");
+        return;
     }
 
-    // 3. Enviamos la información a Supabase
-    // IMPORTANTE: 'nombre', 'usuario' y 'clave' deben ser los nombres de tus columnas en la tabla
-    const { error } = await client.from('llaves').insert([
-        { 
-            nombre: nombreSitio, 
-            usuario: usuarioSitio, 
-            clave: passwordSitio 
+    try {
+        const { error } = await client.from('llaves').insert([
+            { 
+                nombre: nombreSitio, 
+                usuario: usuarioSitio, 
+                clave: passwordSitio 
+            }
+        ]);
+
+        if (error) {
+            console.error("Error de Supabase:", error);
+            alert("Hubo un error al guardar: " + error.message);
+        } else {
+            alert("¡Llave guardada correctamente!");
+            
+            // Limpiar campos
+            document.getElementById('llave-nombre').value = '';
+            document.getElementById('llave-usuario').value = '';
+            document.getElementById('llave-valor').value = '';
         }
-    ]);
-
-    // 4. Avisamos si ha ido bien o mal
-    if (error) {
-        alert("Hubo un error al guardar: " + error.message);
-    } else {
-        alert("¡Llave guardada correctamente!");
-        
-        // Limpiamos los campos para que queden vacíos de nuevo
-        document.getElementById('llave-nombre').value = '';
-        document.getElementById('llave-usuario').value = '';
-        document.getElementById('llave-valor').value = '';
+    } catch (err) {
+        console.error("Error inesperado:", err);
+        alert("Ocurrió un fallo inesperado al procesar el guardado.");
     }
-}    async function cargarLlaves() {
+}
+    async function cargarLlaves() {
     const lista = document.getElementById('lista-llaves');
     if (!lista) return;
 
