@@ -246,29 +246,62 @@
             <div style="background:var(--pc); padding:20px; border-radius:25px; border:1px solid var(--p);">
                 <h3 style="color:var(--s); text-align:center; margin-top:0;">🛍️ Registrar Compra</h3>
                 
-                <select id="capricho-tipo-general" onchange="mostrarSubcategorias(this.value)" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:12px; margin-bottom:10px;">
-                    <option value="">✨ Categoría...</option>
-                    <option value="Material">🧶 Material</option>
-                    <option value="Herramienta">🛠️ Herramienta</option>
-                    <option value="Formacion">📚 Formación</option>
-                </select>
-
-                <div id="div-subcategoria" style="display:none; margin-bottom:10px;">
-                    <select id="capricho-subtipo" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:12px;">
-                        <option value="Lanas">🧶 Lanas</option>
-                        <option value="Telas">👗 Telas</option>
-                        <option value="Hilos">🧵 Hilos</option>
-                        <option value="Accesorios">🎀 Accesorios</option>
-                        <option value="Otros">🧸 Otros</option>
+                <div style="display: flex; gap: 10px; margin-bottom:12px;">
+                    <select id="capricho-tipo-general" onchange="mostrarSubcategorias(this.value)" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px; background:var(--b);">
+                        <option value="">✨ Categoría...</option>
+                        <option value="Material">🧶 Material</option>
+                        <option value="Herramienta">🛠️ Herramienta</option>
+                        <option value="Formacion">📚 Formación</option>
                     </select>
+                    <div id="div-subcategoria" style="flex:1; display:none;">
+                        <select id="capricho-subtipo" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; background:var(--b);">
+                            <option value="Lanas">🧶 Lanas</option>
+                            <option value="Telas">👗 Telas</option>
+                            <option value="Hilos">🧵 Hilos</option>
+                            <option value="Accesorios">🎀 Accesorios</option>
+                            <option value="Otros">🧸 Otros</option>
+                        </select>
+                    </div>
                 </div>
 
-                <input type="text" id="capricho-nombre" placeholder="✏️ ¿Qué has comprado?" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:12px; margin-bottom:10px; box-sizing:border-box;">
-                
-                <input type="number" id="capricho-precio" placeholder="Precio €" style="width:100%; padding:12px; border:1px solid var(--br); border-radius:12px; margin-bottom:20px; box-sizing:border-box;">
-                
+                <input type="text" id="capricho-nombre" placeholder="✏️ Nombre del material" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; margin-bottom:12px; box-sizing: border-box;">
+
+                <div style="display: flex; gap: 10px; margin-bottom:12px;">
+                    <input type="text" id="capricho-grosor" placeholder="🪡 Grosor" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px;">
+                    <input type="text" id="capricho-longitud" placeholder="📏 Longitud" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px;">
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom:12px;">
+                    <input type="text" id="capricho-tienda" placeholder="📍 Tienda" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px;">
+                    <input type="text" id="capricho-composicion" placeholder="🧵 Composición" style="flex:1; padding:10px; border:1px solid var(--br); border-radius:12px;">
+                </div>
+
+                <div style="background: var(--b); padding: 12px; border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--br);">
+                    <div style="display: flex; gap: 8px;">
+                        <div style="flex:1;">
+                            <label style="display:block; font-size:0.7em; font-weight:bold; color:var(--s);">Precio €</label>
+                            <input type="number" id="capricho-precio" step="0.01" placeholder="0.00" style="width:100%; padding:8px; border:none; border-radius:8px; background: var(--f);">
+                        </div>
+                        <div style="flex:0.6;">
+                            <label style="display:block; font-size:0.7em; font-weight:bold; color:var(--s);">Cant.</label>
+                            <input type="number" id="capricho-cantidad" value="1" style="width:100%; padding:8px; border:none; border-radius:8px; background: var(--f);">
+                        </div>
+                        <div style="flex:1.2;">
+                            <label style="display:block; font-size:0.7em; font-weight:bold; color:var(--s);">Fecha</label>
+                            <input type="date" id="capricho-fecha" style="width:100%; padding:7px; border:none; border-radius:8px; background: var(--f); font-size:0.8em;">
+                        </div>
+                    </div>
+                </div>
+
+                <textarea id="capricho-notas" placeholder="📝 Notas..." rows="2" style="width:100%; padding:10px; border:1px solid var(--br); border-radius:12px; margin-bottom:12px; font-family:inherit; box-sizing: border-box;"></textarea>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: var(--s); font-weight: bold; font-size: 0.8em; margin-bottom: 8px;">🖼️ FOTO (OPCIONAL)</label>
+                    <input type="file" id="capricho-foto" accept="image/*" style="width:100%; font-size:0.8em;">
+                </div>
+
                 <button class="btn-api" onclick="procesarGuardadoCapricho()" style="width:100%; background:var(--s); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; cursor:pointer; margin-bottom:10px;">
-                    💖 Guardar Capricho
+                    💖 Registrar Capricho
                 </button>
 
                 <button class="btn-nav" onclick="cerrarHistorial()" style="width:100%; background:white; color:var(--s); border:1px solid var(--s); padding:10px; border-radius:12px; font-weight:bold; cursor:pointer;">
