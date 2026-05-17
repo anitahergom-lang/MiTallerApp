@@ -1227,7 +1227,8 @@ function previsualizarImagenCapricho(event) {
 
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
 async function procesarGuardadoCapricho() {
-    const nombreForm = document.getElementById('capricho-nombre').value.trim();
+    // CAMBIO: Cambiar 'capricho-nombre' por 'nombre-capricho'
+const nombreForm = document.getElementById('nombre-capricho').value.trim();
     // CAMBIO: Cambiar 'capricho-tipo-general' por 'capricho-categoria'
 const tipoGeneral = document.getElementById('capricho-categoria').value;
     const subtipo = document.getElementById('capricho-subtipo').value;
