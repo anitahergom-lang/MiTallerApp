@@ -1227,11 +1227,14 @@ function previsualizarImagenCapricho(event) {
 
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
 async function procesarGuardadoCapricho() {
-    // CAMBIO: Cambiar 'capricho-nombre' por 'nombre-capricho'
-const nombreForm = document.getElementById('nombre-capricho').value.trim();
-    // CAMBIO: Cambiar 'capricho-tipo-general' por 'capricho-categoria'
-const tipoGeneral = document.getElementById('capricho-categoria').value;
-    const subtipo = document.getElementById('capricho-subtipo').value;
+    // 1. Esta la dejamos como estaba, porque coincide con tu HTML
+    const nombreForm = document.getElementById('capricho-nombre').value.trim();
+    
+    // 2. Cambiamos 'capricho-tipo-general' por 'capricho-categoria'
+    const tipoGeneral = document.getElementById('capricho-categoria').value;
+    
+    // 3. Cambiamos 'capricho-subtipo' por 'capricho-subcategoria'
+    const subtipo = document.getElementById('capricho-subcategoria').value;
     const precioUnit = parseFloat(document.getElementById('capricho-gasto').value) || 0;
     const cantidadCompra = parseInt(document.getElementById('capricho-cantidad').value) || 1;
     
