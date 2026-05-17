@@ -1233,8 +1233,8 @@ async function procesarGuardadoCapricho() {
     // 2. Cambiamos 'capricho-tipo-general' por 'capricho-categoria'
     const tipoGeneral = document.getElementById('capricho-categoria').value;
     
-    // 3. Cambiamos 'capricho-subtipo' por 'capricho-subcategoria'
-    const subtipo = document.getElementById('capricho-subcategoria').value;
+// CAMBIO: Le añadimos un interrogante (?) antes del .value para que si está oculto no rompa el botón
+const subtipo = document.getElementById('capricho-subtipo')?.value || '';
     
     // REVISA ESTAS LÍNEAS HACIA ABAJO:
    const precioUnit = parseFloat(document.getElementById('capricho-gasto').value) || 0;
