@@ -1228,21 +1228,19 @@ function previsualizarImagenCapricho(event) {
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
 async function procesarGuardadoCapricho() {
     // 1. Esta la dejamos como estaba, porque coincide con tu HTML
+   // Estas ya las tienes bien y las ha pasado:
     const nombreForm = document.getElementById('capricho-nombre').value.trim();
-    
-    // 2. Cambiamos 'capricho-tipo-general' por 'capricho-categoria'
     const tipoGeneral = document.getElementById('capricho-categoria').value;
-    
-    // 3. Cambiamos 'capricho-subtipo' por 'capricho-subcategoria'
     const subtipo = document.getElementById('capricho-subcategoria').value;
+    
+    // REVISA ESTAS LÍNEAS HACIA ABAJO:
     const precioUnit = parseFloat(document.getElementById('capricho-gasto').value) || 0;
     const cantidadCompra = parseInt(document.getElementById('capricho-cantidad').value) || 1;
-    
     const grosor = document.getElementById('capricho-grosor').value;
-    const longitud = document.getElementById('capricho-longitud').value;
-    const tienda = document.getElementById('capricho-tienda').value;
-    const composicion = document.getElementById('capricho-composicion').value;
-    const notas = document.getElementById('capricho-notas').value;
+    const longitud = document.getElementById('capricho-longitud').value.trim();
+    const tienda = document.getElementById('capricho-tienda').value.trim();
+    const composicion = document.getElementById('capricho-composicion').value.trim();
+    const notas = document.getElementById('capricho-notas').value.trim();
     const fotoFile = document.getElementById('capricho-foto').files[0];
 
     if (!nombreForm) { 
