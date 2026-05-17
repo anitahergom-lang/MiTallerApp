@@ -514,7 +514,7 @@
     let toolsState = { 'canvas-punto': 'pincel', 'canvas-cuerpos': 'pincel' };
     let vueltasContador = 0;
 
- function cambiarVista(v) {
+function cambiarVista(v) {
     // 1. Gestionar botones activos
     document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
     const navBtn = document.getElementById('nav-' + v);
@@ -541,8 +541,16 @@
     if(v === 'REGALOS') cargarRegalos();
     if(v === 'PDFS') { cargarPDFs(); cargarBorradorLocal(); }
     if(v === 'NOTAS') cargarNotas();
-    if (id === 'LLAVES') {
+    
+    // CORRECCIÓN 1: Cambiado 'id' por 'v' para que no falle al verificar las Llaves
+    if(v === 'LLAVES') { 
         cargarLlaves();
+    }
+
+    // CORRECCIÓN 2: Asegurar que al pulsar en "Mis Caprichos" desde fuera, aparezca su menú
+    if(v === 'CAPRICHOS') {
+        const menuCaprichos = document.getElementById('menu-caprichos');
+        if(menuCaprichos) menuCaprichos.style.display = 'block';
     }
 }
     function filtrar(cat) {
