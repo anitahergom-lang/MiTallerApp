@@ -1231,7 +1231,8 @@ async function procesarGuardadoCapricho() {
     const nombreForm = document.getElementById('capricho-nombre').value.trim();
     
     // 2. Cambiamos 'capricho-tipo-general' por 'capricho-categoria'
-    const tipoGeneral = document.getElementById('capricho-categoria').value;
+   // CAMBIO: Cambiamos 'capricho-categoria' por 'capricho-tipo-general'
+const tipoGeneral = document.getElementById('capricho-tipo-general').value;
     
 // CAMBIO: Le añadimos un interrogante (?) antes del .value para que si está oculto no rompa el botón
 const subtipo = document.getElementById('capricho-subtipo')?.value || '';
