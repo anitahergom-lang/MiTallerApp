@@ -1228,30 +1228,35 @@ function previsualizarImagenCapricho(event) {
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
 async function procesarGuardadoCapricho() {
     const nombreForm = document.getElementById('capricho-nombre').value.trim();
-    
-    // CORRECCIÓN 1: Cambiado 'capricho-tipo-general' por 'capricho-categoria'
     const tipoGeneral = document.getElementById('capricho-categoria').value;
-    
-    // CORRECCIÓN 2: Cambiado 'capricho-subtipo' por 'capricho-subcategoria'
     const subtipo = document.getElementById('capricho-subcategoria').value;
-    
-    // CORRECCIÓN 3: (La que hicimos antes) Cambiado 'capricho-precio' por 'capricho-gasto'
     const precioUnit = parseFloat(document.getElementById('capricho-gasto').value) || 0;
-    
     const cantidadCompra = parseInt(document.getElementById('capricho-cantidad').value) || 1;
     
-    const grosor = document.getElementById('capricho-grosor').value;
-// ... (todo el resto de la función se queda exactamente igual)
-    const longitud = document.getElementById('capricho-longitud').value;
-    const tienda = document.getElementById('capricho-tienda').value;
-    const composicion = document.getElementById('capricho-composicion').value;
-    const notas = document.getElementById('capricho-notas').value;
-    const fotoFile = document.getElementById('capricho-foto').files[0];
+    // CONTROL SEGURO: Si el elemento no existe en el HTML, guarda texto vacío en lugar de romper el código
+    const grosorEl = document.getElementById('capricho-grosor');
+    const grosor = grosorEl ? grosorEl.value : "";
+
+    const longitudEl = document.getElementById('capricho-longitud');
+    const longitud = longitudEl ? longitudEl.value : "";
+
+    const tiendaEl = document.getElementById('capricho-tienda');
+    const tienda = tiendaEl ? tiendaEl.value : "";
+
+    const composicionEl = document.getElementById('capricho-composicion');
+    const composicion = composicionEl ? composicionEl.value : "";
+
+    const notasEl = document.getElementById('capricho-notas');
+    const notas = notasEl ? notasEl.value : "";
+
+    const fotoFileEl = document.getElementById('capricho-foto');
+    const fotoFile = fotoFileEl ? fotoFileEl.files[0] : null;
 
     if (!nombreForm) { 
-        alert("El nombre es obligatorio."); 
+        alert("El nombre es obligatorio. 🌸"); 
         return; 
     }
+// ... (A partir de aquí, todo el bloque del try/catch de Supabase se queda exactamente igual)
 
     try {
         let urlFoto = null;
