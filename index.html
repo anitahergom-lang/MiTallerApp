@@ -1238,7 +1238,8 @@ const tipoGeneral = document.getElementById('capricho-tipo-general').value;
 const subtipo = document.getElementById('capricho-subtipo')?.value || '';
     
     // REVISA ESTAS LÍNEAS HACIA ABAJO:
-   const precioUnit = parseFloat(document.getElementById('capricho-gasto').value) || 0;
+// CAMBIO: Cambiamos 'capricho-precio' por 'capricho-gasto'
+const precioUnit = parseFloat(document.getElementById('capricho-gasto').value) || 0;
     const cantidadCompra = parseInt(document.getElementById('capricho-cantidad').value) || 1;
     
     const grosor = document.getElementById('capricho-grosor').value;
