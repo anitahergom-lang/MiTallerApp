@@ -300,7 +300,7 @@
                     <input type="file" id="capricho-foto" accept="image/*" style="width:100%; font-size:0.8em;">
                 </div>
 
-                <button class="btn-api" onclick="procesarGuardadoCapricho()" style="width:100%; background:var(--s); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; cursor:pointer; margin-bottom:10px;">
+                <button class="btn-api" onclick="procesarGuardadoCapricho(event)" style="width:100%; background:var(--s); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; cursor:pointer; margin-bottom:10px;">
                     💖 Registrar Capricho
                 </button>
 
@@ -1226,14 +1226,17 @@ function previsualizarImagenCapricho(event) {
 }
 
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
-async function procesarGuardadoCapricho() {
+// 1. Añadimos la "e" dentro del paréntesis
+async function procesarGuardadoCapricho(e) {
+    // 2. Línea mágica nueva: detiene el envío automático del formulario
+    if (e) e.preventDefault();
+
     const nombreForm = document.getElementById('capricho-nombre').value.trim();
     const tipoGeneral = document.getElementById('capricho-categoria').value;
     const subtipo = document.getElementById('capricho-subcategoria').value;
     const precioUnit = parseFloat(document.getElementById('capricho-gasto').value) || 0;
     const cantidadCompra = parseInt(document.getElementById('capricho-cantidad').value) || 1;
     
-    // CONTROL SEGURO: Si el elemento no existe en el HTML, guarda texto vacío en lugar de romper el código
     const grosorEl = document.getElementById('capricho-grosor');
     const grosor = grosorEl ? grosorEl.value : "";
 
@@ -1256,6 +1259,7 @@ async function procesarGuardadoCapricho() {
         alert("El nombre es obligatorio. 🌸"); 
         return; 
     }
+// ... (todo el resto del bloque try/catch de Supabase se queda idéntico)
 // ... (A partir de aquí, todo el bloque del try/catch de Supabase se queda exactamente igual)
 
     try {
