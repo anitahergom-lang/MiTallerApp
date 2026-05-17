@@ -300,7 +300,7 @@
                     <input type="file" id="capricho-foto" accept="image/*" style="width:100%; font-size:0.8em;">
                 </div>
 
-                <button class="btn-api" onclick="procesarGuardadoCapricho(event)" style="width:100%; background:var(--s); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; cursor:pointer; margin-bottom:10px;">
+                <button class="btn-api" onclick="procesarGuardadoCapricho()" style="width:100%; background:var(--s); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; cursor:pointer; margin-bottom:10px;">
                     💖 Registrar Capricho
                 </button>
 
@@ -1226,41 +1226,24 @@ function previsualizarImagenCapricho(event) {
 }
 
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
-// 1. Añadimos la "e" dentro del paréntesis
-async function procesarGuardadoCapricho(e) {
-    // 2. Línea mágica nueva: detiene el envío automático del formulario
-    if (e) e.preventDefault();
-
+async function procesarGuardadoCapricho() {
     const nombreForm = document.getElementById('capricho-nombre').value.trim();
-    const tipoGeneral = document.getElementById('capricho-categoria').value;
-    const subtipo = document.getElementById('capricho-subcategoria').value;
-    const precioUnit = parseFloat(document.getElementById('capricho-gasto').value) || 0;
+    const tipoGeneral = document.getElementById('capricho-tipo-general').value;
+    const subtipo = document.getElementById('capricho-subtipo').value;
+    const precioUnit = parseFloat(document.getElementById('capricho-precio').value) || 0;
     const cantidadCompra = parseInt(document.getElementById('capricho-cantidad').value) || 1;
     
-    const grosorEl = document.getElementById('capricho-grosor');
-    const grosor = grosorEl ? grosorEl.value : "";
-
-    const longitudEl = document.getElementById('capricho-longitud');
-    const longitud = longitudEl ? longitudEl.value : "";
-
-    const tiendaEl = document.getElementById('capricho-tienda');
-    const tienda = tiendaEl ? tiendaEl.value : "";
-
-    const composicionEl = document.getElementById('capricho-composicion');
-    const composicion = composicionEl ? composicionEl.value : "";
-
-    const notasEl = document.getElementById('capricho-notas');
-    const notas = notasEl ? notasEl.value : "";
-
-    const fotoFileEl = document.getElementById('capricho-foto');
-    const fotoFile = fotoFileEl ? fotoFileEl.files[0] : null;
+    const grosor = document.getElementById('capricho-grosor').value;
+    const longitud = document.getElementById('capricho-longitud').value;
+    const tienda = document.getElementById('capricho-tienda').value;
+    const composicion = document.getElementById('capricho-composicion').value;
+    const notas = document.getElementById('capricho-notas').value;
+    const fotoFile = document.getElementById('capricho-foto').files[0];
 
     if (!nombreForm) { 
-        alert("El nombre es obligatorio. 🌸"); 
+        alert("El nombre es obligatorio."); 
         return; 
     }
-// ... (todo el resto del bloque try/catch de Supabase se queda idéntico)
-// ... (A partir de aquí, todo el bloque del try/catch de Supabase se queda exactamente igual)
 
     try {
         let urlFoto = null;
