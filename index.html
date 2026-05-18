@@ -1227,26 +1227,25 @@ function previsualizarImagenCapricho(event) {
 
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
 async function procesarGuardadoCapricho() {
-    // 1. Esta la dejamos como estaba, porque coincide con tu HTML
-    const nombreForm = document.getElementById('capricho-nombre').value.trim();
-    
-    // 2. Cambiamos 'capricho-tipo-general' por 'capricho-categoria'
-   // CAMBIO: Cambiamos 'capricho-categoria' por 'capricho-tipo-general'
-const tipoGeneral = document.getElementById('capricho-tipo-general').value;
-    
-// CAMBIO: Le añadimos un interrogante (?) antes del .value para que si está oculto no rompa el botón
-const subtipo = document.getElementById('capricho-subtipo')?.value || '';
-    
-    // REVISA ESTAS LÍNEAS HACIA ABAJO:
-// CAMBIO: Cambiar 'capricho-gasto' por 'gasto-capricho'
-const precioUnit = parseFloat(document.getElementById('gasto-capricho').value) || 0;
-    const cantidadCompra = parseInt(document.getElementById('capricho-cantidad').value) || 1;
-    
-    const grosor = document.getElementById('capricho-grosor').value;
-    const longitud = document.getElementById('capricho-longitud').value;
-    const tienda = document.getElementById('capricho-tienda').value;
-    const composicion = document.getElementById('capricho-composicion').value;
-    const notas = document.getElementById('capricho-notas').value;
+    try {
+        // 1. Leemos el nombre y las categorías de la pantalla
+        const nombreForm = document.getElementById('capricho-nombre').value.trim();
+        const tipoGeneral = document.getElementById('capricho-tipo-general').value;
+        // Usamos el signo "?" por si el subtipo está oculto, así el botón no se rompe
+        const subtipo = document.getElementById('capricho-subtipo')?.value || '';
+        
+        // 2. CORRECCIÓN: Cambiamos 'capricho-gasto' por 'capricho-precio' para que coincida con tu HTML
+        const precioUnit = parseFloat(document.getElementById('capricho-precio').value) || 0;
+        
+        // 3. CORRECCIÓN: Cambiamos 'cantidad-capricho' por 'capricho-cantidad' para que coincida con tu HTML
+        const cantidadCompra = parseInt(document.getElementById('capricho-cantidad').value) || 1;
+        
+        // 4. El resto de campos de texto que ya coinciden con tu pantalla
+        const grosor = document.getElementById('capricho-grosor').value;
+        const longitud = document.getElementById('capricho-longitud').value.trim();
+        const tienda = document.getElementById('capricho-tienda').value.trim();
+        const composicion = document.getElementById('capricho-composicion').value.trim();
+        const notas = document.getElementById('capricho-notas').value.trim();
     const fotoFile = document.getElementById('capricho-foto').files[0];
 
     if (!nombreForm) { 
