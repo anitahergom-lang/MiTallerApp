@@ -1227,27 +1227,36 @@ function previsualizarImagenCapricho(event) {
 
 // Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
 async function procesarGuardadoCapricho() {
-    // 1. Esta la dejamos como estaba, porque coincide con tu HTML
+    console.log("Iniciando guardado blindado...");
+
+    // 1. Definimos los IDs que necesitamos
+    const ids = [
+        'capricho-nombre', 'capricho-tipo-general', 'gasto-capricho', 
+        'capricho-cantidad', 'capricho-grosor', 'capricho-longitud', 
+        'capricho-tienda', 'capricho-composicion', 'capricho-notas'
+    ];
+
+    // 2. Verificación de seguridad (El 'Debug' automático)
+    for (let id of ids) {
+        if (!document.getElementById(id)) {
+            console.error(`❌ ERROR: No se encuentra el elemento con ID: ${id}. Revisa tu HTML.`);
+            alert(`Error técnico: Falta el campo ${id} en el formulario.`);
+            return; // Detenemos la ejecución aquí para que no rompa
+        }
+    }
+
+    // 3. Obtenemos valores (Ahora sabemos que existen)
     const nombreForm = document.getElementById('capricho-nombre').value.trim();
-    
-    // 2. Cambiamos 'capricho-tipo-general' por 'capricho-categoria'
-   // CAMBIO: Cambiamos 'capricho-categoria' por 'capricho-tipo-general'
-const tipoGeneral = document.getElementById('capricho-tipo-general').value;
-    
-// CAMBIO: Le añadimos un interrogante (?) antes del .value para que si está oculto no rompa el botón
-const subtipo = document.getElementById('capricho-subtipo')?.value || '';
-    
-    // REVISA ESTAS LÍNEAS HACIA ABAJO:
-// CAMBIO: Cambiar 'capricho-gasto' por 'gasto-capricho'
-const precioUnit = parseFloat(document.getElementById('gasto-capricho').value) || 0;
+    const tipoGeneral = document.getElementById('capricho-tipo-general').value;
+    const subtipo = document.getElementById('capricho-subtipo')?.value || '';
+    const precioUnit = parseFloat(document.getElementById('gasto-capricho').value) || 0;
     const cantidadCompra = parseInt(document.getElementById('capricho-cantidad').value) || 1;
-    
     const grosor = document.getElementById('capricho-grosor').value;
     const longitud = document.getElementById('capricho-longitud').value;
     const tienda = document.getElementById('capricho-tienda').value;
     const composicion = document.getElementById('capricho-composicion').value;
     const notas = document.getElementById('capricho-notas').value;
-    const fotoFile = document.getElementById('capricho-foto').files[0];
+    const fotoFile = document.getElementById('capricho-foto')?.files[0]; // Usamos ? por si no hay input foto
 
     if (!nombreForm) { 
         alert("El nombre es obligatorio."); 
@@ -1258,14 +1267,14 @@ const precioUnit = parseFloat(document.getElementById('gasto-capricho').value) |
         let urlFoto = null;
         if (fotoFile) {
             const fileName = `${Date.now()}-${fotoFile.name}`;
-            const { data: dataImg } = await _supabase.storage.from('materiales').upload(fileName, fotoFile);
-            if (dataImg) {
-                const { data: dataUrl } = _supabase.storage.from('materiales').getPublicUrl(fileName);
-                urlFoto = dataUrl.publicUrl;
-            }
+            const { data: dataImg, error: errorImg } = await _supabase.storage.from('materiales').upload(fileName, fotoFile);
+            if (errorImg) throw errorImg;
+            
+            const { data: dataUrl } = _supabase.storage.from('materiales').getPublicUrl(fileName);
+            urlFoto = dataUrl.publicUrl;
         }
 
-        // 1. ACTUALIZAR STOCK (Solo inventario físico)
+        // --- LÓGICA DE STOCK ---
         if (tipoGeneral === "Material") {
             const { data: existente } = await _supabase.from('stock').select('*').eq('nombre', nombreForm).maybeSingle();
             
@@ -1288,11 +1297,11 @@ const precioUnit = parseFloat(document.getElementById('gasto-capricho').value) |
             }
         }
 
-        // 2. REGISTRAR EN FINANZAS (Confirmado: monto_total)
+        // --- LÓGICA DE FINANZAS ---
         const { error: errorFinanzas } = await _supabase.from('finanzas').insert([{
             tipo: tipoGeneral,
             concepto: nombreForm,
-            monto_total: precioUnit * cantidadCompra, // <--- Usando el nombre que me confirmas
+            monto_total: precioUnit * cantidadCompra,
             unidades: cantidadCompra,
             precio_unitario: precioUnit,
             categoria: subtipo,
@@ -1304,8 +1313,9 @@ const precioUnit = parseFloat(document.getElementById('gasto-capricho').value) |
 
         alert("💖 ¡Por fin! Todo guardado: Inventario actualizado y gasto registrado.");
         
-        limpiarFormularioCapricho();
-        cerrarHistorial();
+        // Ejecutar limpieza (asegúrate de que estas funciones existan)
+        if (typeof limpiarFormularioCapricho === 'function') limpiarFormularioCapricho();
+        if (typeof cerrarHistorial === 'function') cerrarHistorial();
         if (typeof cargarStock === 'function') cargarStock();
         
     } catch (err) {
