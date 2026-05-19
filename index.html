@@ -1249,7 +1249,11 @@ async function procesarGuardadoCapricho() {
     const nombreForm = document.getElementById('capricho-nombre').value.trim();
     const tipoGeneral = document.getElementById('capricho-tipo-general').value;
     const subtipo = document.getElementById('capricho-subtipo')?.value || '';
-    const precioUnit = parseFloat(document.getElementById('capricho-precio').value) || 0;
+   // Cambia esto:
+// const precioUnit = parseFloat(document.getElementById('gasto-capricho').value) || 0;
+
+// Por esto (que coincide con el id="capricho-precio" que me acabas de mostrar):
+const precioUnit = parseFloat(document.getElementById('capricho-precio').value) || 0;
     const cantidadCompra = parseInt(document.getElementById('capricho-cantidad').value) || 1;
     const grosor = document.getElementById('capricho-grosor').value;
     const longitud = document.getElementById('capricho-longitud').value;
