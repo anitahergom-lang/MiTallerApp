@@ -1225,42 +1225,50 @@ function previsualizarImagenCapricho(event) {
     reader.readAsDataURL(event.target.files[0]);
 }
 
-// Esta función es la que hará la magia de la "Doble Entrada" en el próximo paso
+// 1. Herramienta auxiliar (puedes ponerla justo antes de la función principal)
+function buscarElemento(idsPosibles) {
+    for (let id of idsPosibles) {
+        const elemento = document.getElementById(id);
+        if (elemento) return elemento;
+    }
+    return null;
+}
+
+// 2. Función principal unificada
 async function procesarGuardadoCapricho() {
-    console.log("Iniciando guardado blindado...");
+    console.log("Iniciando guardado inteligente...");
 
-    // 1. Definimos los IDs que necesitamos
-    const ids = [
-        'capricho-nombre', 'capricho-tipo-general', 'gasto-capricho', 
-        'capricho-cantidad', 'capricho-grosor', 'capricho-longitud', 
-        'capricho-tienda', 'capricho-composicion', 'capricho-notas'
-    ];
+    // Buscamos los elementos probando varias combinaciones posibles de IDs
+    const elNombre = buscarElemento(['capricho-nombre', 'nombre']);
+    const elTipo = buscarElemento(['capricho-tipo-general', 'tipo']);
+    const elSubtipo = buscarElemento(['capricho-subtipo', 'subtipo']);
+    const elPrecio = buscarElemento(['capricho-precio', 'gasto-capricho', 'precio']);
+    const elCantidad = buscarElemento(['capricho-cantidad', 'cantidad']);
+    const elGrosor = buscarElemento(['capricho-grosor', 'grosor']);
+    const elLongitud = buscarElemento(['capricho-longitud', 'longitud']);
+    const elTienda = buscarElemento(['capricho-tienda', 'tienda']);
+    const elComposicion = buscarElemento(['capricho-composicion', 'composicion']);
+    const elNotas = buscarElemento(['capricho-notas', 'notas']);
+    const elFoto = buscarElemento(['capricho-foto', 'foto']);
 
-    // 2. Verificación de seguridad (El 'Debug' automático)
-    for (let id of ids) {
-        if (!document.getElementById(id)) {
-            console.error(`❌ ERROR: No se encuentra el elemento con ID: ${id}. Revisa tu HTML.`);
-            alert(`Error técnico: Falta el campo ${id} en el formulario.`);
-            return; // Detenemos la ejecución aquí para que no rompa
-        }
+    // Validación crítica: Si no encontramos el nombre o el precio, no podemos seguir
+    if (!elNombre || !elPrecio) {
+        alert("❌ Error: No he encontrado el campo de Nombre o Precio en el formulario. Revisa los IDs.");
+        return;
     }
 
-    // 3. Obtenemos valores (Ahora sabemos que existen)
-    const nombreForm = document.getElementById('capricho-nombre').value.trim();
-    const tipoGeneral = document.getElementById('capricho-tipo-general').value;
-    const subtipo = document.getElementById('capricho-subtipo')?.value || '';
-   // Cambia esto:
-// const precioUnit = parseFloat(document.getElementById('gasto-capricho').value) || 0;
-
-// Por esto (que coincide con el id="capricho-precio" que me acabas de mostrar):
-const precioUnit = parseFloat(document.getElementById('capricho-precio').value) || 0;
-    const cantidadCompra = parseInt(document.getElementById('capricho-cantidad').value) || 1;
-    const grosor = document.getElementById('capricho-grosor').value;
-    const longitud = document.getElementById('capricho-longitud').value;
-    const tienda = document.getElementById('capricho-tienda').value;
-    const composicion = document.getElementById('capricho-composicion').value;
-    const notas = document.getElementById('capricho-notas').value;
-    const fotoFile = document.getElementById('capricho-foto')?.files[0]; // Usamos ? por si no hay input foto
+    // Obtenemos valores de forma segura
+    const nombreForm = elNombre.value.trim();
+    const tipoGeneral = elTipo ? elTipo.value : 'Material';
+    const subtipo = elSubtipo ? elSubtipo.value : '';
+    const precioUnit = parseFloat(elPrecio.value) || 0;
+    const cantidadCompra = elCantidad ? parseInt(elCantidad.value) || 1 : 1;
+    const grosor = elGrosor ? elGrosor.value : '';
+    const longitud = elLongitud ? elLongitud.value : '';
+    const tienda = elTienda ? elTienda.value : '';
+    const composicion = elComposicion ? elComposicion.value : '';
+    const notas = elNotas ? elNotas.value : '';
+    const fotoFile = elFoto && elFoto.files ? elFoto.files[0] : null;
 
     if (!nombreForm) { 
         alert("El nombre es obligatorio."); 
@@ -1317,7 +1325,7 @@ const precioUnit = parseFloat(document.getElementById('capricho-precio').value) 
 
         alert("💖 ¡Por fin! Todo guardado: Inventario actualizado y gasto registrado.");
         
-        // Ejecutar limpieza (asegúrate de que estas funciones existan)
+        // Limpieza final
         if (typeof limpiarFormularioCapricho === 'function') limpiarFormularioCapricho();
         if (typeof cerrarHistorial === 'function') cerrarHistorial();
         if (typeof cargarStock === 'function') cargarStock();
