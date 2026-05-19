@@ -1242,7 +1242,7 @@ function buscarElemento(idsPosibles) {
 async function procesarGuardadoCapricho() {
     console.log("Iniciando guardado inteligente...");
 
-    // Buscamos los elementos probando varias combinaciones posibles de IDs
+    // Buscamos los elementos
     const elNombre = buscarElemento(['capricho-nombre', 'nombre']);
     const elTipo = buscarElemento(['capricho-tipo-general', 'tipo']);
     const elSubtipo = buscarElemento(['capricho-subtipo', 'subtipo']);
@@ -1255,13 +1255,11 @@ async function procesarGuardadoCapricho() {
     const elNotas = buscarElemento(['capricho-notas', 'notas']);
     const elFoto = buscarElemento(['capricho-foto', 'foto']);
 
-    // Validación crítica: Si no encontramos el nombre o el precio, no podemos seguir
     if (!elNombre || !elPrecio) {
         alert("❌ Error: No he encontrado el campo de Nombre o Precio en el formulario. Revisa los IDs.");
         return;
     }
 
-    // Obtenemos valores de forma segura
     const nombreForm = elNombre.value.trim();
     const tipoGeneral = elTipo ? elTipo.value : 'Material';
     const subtipo = elSubtipo ? elSubtipo.value : '';
@@ -1290,47 +1288,44 @@ async function procesarGuardadoCapricho() {
             urlFoto = dataUrl.publicUrl;
         }
 
-// --- LÓGICA DE STOCK MEJORADA ---
-if (tipoGeneral === "Material") {
-    // 1. Limpiamos el nombre para buscar (quitamos espacios extra)
-    const nombreLimpio = nombreForm.trim();
-    
-    console.log("Buscando material para actualizar (nombre):", nombreLimpio);
+        // --- LÓGICA DE STOCK (ESTUDIO_DATA) ---
+        if (tipoGeneral === "Material") {
+            const nombreLimpio = nombreForm.trim();
+            console.log("Buscando material en estudio_data para actualizar:", nombreLimpio);
 
-    // 2. Buscamos el material ignorando mayúsculas/minúsculas
-    const { data: existente, error: errorBusqueda } = await _supabase.from('stock')
-        .select('*')
-        .ilike('nombre', nombreLimpio) 
-        .maybeSingle();
+            // Buscamos en la tabla correcta: estudio_data
+            const { data: existente, error: errorBusqueda } = await _supabase.from('estudio_data')
+                .select('*')
+                .ilike('nombre', nombreLimpio) 
+                .maybeSingle();
 
-    if (errorBusqueda) console.error("Error buscando en stock:", errorBusqueda);
+            if (errorBusqueda) console.error("Error buscando en estudio_data:", errorBusqueda);
 
-    // 3. Calculamos la nueva cantidad
-    const cantidadActual = existente ? Number(existente.cantidad) : 0;
-    const nuevaCantidad = cantidadActual + cantidadCompra;
+            const cantidadActual = existente ? Number(existente.cantidad) : 0;
+            const nuevaCantidad = cantidadActual + cantidadCompra;
 
-    const datosStock = {
-        nombre: nombreLimpio, // Guardamos el nombre limpio
-        categoria: subtipo,
-        cantidad: nuevaCantidad,
-        grosor: grosor,
-        longitud: longitud,
-        tienda: tienda,
-        composicion: composicion,
-        notas: notas,
-        foto_url: urlFoto || (existente ? existente.foto_url : null)
-    };
+            const datosStock = {
+                nombre: nombreLimpio,
+                categoria: subtipo,
+                cantidad: nuevaCantidad,
+                grosor: grosor,
+                longitud: longitud,
+                tienda: tienda,
+                composicion: composicion,
+                notas: notas,
+                foto_url: urlFoto || (existente ? existente.foto_url : null)
+            };
 
-    if (existente) {
-        console.log("✅ Material encontrado, actualizando stock a:", nuevaCantidad);
-        const { error: errorUpdate } = await _supabase.from('stock').update(datosStock).eq('id', existente.id);
-        if (errorUpdate) console.error("Error al actualizar stock:", errorUpdate);
-    } else {
-        console.log("🆕 Material no encontrado, creando nueva tarjeta de stock...");
-        const { error: errorInsert } = await _supabase.from('stock').insert([datosStock]);
-        if (errorInsert) console.error("Error al crear nuevo stock:", errorInsert);
-    }
-}
+            if (existente) {
+                console.log("✅ Material encontrado, actualizando...");
+                const { error: errorUpdate } = await _supabase.from('estudio_data').update(datosStock).eq('id', existente.id);
+                if (errorUpdate) console.error("Error al actualizar estudio_data:", errorUpdate);
+            } else {
+                console.log("🆕 Material no encontrado, creando nueva tarjeta...");
+                const { error: errorInsert } = await _supabase.from('estudio_data').insert([datosStock]);
+                if (errorInsert) console.error("Error al crear nuevo registro en estudio_data:", errorInsert);
+            }
+        }
 
         // --- LÓGICA DE FINANZAS ---
         const { error: errorFinanzas } = await _supabase.from('finanzas').insert([{
@@ -1346,9 +1341,9 @@ if (tipoGeneral === "Material") {
 
         if (errorFinanzas) throw errorFinanzas;
 
-        alert("💖 ¡Por fin! Todo guardado: Inventario actualizado y gasto registrado.");
+        alert("💖 ¡Todo guardado! Inventario en 'estudio_data' actualizado y gasto en 'finanzas' registrado.");
         
-        // Limpieza final
+        // Limpieza final y refresco
         if (typeof limpiarFormularioCapricho === 'function') limpiarFormularioCapricho();
         if (typeof cerrarHistorial === 'function') cerrarHistorial();
         if (typeof cargarStock === 'function') cargarStock();
