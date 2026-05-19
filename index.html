@@ -1288,24 +1288,24 @@ async function procesarGuardadoCapricho() {
             urlFoto = dataUrl.publicUrl;
         }
 
+        let idVinculado = null;
+
         // --- LÓGICA DE STOCK (ESTUDIO_DATA) ---
         if (tipoGeneral === "Material") {
-            const nombreLimpio = nombreForm.trim();
-            console.log("Buscando material en estudio_data para actualizar:", nombreLimpio);
-
-            // Buscamos en la tabla correcta: estudio_data
+            console.log("Buscando en estudio_data...");
+            
             const { data: existente, error: errorBusqueda } = await _supabase.from('estudio_data')
                 .select('*')
-                .ilike('nombre', nombreLimpio) 
+                .ilike('contenido', nombreForm) 
                 .maybeSingle();
 
-            if (errorBusqueda) console.error("Error buscando en estudio_data:", errorBusqueda);
+            if (errorBusqueda) console.error("Error buscando:", errorBusqueda);
 
-            const cantidadActual = existente ? Number(existente.cantidad) : 0;
-            const nuevaCantidad = cantidadActual + cantidadCompra;
+            const nuevaCantidad = (existente ? Number(existente.cantidad) : 0) + cantidadCompra;
 
             const datosStock = {
-                nombre: nombreLimpio,
+                contenido: nombreForm,
+                tipo_material: tipoGeneral,
                 categoria: subtipo,
                 cantidad: nuevaCantidad,
                 grosor: grosor,
@@ -1313,17 +1313,16 @@ async function procesarGuardadoCapricho() {
                 tienda: tienda,
                 composicion: composicion,
                 notas: notas,
-                foto_url: urlFoto || (existente ? existente.foto_url : null)
+                ultimo_precio_unitario: precioUnit
             };
 
             if (existente) {
-                console.log("✅ Material encontrado, actualizando...");
-                const { error: errorUpdate } = await _supabase.from('estudio_data').update(datosStock).eq('id', existente.id);
-                if (errorUpdate) console.error("Error al actualizar estudio_data:", errorUpdate);
+                await _supabase.from('estudio_data').update(datosStock).eq('id', existente.id);
+                idVinculado = existente.id;
             } else {
-                console.log("🆕 Material no encontrado, creando nueva tarjeta...");
-                const { error: errorInsert } = await _supabase.from('estudio_data').insert([datosStock]);
-                if (errorInsert) console.error("Error al crear nuevo registro en estudio_data:", errorInsert);
+                const { data: nuevo, error: errorInsert } = await _supabase.from('estudio_data').insert([datosStock]).select();
+                if (errorInsert) throw errorInsert;
+                idVinculado = nuevo[0].id;
             }
         }
 
@@ -1335,15 +1334,19 @@ async function procesarGuardadoCapricho() {
             unidades: cantidadCompra,
             precio_unitario: precioUnit,
             categoria: subtipo,
+            composicion: composicion,
+            grosor: grosor,
+            longitud: longitud,
+            tienda: tienda,
             notas: notas,
-            foto: urlFoto
+            foto: urlFoto,
+            id_stock_vinculado: idVinculado
         }]);
 
         if (errorFinanzas) throw errorFinanzas;
 
-        alert("💖 ¡Todo guardado! Inventario en 'estudio_data' actualizado y gasto en 'finanzas' registrado.");
+        alert("💖 ¡Todo guardado correctamente!");
         
-        // Limpieza final y refresco
         if (typeof limpiarFormularioCapricho === 'function') limpiarFormularioCapricho();
         if (typeof cerrarHistorial === 'function') cerrarHistorial();
         if (typeof cargarStock === 'function') cargarStock();
