@@ -141,6 +141,40 @@
     z-index: 1000;
 }        
         .contador-vueltas-mini { display: flex; align-items: center; gap: 10px; background: var(--s); color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
+    /* Tarjeta para el historial */
+.tarjeta-historial {
+    background: var(--b); /* Fondo que cambia según el modo */
+    border: 1px solid var(--br); /* Borde suave */
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s; /* Un efecto suave al tocar */
+}
+
+/* Tipografía clara y legible */
+.tarjeta-nombre { 
+    color: var(--s); /* Color rosita */
+    font-weight: 600; 
+    font-size: 1.05rem;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.tarjeta-precio { 
+    color: var(--p); 
+    font-weight: bold; 
+    font-size: 1.1rem; 
+}
+
+.tarjeta-fecha { 
+    color: var(--txt); /* Color del texto general */
+    opacity: 0.7; /* Un poco menos intenso, pero perfectamente legible */
+    font-size: 0.85rem; /* Pequeña pero clara, nada de diminuta */
+    margin-top: 5px;
+}
     </style>
 </head>
 <body>
