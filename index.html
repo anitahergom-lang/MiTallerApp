@@ -1292,41 +1292,59 @@ async function procesarGuardadoCapricho() {
 
         // --- LÓGICA DE STOCK (ESTUDIO_DATA) ---
         if (tipoGeneral === "Material") {
-            console.log("Buscando en estudio_data...");
+            console.log("Buscando en estudio_data por contenido:", nombreForm);
             
+            // Buscamos si ya existe una ficha con ese mismo contenido (nombre)
             const { data: existente, error: errorBusqueda } = await _supabase.from('estudio_data')
                 .select('*')
                 .ilike('contenido', nombreForm) 
                 .maybeSingle();
 
-            if (errorBusqueda) console.error("Error buscando:", errorBusqueda);
-
-            const nuevaCantidad = (existente ? Number(existente.cantidad) : 0) + cantidadCompra;
-
-            const datosStock = {
-                contenido: nombreForm,
-                tipo_material: tipoGeneral,
-                categoria: subtipo,
-                cantidad: nuevaCantidad,
-                grosor: grosor,
-                longitud: longitud,
-                tienda: tienda,
-                composicion: composicion,
-                notas: notas,
-                ultimo_precio_unitario: precioUnit
-            };
+            if (errorBusqueda) console.error("Error buscando en estudio_data:", errorBusqueda);
 
             if (existente) {
-                await _supabase.from('estudio_data').update(datosStock).eq('id', existente.id);
+                console.log("✅ Material encontrado. Actualizando ÚNICAMENTE la cantidad...");
+                const nuevaCantidad = Number(existente.cantidad || 0) + cantidadCompra;
+                
+                // REQUISITO: No tocamos ningún dato de la ficha, SOLO la cantidad
+                const { error: errorUpdate } = await _supabase.from('estudio_data')
+                    .update({ cantidad: nuevaCantidad })
+                    .eq('id', existente.id);
+                    
+                if (errorUpdate) console.error("Error al actualizar la cantidad:", errorUpdate);
                 idVinculado = existente.id;
             } else {
-                const { data: nuevo, error: errorInsert } = await _supabase.from('estudio_data').insert([datosStock]).select();
+                console.log("🆕 Material no encontrado. Creando ficha completa desde cero...");
+                
+                // REQUISITO: Crear la tarjeta con todos sus datos originales para que se vea perfecta
+                const datosNuevoStock = {
+                    contenido: nombreForm,
+                    tipo_material: tipoGeneral,
+                    categoria: subtipo,
+                    cantidad: cantidadCompra,
+                    grosor: grosor,
+                    longitud: longitud,
+                    tienda: tienda,
+                    composicion: composicion,
+                    notas: notas,
+                    ultimo_precio_unitario: precioUnit
+                    // Nota: Si tu tabla estudio_data tuviera columna 'foto' o 'foto_url' la añadiríamos aquí, 
+                    // pero según tu lista de columnas de estudio_data no almacena foto, la guarda en finanzas.
+                };
+
+                const { data: nuevo, error: errorInsert } = await _supabase.from('estudio_data')
+                    .insert([datosNuevoStock])
+                    .select();
+                    
                 if (errorInsert) throw errorInsert;
-                idVinculado = nuevo[0].id;
+                if (nuevo && nuevo.length > 0) {
+                    idVinculado = nuevo[0].id;
+                }
             }
         }
 
         // --- LÓGICA DE FINANZAS ---
+        console.log("Insertando registro en finanzas...");
         const { error: errorFinanzas } = await _supabase.from('finanzas').insert([{
             tipo: tipoGeneral,
             concepto: nombreForm,
@@ -1345,10 +1363,13 @@ async function procesarGuardadoCapricho() {
 
         if (errorFinanzas) throw errorFinanzas;
 
-        alert("💖 ¡Todo guardado correctamente!");
+        alert("💖 ¡Todo guardado! Inventario procesado correctamente y gasto registrado.");
         
+        // Limpieza final y refresco automático de las pantallas
         if (typeof limpiarFormularioCapricho === 'function') limpiarFormularioCapricho();
         if (typeof cerrarHistorial === 'function') cerrarHistorial();
+        
+        // Esto refrescará tu lista visual de lanas/stock inmediatamente para que veas el cambio
         if (typeof cargarStock === 'function') cargarStock();
         
     } catch (err) {
