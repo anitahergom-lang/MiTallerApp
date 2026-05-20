@@ -1296,7 +1296,6 @@ async function procesarGuardadoCapricho() {
         if (tipoGeneral === "Material") {
             console.log("Buscando coincidencia en estudio_data por columna 'tipo_material'...", nombreForm);
             
-            // Cotejamos usando el nombre de columna correcto en stock ('tipo_material')
             const { data: existente, error: errorBusqueda } = await _supabase.from('estudio_data')
                 .select('*')
                 .ilike('tipo_material', nombreForm) 
@@ -1305,20 +1304,18 @@ async function procesarGuardadoCapricho() {
             if (errorBusqueda) console.error("Error al cotejar stock:", errorBusqueda);
 
             if (existente) {
-                console.log("✅ ¡Coincidencia encontrada! Sumando unidades al registro existente...");
+                console.log("✅ ¡Coincidencia encontrada! Sumando unidades...");
                 const nuevaCantidad = Number(existente.cantidad || 0) + cantidadCompra;
                 
-                // ACTUALIZACIÓN EXCLUSIVA: Solo alteramos la cantidad numérica
                 const { error: errorUpdate } = await _supabase.from('estudio_data')
                     .update({ cantidad: nuevaCantidad })
                     .eq('id', existente.id);
                     
-                if (errorUpdate) console.error("Error al actualizar cantidad de stock:", errorUpdate);
+                if (errorUpdate) console.error("Error al actualizar cantidad:", errorUpdate);
                 idVinculado = existente.id;
             } else {
-                console.log("🆕 No existe en el inventario. Creando ficha nueva en estudio_data...");
+                console.log("🆕 No existe. Creando ficha nueva...");
                 
-                // Aquí usamos 'tipo_material' para registrar el nombre del producto
                 const datosNuevoStock = {
                     tipo_material: nombreForm, 
                     categoria: subtipo || 'Lana',
@@ -1342,12 +1339,11 @@ async function procesarGuardadoCapricho() {
         }
 
         // --- MAPEO PARA LA TABLA: FINANZAS ---
-        console.log("Insertando registro en finanzas usando la columna 'concepto'...");
+        console.log("Insertando en finanzas...");
         
-        // Aquí hacemos la traducción: el nombre del formulario se guarda en 'concepto'
         const { error: errorFinanzas } = await _supabase.from('finanzas').insert([{
             tipo: tipoGeneral,
-            concepto: nombreForm, // <-- Traducción exitosa aquí
+            concepto: nombreForm, 
             monto_total: precioUnit * cantidadCompra,
             unidades: cantidadCompra,
             precio_unitario: precioUnit,
@@ -1358,23 +1354,27 @@ async function procesarGuardadoCapricho() {
             tienda: tienda,
             notas: notas,
             foto: urlFoto,
-            id_stock_vinculado: idVinculado // Enlace relacional entre tablas
+            id_stock_vinculado: idVinculado
         }]);
 
         if (errorFinanzas) throw errorFinanzas;
 
-        alert("💖 ¡Procesado perfectamente! El gasto se apuntó como 'concepto' y el stock se revisó por 'tipo_material'.");
+        alert("💖 ¡Procesado perfectamente!");
         
-        // Limpiamos formularios y regresamos al menú
+        // --- LIMPIEZA Y ACTUALIZACIÓN VISUAL ---
         if (typeof limpiarFormularioCapricho === 'function') limpiarFormularioCapricho();
         if (typeof cerrarHistorial === 'function') cerrarHistorial();
         
-        // Forzamos la actualización visual del inventario en pantalla
-        if (typeof filtrar === 'function') filtrar('Todo');
+        // Refresco automático de la interfaz
+        if (typeof filtrar === 'function') {
+            filtrar('Todo');
+        } else if (typeof cargarStock === 'function') {
+            cargarStock();
+        }
         
     } catch (err) {
-        console.error("Error detallado en la operación:", err);
-        alert("Error al guardar el capricho: " + err.message);
+        console.error("Error detallado:", err);
+        alert("Error al guardar: " + err.message);
     }
 }
 function limpiarFormularioCapricho() {
