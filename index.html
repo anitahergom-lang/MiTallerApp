@@ -1242,7 +1242,7 @@ function buscarElemento(idsPosibles) {
 async function procesarGuardadoCapricho() {
     console.log("Iniciando guardado inteligente...");
 
-    // Buscamos los elementos
+    // 1. Localizamos los elementos del formulario
     const elNombre = buscarElemento(['capricho-nombre', 'nombre']);
     const elTipo = buscarElemento(['capricho-tipo-general', 'tipo']);
     const elSubtipo = buscarElemento(['capricho-subtipo', 'subtipo']);
@@ -1256,10 +1256,11 @@ async function procesarGuardadoCapricho() {
     const elFoto = buscarElemento(['capricho-foto', 'foto']);
 
     if (!elNombre || !elPrecio) {
-        alert("❌ Error: No he encontrado el campo de Nombre o Precio en el formulario. Revisa los IDs.");
+        alert("❌ Error: No he encontrado el campo de Nombre o Precio en el formulario.");
         return;
     }
 
+    // 2. Extraemos los valores introducidos
     const nombreForm = elNombre.value.trim();
     const tipoGeneral = elTipo ? elTipo.value : 'Material';
     const subtipo = elSubtipo ? elSubtipo.value : '';
@@ -1278,6 +1279,7 @@ async function procesarGuardadoCapricho() {
     }
 
     try {
+        // Manejo de la foto en Storage si existe
         let urlFoto = null;
         if (fotoFile) {
             const fileName = `${Date.now()}-${fotoFile.name}`;
@@ -1290,46 +1292,42 @@ async function procesarGuardadoCapricho() {
 
         let idVinculado = null;
 
-        // --- LÓGICA DE STOCK (ESTUDIO_DATA) ---
+        // --- MAPEO PARA LA TABLA: ESTUDIO_DATA ---
         if (tipoGeneral === "Material") {
-            console.log("Buscando en estudio_data por contenido:", nombreForm);
+            console.log("Buscando coincidencia en estudio_data por columna 'tipo_material'...", nombreForm);
             
-            // Buscamos si ya existe una ficha con ese mismo contenido (nombre)
+            // Cotejamos usando el nombre de columna correcto en stock ('tipo_material')
             const { data: existente, error: errorBusqueda } = await _supabase.from('estudio_data')
                 .select('*')
-                .ilike('contenido', nombreForm) 
+                .ilike('tipo_material', nombreForm) 
                 .maybeSingle();
 
-            if (errorBusqueda) console.error("Error buscando en estudio_data:", errorBusqueda);
+            if (errorBusqueda) console.error("Error al cotejar stock:", errorBusqueda);
 
             if (existente) {
-                console.log("✅ Material encontrado. Actualizando ÚNICAMENTE la cantidad...");
+                console.log("✅ ¡Coincidencia encontrada! Sumando unidades al registro existente...");
                 const nuevaCantidad = Number(existente.cantidad || 0) + cantidadCompra;
                 
-                // REQUISITO: No tocamos ningún dato de la ficha, SOLO la cantidad
+                // ACTUALIZACIÓN EXCLUSIVA: Solo alteramos la cantidad numérica
                 const { error: errorUpdate } = await _supabase.from('estudio_data')
                     .update({ cantidad: nuevaCantidad })
                     .eq('id', existente.id);
                     
-                if (errorUpdate) console.error("Error al actualizar la cantidad:", errorUpdate);
+                if (errorUpdate) console.error("Error al actualizar cantidad de stock:", errorUpdate);
                 idVinculado = existente.id;
             } else {
-                console.log("🆕 Material no encontrado. Creando ficha completa desde cero...");
+                console.log("🆕 No existe en el inventario. Creando ficha nueva en estudio_data...");
                 
-                // REQUISITO: Crear la tarjeta con todos sus datos originales para que se vea perfecta
+                // Aquí usamos 'tipo_material' para registrar el nombre del producto
                 const datosNuevoStock = {
-                    contenido: nombreForm,
-                    tipo_material: tipoGeneral,
-                    categoria: subtipo,
+                    tipo_material: nombreForm, 
+                    categoria: subtipo || 'Lana',
                     cantidad: cantidadCompra,
                     grosor: grosor,
                     longitud: longitud,
                     tienda: tienda,
                     composicion: composicion,
-                    notas: notas,
-                    ultimo_precio_unitario: precioUnit
-                    // Nota: Si tu tabla estudio_data tuviera columna 'foto' o 'foto_url' la añadiríamos aquí, 
-                    // pero según tu lista de columnas de estudio_data no almacena foto, la guarda en finanzas.
+                    notas: notas
                 };
 
                 const { data: nuevo, error: errorInsert } = await _supabase.from('estudio_data')
@@ -1343,11 +1341,13 @@ async function procesarGuardadoCapricho() {
             }
         }
 
-        // --- LÓGICA DE FINANZAS ---
-        console.log("Insertando registro en finanzas...");
+        // --- MAPEO PARA LA TABLA: FINANZAS ---
+        console.log("Insertando registro en finanzas usando la columna 'concepto'...");
+        
+        // Aquí hacemos la traducción: el nombre del formulario se guarda en 'concepto'
         const { error: errorFinanzas } = await _supabase.from('finanzas').insert([{
             tipo: tipoGeneral,
-            concepto: nombreForm,
+            concepto: nombreForm, // <-- Traducción exitosa aquí
             monto_total: precioUnit * cantidadCompra,
             unidades: cantidadCompra,
             precio_unitario: precioUnit,
@@ -1358,23 +1358,23 @@ async function procesarGuardadoCapricho() {
             tienda: tienda,
             notas: notas,
             foto: urlFoto,
-            id_stock_vinculado: idVinculado
+            id_stock_vinculado: idVinculado // Enlace relacional entre tablas
         }]);
 
         if (errorFinanzas) throw errorFinanzas;
 
-        alert("💖 ¡Todo guardado! Inventario procesado correctamente y gasto registrado.");
+        alert("💖 ¡Procesado perfectamente! El gasto se apuntó como 'concepto' y el stock se revisó por 'tipo_material'.");
         
-        // Limpieza final y refresco automático de las pantallas
+        // Limpiamos formularios y regresamos al menú
         if (typeof limpiarFormularioCapricho === 'function') limpiarFormularioCapricho();
         if (typeof cerrarHistorial === 'function') cerrarHistorial();
         
-        // Esto refrescará tu lista visual de lanas/stock inmediatamente para que veas el cambio
-        if (typeof cargarStock === 'function') cargarStock();
+        // Forzamos la actualización visual del inventario en pantalla
+        if (typeof filtrar === 'function') filtrar('Todo');
         
     } catch (err) {
-        console.error("Error detallado:", err);
-        alert("Error al guardar: " + err.message);
+        console.error("Error detallado en la operación:", err);
+        alert("Error al guardar el capricho: " + err.message);
     }
 }
 function limpiarFormularioCapricho() {
