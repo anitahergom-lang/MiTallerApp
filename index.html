@@ -344,14 +344,43 @@
             </div>
         </div>
 
-        <div id="vista-LISTA_GASTOS" style="display:none; margin-top:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 style="color:var(--s); margin:0;">📜 Historial de Gastos</h3>
-                <button onclick="cerrarHistorial()" style="background:var(--pc); border:none; padding:8px 12px; border-radius:10px; color:var(--s); font-weight:bold; cursor:pointer;">⬅️ Volver</button>
-            </div>
-            <div id="contenedor-lista-gastos"></div>
-        </div>
+<div id="vista-LISTA_GASTOS" style="display:none; max-width: 500px; margin: 0 auto; margin-top: 20px;">
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h3 style="color:var(--s); margin:0; font-size: 1.4rem;">📜 Mi Historial</h3>
+        <button onclick="cerrarHistorial()" style="background:var(--pc); border:none; padding:8px 12px; border-radius:10px; color:var(--s); font-weight:bold; cursor:pointer;">⬅️ Volver</button>
     </div>
+
+    <div class="filtros-container" style="margin-bottom: 10px; border-bottom: 1px dashed var(--br); padding-bottom: 10px;">
+        <select id="filtro-fecha-hist" class="btn-filtro" onchange="aplicarFiltrosHistorial()" style="background: var(--b); color: var(--txt);">
+            <option value="todo">📅 Todo el tiempo</option>
+            <option value="mes">Este mes</option>
+            <option value="3meses">Últimos 3 meses</option>
+            <option value="6meses">Últimos 6 meses</option>
+            <option value="anio">Este año</option>
+        </select>
+        <select id="filtro-tienda-hist" class="btn-filtro" onchange="aplicarFiltrosHistorial()" style="background: var(--b); color: var(--txt);">
+            <option value="todas">🛍️ Todas las tiendas</option>
+        </select>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-bottom:10px; overflow-x:auto; scrollbar-width: none; padding-bottom: 5px;">
+        <button class="btn-filtro active" id="btn-hist-Todos" onclick="seleccionarCategoriaHistorial('Todos')">✨ Todos</button>
+        <button class="btn-filtro" id="btn-hist-Material" onclick="seleccionarCategoriaHistorial('Material')">🧶 Material</button>
+        <button class="btn-filtro" id="btn-hist-Herramientas" onclick="seleccionarCategoriaHistorial('Herramientas')">🛠️ Herramientas</button>
+        <button class="btn-filtro" id="btn-hist-Formacion" onclick="seleccionarCategoriaHistorial('Formacion')">📚 Formación</button>
+    </div>
+
+    <div id="sub-filtros-material" style="display:none; gap:6px; margin-bottom:15px; overflow-x:auto; scrollbar-width: none; padding-bottom: 5px;">
+        <button class="btn-filtro" style="font-size: 11px; padding: 5px 10px;" onclick="aplicarFiltrosHistorial('Lanas')">🧶 Lanas</button>
+        <button class="btn-filtro" style="font-size: 11px; padding: 5px 10px;" onclick="aplicarFiltrosHistorial('Telas')">👗 Telas</button>
+        <button class="btn-filtro" style="font-size: 11px; padding: 5px 10px;" onclick="aplicarFiltrosHistorial('Hilos')">🧵 Hilos</button>
+        <button class="btn-filtro" style="font-size: 11px; padding: 5px 10px;" onclick="aplicarFiltrosHistorial('Accesorios')">🎀 Accesorios</button>
+        <button class="btn-filtro" style="font-size: 11px; padding: 5px 10px;" onclick="aplicarFiltrosHistorial('Otros')">🧸 Otros</button>
+    </div>
+
+    <div id="contenedor-lista-gastos" style="display: flex; flex-direction: column; gap: 10px;">
+        </div>
 </div>
     
 <div id="vista-COMPRAS" style="display:none;">
@@ -496,26 +525,7 @@
             </div>
         </div>
     </div>
-</div>
-
-<div id="vista-LISTA_GASTOS" class="view" style="display:none; margin-top:20px; border-top: 2px dashed var(--br); padding-top: 20px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3 style="color:var(--s); margin:0;">📜 Mi Historial de Gastos</h3>
-        <button onclick="cerrarHistorial()" style="background:var(--pc); border:none; padding:8px 15px; border-radius:12px; cursor:pointer; color:var(--s); font-weight:bold; font-size:0.75rem; display:flex; align-items:center; gap:5px;">
-            ⬅️ Volver a Mis Caprichos
-        </button>
-    </div>
-    
-    <div style="display:flex; gap:8px; margin-bottom:20px; overflow-x:auto; padding-bottom:10px; scrollbar-width: none; -webkit-overflow-scrolling: touch;">
-        <button onclick="cargarHistorialGastos('TODOS')" style="background:var(--p); color:white; border:none; padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">🛍️ Todos</button>
-        <button onclick="cargarHistorialGastos('Material')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">🧶 Material</button>
-        <button onclick="cargarHistorialGastos('Herramientas')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">✂️ Herramientas</button>
-        <button onclick="cargarHistorialGastos('Formación')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">📚 Formación</button>
-    </div>
-
-    <div id="contenedor-lista-gastos" style="min-height: 100px;">
-        </div>
-</div>    
+</div>  
     
 <div id="vista-LLAVES" class="view" style="display:none;">
     <h2 style="color:var(--s); text-align:center;">🔑 Mis Llaves</h2>
@@ -1503,50 +1513,45 @@ async function eliminarNota(id) {
     }
 }
 // --- LÓGICA DE CAPRICHOS (Sustituye lo que tengas de esto por este bloque) ---
-
-// --- LÓGICA DE CAPRICHOS: NAVEGACIÓN Y CIERRE ---
-
-// --- LÓGICA DE CAPRICHOS: NAVEGACIÓN, CIERRE Y CARGA (BLOQUE UNIFICADO) ---
-
-// --- LÓGICA DE CAPRICHOS: NAVEGACIÓN Y CIERRE (BLOQUE UNIFICADO) ---
-
+// --- LÓGICA DE CAPRICHOS: NAVEGACIÓN BLINDADA ---
 function cambiarVistaInterna(subVista) {
-    // 1. Escondemos el menú completo (los 4 botones y el botón inicio)
-    const menu = document.getElementById('menu-caprichos');
-    if (menu) menu.style.display = 'none';
-
-    // 2. Escondemos sub-vistas para que no se amontonen
+    // 1. Escondemos TODO lo de caprichos para limpiar
+    document.getElementById('menu-caprichos').style.display = 'none';
     const vistaLista = document.getElementById('vista-LISTA_GASTOS');
     if (vistaLista) vistaLista.style.display = 'none';
-    
     const vistaAnadir = document.getElementById('vista-AÑADIR_CAPRICHO');
     if (vistaAnadir) vistaAnadir.style.display = 'none';
-
-    // 3. Mostramos la que hemos elegido
+    
+    // 2. Mostramos SOLO lo que toca
     const destino = document.getElementById('vista-' + subVista);
     if (destino) {
         destino.style.display = 'block';
-        if (subVista === 'LISTA_GASTOS') {
-            cargarHistorialGastos('TODOS');
+        if (subVista === 'AÑADIR_CAPRICHO') {
+            document.getElementById('capricho-fecha').valueAsDate = new Date();
+        } else if (subVista === 'LISTA_GASTOS') {
+            // Mañana haremos esta función para que cargue los datos reales
+            console.log("Preparando historial..."); 
         }
+    } else {
+        alert("¡Próximamente! Estamos preparando " + subVista + " 🌸");
+        document.getElementById('menu-caprichos').style.display = 'block';
     }
 }
 
-// Función para cerrar el Historial
 function cerrarHistorial() {
-    // Escondemos sub-vistas
-    if (document.getElementById('vista-LISTA_GASTOS')) document.getElementById('vista-LISTA_GASTOS').style.display = 'none';
-    if (document.getElementById('vista-AÑADIR_CAPRICHO')) document.getElementById('vista-AÑADIR_CAPRICHO').style.display = 'none';
+    // Escondemos las sub-vistas
+    const vistaLista = document.getElementById('vista-LISTA_GASTOS');
+    if (vistaLista) vistaLista.style.display = 'none';
+    const vistaAnadir = document.getElementById('vista-AÑADIR_CAPRICHO');
+    if (vistaAnadir) vistaAnadir.style.display = 'none';
     
-    // Mostramos de nuevo el menú principal
+    // Volvemos al menú base de caprichos
     const menu = document.getElementById('menu-caprichos');
     if (menu) menu.style.display = 'block';
-
     const vistaCaprichos = document.getElementById('vista-CAPRICHOS');
     if (vistaCaprichos) vistaCaprichos.style.display = 'block';
 }
 
-// ESTA ES LA FUNCIÓN QUE TE FALTABA PARA EL BOTÓN DE AÑADIR
 function volverMenuCaprichos() {
     cerrarHistorial();
 }
