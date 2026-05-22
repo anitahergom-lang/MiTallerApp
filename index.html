@@ -250,11 +250,9 @@
     <div id="lista-stock" class="grid-estudio"></div>
 </div>
 
-<div id="caprichos" class="view" style="display: none;">
-    <div id="header-caprichos" style="text-align:center; margin-bottom:20px;">
-        <span style="font-size:3rem;">🛍️</span>
-        <h2 style="margin:5px 0; color:var(--s);">Mis Caprichos</h2>
-    </div>
+<div id="vista-CAPRICHOS" class="vista" style="display:none;">
+    <div class="card">
+        <h2 style="color:var(--p); text-align:center; margin-bottom:20px;">💸 Mis Caprichos</h2>
         
         <div id="menu-caprichos">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -566,12 +564,9 @@ function cambiarVista(v) {
         if(vista) vista.style.display = 'none';
     });
 
-    // 3. NUEVO: Esconder también las sub-vistas de Caprichos para que no se solapen al navegar
+    // 3. NUEVO: Esconder también la sub-vista de añadir de Caprichos para que no se solape
     const vistaExtra = document.getElementById('vista-AÑADIR_CAPRICHO');
     if (vistaExtra) vistaExtra.style.display = 'none';
-    
-    const vistaHistorial = document.getElementById('vista-HISTORIAL');
-    if (vistaHistorial) vistaHistorial.style.display = 'none';
 
     // 4. Mostrar la vista activa
     const vistaActiva = document.getElementById('vista-' + v);
@@ -590,15 +585,13 @@ function cambiarVista(v) {
         cargarLlaves();
     }
 
-    // CORRECCIÓN 2: Asegurar que al pulsar en "Mis Caprichos" desde fuera, aparezca su menú limpio
+    // CORRECCIÓN 2: Asegurar que al pulsar en "Mis Caprichos" desde fuera, aparezca su menú
     if(v === 'CAPRICHOS') {
         const menuCaprichos = document.getElementById('menu-caprichos');
-        const headerCaprichos = document.getElementById('header-caprichos'); // Para manejar el título gigante
-        
         if(menuCaprichos) menuCaprichos.style.display = 'block';
-        if(headerCaprichos) headerCaprichos.style.display = 'block'; // Nos aseguramos de que el título vuelva
     }
-} function filtrar(cat) {
+}
+    function filtrar(cat) {
         document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('active'));
         const fBtn = document.getElementById('filtro-' + cat);
         if(fBtn) fBtn.classList.add('active');
@@ -1234,53 +1227,24 @@ async function guardarNuevaLlave() {
   // Función para navegar DENTRO de la sección de Caprichos
 // Función para navegar a las sub-secciones
 function cambiarVistaInterna(subSeccion) {
-    // 1. Ocultamos el título gigante y los botones para ganar espacio visual
-    const header = document.getElementById('header-caprichos');
-    const menu = document.getElementById('menu-caprichos');
-    if (header) header.style.display = 'none';
-    if (menu) menu.style.display = 'none';
-
-    // 2. Ocultamos cualquier subsección que pudiera estar abierta previamente
-    const vistasExtra = ['vista-AÑADIR_CAPRICHO', 'vista-HISTORIAL']; // Aquí controlamos los solapamientos
-    vistasExtra.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-    });
-
-    // 3. Mostramos la vista de destino
+    document.getElementById('vista-CAPRICHOS').style.display = 'none';
     const vistaDestino = document.getElementById('vista-' + subSeccion);
     
     if (vistaDestino) {
         vistaDestino.style.display = 'block';
-        
         // Si es la vista de añadir, ponemos la fecha de hoy por defecto
         if(subSeccion === 'AÑADIR_CAPRICHO') {
-            const fechaInput = document.getElementById('capricho-fecha');
-            if (fechaInput) fechaInput.valueAsDate = new Date();
+            document.getElementById('capricho-fecha').valueAsDate = new Date();
         }
     } else {
         alert("¡Próximamente! Estamos preparando " + subSeccion + " 🌸");
-        volverMenuCaprichos(); // Si la sección aún no existe, nos devuelve a la pantalla principal limpia
+        document.getElementById('vista-CAPRICHOS').style.display = 'block';
     }
 }
 
 function volverMenuCaprichos() {
-    // 1. Ocultamos todas las subsecciones
-    const vistasExtra = ['vista-AÑADIR_CAPRICHO', 'vista-HISTORIAL'];
-    vistasExtra.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-    });
-
-    // 2. Devolvemos la visibilidad al título y al menú principal
-    const header = document.getElementById('header-caprichos');
-    const menu = document.getElementById('menu-caprichos');
-    if (header) header.style.display = 'block';
-    if (menu) menu.style.display = 'block';
-
-    // 3. Nos aseguramos de que el contenedor maestro siga visible
-    const vistaPrincipal = document.getElementById('vista-CAPRICHOS');
-    if (vistaPrincipal) vistaPrincipal.style.display = 'block';
+    document.getElementById('vista-AÑADIR_CAPRICHO').style.display = 'none';
+    document.getElementById('vista-CAPRICHOS').style.display = 'block';
 }
 
 function mostrarSubcategorias(valor) {
