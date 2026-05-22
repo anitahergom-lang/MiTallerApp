@@ -496,17 +496,7 @@
         </button>
     </div>
     
-    <div style="display:flex; gap:8px; margin-bottom:20px; overflow-x:auto; padding-bottom:10px; scrollbar-width: none; -webkit-overflow-scrolling: touch;">
-        <button onclick="cargarHistorialGastos('TODOS')" style="background:var(--p); color:white; border:none; padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">🛍️ Todos</button>
-        <button onclick="cargarHistorialGastos('Material')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">🧶 Material</button>
-        <button onclick="cargarHistorialGastos('Herramientas')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">✂️ Herramientas</button>
-        <button onclick="cargarHistorialGastos('Formación')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">📚 Formación</button>
-    </div>
 
-    <div id="contenedor-lista-gastos" style="min-height: 100px;">
-        </div>
-</div>    
-    
 <div id="vista-LLAVES" class="view" style="display:none;">
     <h2 style="color:var(--s); text-align:center;">🔑 Mis Llaves</h2>
     <div style="background:var(--b); padding:15px; border-radius:20px; border:1px solid var(--br); margin-bottom:20px;">
@@ -554,9 +544,13 @@ function cambiarVista(v) {
         if(vista) vista.style.display = 'none';
     });
 
-    // 3. NUEVO: Esconder también la sub-vista de añadir de Caprichos para que no se solape
-    const vistaExtra = document.getElementById('vista-AÑADIR_CAPRICHO');
-    if (vistaExtra) vistaExtra.style.display = 'none';
+    // 3. MAGIA ANTI-SOLAPAMIENTOS: Esconder TODAS las sub-vistas de Caprichos
+    const vistaAnadir = document.getElementById('vista-AÑADIR_CAPRICHO');
+    if (vistaAnadir) vistaAnadir.style.display = 'none';
+    
+    // Aquí está la clave: Ocultar explícitamente el historial al salir de la sección
+    const vistaHistorial = document.getElementById('vista-LISTA_GASTOS');
+    if (vistaHistorial) vistaHistorial.style.display = 'none';
 
     // 4. Mostrar la vista activa
     const vistaActiva = document.getElementById('vista-' + v);
@@ -569,16 +563,15 @@ function cambiarVista(v) {
     if(v === 'REGALOS') cargarRegalos();
     if(v === 'PDFS') { cargarPDFs(); cargarBorradorLocal(); }
     if(v === 'NOTAS') cargarNotas();
-    
-    // CORRECCIÓN 1: Cambiado 'id' por 'v' para que no falle al verificar las Llaves
-    if(v === 'LLAVES') { 
-        cargarLlaves();
-    }
+    if(v === 'LLAVES') cargarLlaves();
 
-    // CORRECCIÓN 2: Asegurar que al pulsar en "Mis Caprichos" desde fuera, aparezca su menú
+    // 6. Asegurar que al pulsar en "Mis Caprichos", vuelva al menú principal limpio
     if(v === 'CAPRICHOS') {
         const menuCaprichos = document.getElementById('menu-caprichos');
         if(menuCaprichos) menuCaprichos.style.display = 'block';
+        
+        // Forzamos el cierre de cualquier sub-sección para que quede como nuevo
+        if (typeof cerrarHistorial === 'function') cerrarHistorial();
     }
 }
     function filtrar(cat) {
