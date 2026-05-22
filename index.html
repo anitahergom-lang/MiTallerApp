@@ -250,8 +250,7 @@
     <div id="lista-stock" class="grid-estudio"></div>
 </div>
 
-<div id="vista-CAPRICHOS" class="vista" style="display:block;">
-    </div>
+<div id="vista-CAPRICHOS" class="vista" style="display:none;">
     <div class="card">
         <h2 style="color:var(--p); text-align:center; margin-bottom:20px;">💸 Mis Caprichos</h2>
         
@@ -489,11 +488,11 @@
     </div>
 </div>
 
-<div id="vista-LISTA_GASTOS" class="view" style="display:none; margin-top:0;">
+<div id="vista-LISTA_GASTOS" class="view" style="display:none; margin-top:20px; border-top: 2px dashed var(--br); padding-top: 20px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3 style="color:var(--s); margin:0;">📜 Mi Historial</h3>
-        <button onclick="volverMenuCaprichos()" style="background:var(--pc); border:none; padding:8px 15px; border-radius:12px; cursor:pointer; color:var(--s); font-weight:bold;">
-            ⬅️ Volver
+        <h3 style="color:var(--s); margin:0;">📜 Mi Historial de Gastos</h3>
+        <button onclick="cerrarHistorial()" style="background:var(--pc); border:none; padding:8px 15px; border-radius:12px; cursor:pointer; color:var(--s); font-weight:bold; font-size:0.75rem; display:flex; align-items:center; gap:5px;">
+            ⬅️ Volver a Mis Caprichos
         </button>
     </div>
     
@@ -547,32 +546,30 @@ const _supabase = client;
     let vueltasContador = 0;
 
 function cambiarVista(v) {
-    // 1. Lista COMPLETA de todas las vistas posibles en tu App
-    const todasLasVistas = [
-        'INICIO', 'STOCK', 'COMPRAS', 'PROYECTOS', 'PDFS', 'REGALOS', 
-        'NOTAS', 'LLAVES', 'CAPRICHOS', 'AÑADIR_CAPRICHO', 'LISTA_GASTOS'
-    ];
-
-    // 2. Apagamos TODO (sin excepciones)
-    todasLasVistas.forEach(id => {
-        const el = document.getElementById('vista-' + id);
-        if(el) el.style.display = 'none';
-    });
-
-    // 3. Encendemos SOLO la que pediste
-    const vistaActiva = document.getElementById('vista-' + v);
-    if(vistaActiva) {
-        vistaActiva.style.display = 'block';
-    }
-
-    // 4. Gestionar botones activos del menú principal
+    // 1. Gestionar botones activos
     document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
-    // Si la vista es una subsección, activamos el botón de CAPRICHOS
-    const botonActivo = (v === 'AÑADIR_CAPRICHO' || v === 'LISTA_GASTOS') ? 'CAPRICHOS' : v;
-    const navBtn = document.getElementById('nav-' + botonActivo);
+    const navBtn = document.getElementById('nav-' + v);
     if(navBtn) navBtn.classList.add('active');
 
-    // 5. Cargas específicas (esto se queda igual)
+    // 2. Esconder todas las vistas principales
+    ['INICIO', 'STOCK', 'COMPRAS', 'PROYECTOS', 'PDFS', 'REGALOS', 'NOTAS', 'LLAVES', 'CAPRICHOS'].forEach(id => {
+        const vista = document.getElementById('vista-' + id);
+        if(vista) vista.style.display = 'none';
+    });
+
+    // 3. MAGIA ANTI-SOLAPAMIENTOS: Esconder TODAS las sub-vistas de Caprichos
+    const vistaAnadir = document.getElementById('vista-AÑADIR_CAPRICHO');
+    if (vistaAnadir) vistaAnadir.style.display = 'none';
+    
+    // Aquí está la clave: Ocultar explícitamente el historial al salir de la sección
+    const vistaHistorial = document.getElementById('vista-LISTA_GASTOS');
+    if (vistaHistorial) vistaHistorial.style.display = 'none';
+
+    // 4. Mostrar la vista activa
+    const vistaActiva = document.getElementById('vista-' + v);
+    if(vistaActiva) vistaActiva.style.display = 'block';
+
+    // 5. Cargas específicas de cada sección
     if(v === 'STOCK') filtrar('Todo');
     if(v === 'COMPRAS') cargarCompras();
     if(v === 'PROYECTOS') setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
@@ -580,7 +577,6 @@ function cambiarVista(v) {
     if(v === 'PDFS') { cargarPDFs(); cargarBorradorLocal(); }
     if(v === 'NOTAS') cargarNotas();
     if(v === 'LLAVES') cargarLlaves();
-}
 
     // 6. Asegurar que al pulsar en "Mis Caprichos", vuelva al menú principal limpio
     if(v === 'CAPRICHOS') {
