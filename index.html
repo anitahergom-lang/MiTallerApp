@@ -497,15 +497,18 @@
     </div>
     
     <div style="display:flex; gap:8px; margin-bottom:20px; overflow-x:auto; padding-bottom:10px; scrollbar-width: none; -webkit-overflow-scrolling: touch;">
-        <button onclick="cargarHistorialGastos('TODOS')" style="background:var(--p); color:white; border:none; padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">🛍️ Todos</button>
-        <button onclick="cargarHistorialGastos('Material')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">🧶 Material</button>
-        <button onclick="cargarHistorialGastos('Herramientas')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">✂️ Herramientas</button>
-        <button onclick="cargarHistorialGastos('Formación')" style="background:var(--b); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; cursor:pointer; white-space:nowrap;">📚 Formación</button>
+        <button onclick="cargarHistorialGastos('TODOS')" style="background:var(--p); color:white; border:none; padding:8px 15px; border-radius:12px; font-size:0.8rem; font-weight:bold; cursor:pointer; white-space:nowrap;">🛍️ Todos</button>
+        
+        <button onclick="cargarHistorialGastos('Material')" style="background:var(--b); color:var(--txt); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; font-weight:bold; cursor:pointer; white-space:nowrap;">🧶 Material</button>
+        
+        <button onclick="cargarHistorialGastos('Herramientas')" style="background:var(--b); color:var(--txt); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; font-weight:bold; cursor:pointer; white-space:nowrap;">✂️ Herramientas</button>
+        
+        <button onclick="cargarHistorialGastos('Formación')" style="background:var(--b); color:var(--txt); border:1px solid var(--br); padding:8px 15px; border-radius:12px; font-size:0.8rem; font-weight:bold; cursor:pointer; white-space:nowrap;">📚 Formación</button>
     </div>
 
     <div id="contenedor-lista-gastos" style="min-height: 100px;">
-        </div>
-</div>    
+    </div>
+</div> 
     
 <div id="vista-LLAVES" class="view" style="display:none;">
     <h2 style="color:var(--s); text-align:center;">🔑 Mis Llaves</h2>
