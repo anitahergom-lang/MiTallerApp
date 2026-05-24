@@ -552,7 +552,18 @@ const _supabase = client;
     let toolsState = { 'canvas-punto': 'pincel', 'canvas-cuerpos': 'pincel' };
     let vueltasContador = 0;
 
-function cambiarVista(v) {
+// --- NUEVA FUNCIÓN DE LIMPIEZA ---
+function resetearVistas() {
+    // 1. Ocultar todas las pantallas (buscamos cualquier ID que empiece por 'vista-')
+    document.querySelectorAll('[id^="vista-"]').forEach(el => {
+        el.style.display = 'none';
+    });
+    
+    // 2. Limpiar botones activos
+    document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
+}
+    function cambiarVista(v) {
+    resetearVistas();
     // 1. Gestionar botones activos
     document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
     const navBtn = document.getElementById('nav-' + v);
@@ -1227,6 +1238,7 @@ async function guardarNuevaLlave() {
   // Función para navegar DENTRO de la sección de Caprichos
 // Función para navegar a las sub-secciones
 function cambiarVistaInterna(subSeccion) {
+    resetearVistas();
     document.getElementById('vista-CAPRICHOS').style.display = 'none';
     const vistaDestino = document.getElementById('vista-' + subSeccion);
     
