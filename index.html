@@ -252,7 +252,9 @@
 
 <div id="vista-CAPRICHOS" class="vista" style="display:none;">
     <div class="card">
-        <h2 style="color:var(--p); text-align:center; margin-bottom:20px;">💸 Mis Caprichos</h2>
+       <div id="header-principal-caprichos" style="text-align:center; margin-bottom:20px;">
+    <h2 style="color:var(--p); margin:0;">💸 <span id="titulo-caprichos-texto">Mis Caprichos</span></h2>
+</div>
         
         <div id="menu-caprichos">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -1238,19 +1240,35 @@ async function guardarNuevaLlave() {
   // Función para navegar DENTRO de la sección de Caprichos
 // Función para navegar a las sub-secciones
 function cambiarVistaInterna(subSeccion) {
-    resetearVistas();
-    document.getElementById('vista-CAPRICHOS').style.display = 'none';
+    // 1. Limpieza total (tu función de seguridad que creamos antes)
+    resetearVistas(); 
+    
+    // 2. Elementos del header principal para controlar el espacio
+    const header = document.getElementById('header-principal-caprichos');
+    const titulo = document.getElementById('titulo-caprichos-texto');
     const vistaDestino = document.getElementById('vista-' + subSeccion);
     
     if (vistaDestino) {
         vistaDestino.style.display = 'block';
-        // Si es la vista de añadir, ponemos la fecha de hoy por defecto
+
+        // 3. Lógica de espacio: Ocultar el título principal en el Historial (LISTA_GASTOS)
+        if (subSeccion === 'LISTA_GASTOS') {
+            if(header) header.style.display = 'none'; 
+        } else {
+            if(header) header.style.display = 'block'; 
+            // 4. Cambiamos el texto dinámicamente según la sección
+            if(titulo) titulo.innerText = (subSeccion === 'AÑADIR_CAPRICHO') ? 'Registrar Compra' : 'Mis Caprichos';
+        }
+
+        // 5. Tu lógica original para la fecha por defecto
         if(subSeccion === 'AÑADIR_CAPRICHO') {
-            document.getElementById('capricho-fecha').valueAsDate = new Date();
+            const fechaInput = document.getElementById('capricho-fecha');
+            if(fechaInput) fechaInput.valueAsDate = new Date();
         }
     } else {
         alert("¡Próximamente! Estamos preparando " + subSeccion + " 🌸");
         document.getElementById('vista-CAPRICHOS').style.display = 'block';
+        if(header) header.style.display = 'block';
     }
 }
 
@@ -1445,7 +1463,6 @@ function abrirModalNota(id = null, titulo = '', contenido = '', url = '') {
     document.getElementById('modal-titulo-accion').innerText = id ? 'Editar Nota' : 'Nueva Nota';
     document.getElementById('btn-guardar-nota').innerText = id ? 'ACTUALIZAR' : 'PEGAR AL MURO';
 }
-
 function cerrarModalNota() {
     document.getElementById('modal-nota').style.display = 'none';
 }
