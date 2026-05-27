@@ -1358,28 +1358,16 @@ async function procesarGuardadoCapricho() {
 
         // --- MAPEO PARA LA TABLA: ESTUDIO_DATA ---
         if (tipoGeneral === "Material") {
-            console.log("Buscando coincidencia en estudio_data por columna 'tipo_material'...", nombreForm);
-            
             const { data: existente, error: errorBusqueda } = await _supabase.from('estudio_data')
                 .select('*')
                 .ilike('tipo_material', nombreForm) 
                 .maybeSingle();
 
-            if (errorBusqueda) console.error("Error al cotejar stock:", errorBusqueda);
-
             if (existente) {
-                console.log("✅ ¡Coincidencia encontrada! Sumando unidades...");
                 const nuevaCantidad = Number(existente.cantidad || 0) + cantidadCompra;
-                
-                const { error: errorUpdate } = await _supabase.from('estudio_data')
-                    .update({ cantidad: nuevaCantidad })
-                    .eq('id', existente.id);
-                    
-                if (errorUpdate) console.error("Error al actualizar cantidad:", errorUpdate);
+                await _supabase.from('estudio_data').update({ cantidad: nuevaCantidad }).eq('id', existente.id);
                 idVinculado = existente.id;
             } else {
-                console.log("🆕 No existe. Creando ficha nueva...");
-                
                 const datosNuevoStock = {
                     tipo_material: nombreForm, 
                     categoria: subtipo || 'Lana',
@@ -1390,22 +1378,14 @@ async function procesarGuardadoCapricho() {
                     composicion: composicion,
                     notas: notas
                 };
-
-                const { data: nuevo, error: errorInsert } = await _supabase.from('estudio_data')
-                    .insert([datosNuevoStock])
-                    .select();
-                    
-                if (errorInsert) throw errorInsert;
-                if (nuevo && nuevo.length > 0) {
-                    idVinculado = nuevo[0].id;
-                }
+                const { data: nuevo, error: errorInsert } = await _supabase.from('estudio_data').insert([datosNuevoStock]).select();
+                if (nuevo && nuevo.length > 0) idVinculado = nuevo[0].id;
             }
         }
 
         // --- MAPEO PARA LA TABLA: FINANZAS ---
         console.log("Insertando en finanzas...");
-        
-        const { error: errorFinanzas } = await _supabase.from('finanzas').insert([{
+        const { data: dataFinanza, error: errorFinanzas } = await _supabase.from('finanzas').insert([{
             tipo: tipoGeneral,
             concepto: nombreForm, 
             monto_total: precioUnit * cantidadCompra,
@@ -1419,9 +1399,23 @@ async function procesarGuardadoCapricho() {
             notas: notas,
             foto: urlFoto,
             id_stock_vinculado: idVinculado
-        }]);
+        }]).select();
 
         if (errorFinanzas) throw errorFinanzas;
+
+        // --- AUTOMATIZACIÓN: GUARDADO EN MI_HISTORIAL ---
+        if (dataFinanza && dataFinanza.length > 0) {
+            await _supabase.from('mi_historial').insert([{
+                id_finanza_original: dataFinanza[0].id,
+                categoria_padre: tipoGeneral,
+                subcategoria: subtipo,
+                nombre_producto: nombreForm,
+                fecha_compra: new Date().toISOString(),
+                tienda: tienda,
+                precio_total: precioUnit * cantidadCompra,
+                notas: notas
+            }]);
+        }
 
         alert("💖 ¡Procesado perfectamente!");
         
@@ -1429,7 +1423,6 @@ async function procesarGuardadoCapricho() {
         if (typeof limpiarFormularioCapricho === 'function') limpiarFormularioCapricho();
         if (typeof cerrarHistorial === 'function') cerrarHistorial();
         
-        // Refresco automático de la interfaz
         if (typeof filtrar === 'function') {
             filtrar('Todo');
         } else if (typeof cargarStock === 'function') {
