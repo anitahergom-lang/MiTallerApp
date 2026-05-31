@@ -1424,13 +1424,15 @@ async function procesarGuardadoCapricho() {
         if (typeof limpiarFormularioCapricho === 'function') limpiarFormularioCapricho();
         if (typeof cerrarHistorial === 'function') cerrarHistorial();
         
-        setTimeout(() => {
+        // Refresco mejorado para asegurar que la UI se entere del cambio
+        setTimeout(async () => {
             if (typeof filtrar === 'function') {
-                filtrar('Todo');
+                await filtrar('Todo');
             } else if (typeof cargarStock === 'function') {
-                cargarStock();
+                await cargarStock();
             }
-        }, 500);
+            window.dispatchEvent(new Event('resize')); 
+        }, 800);
         
     } catch (err) {
         console.error("Error detallado:", err);
