@@ -1343,22 +1343,24 @@ async function procesarGuardadoCapricho() {
     }
 
     try {
-        // Manejo de la foto en Storage si existe
+        // Manejo de la foto en Storage
         let urlFoto = null;
         if (fotoFile) {
             const fileName = `${Date.now()}-${fotoFile.name}`;
-            const { data: dataImg, error: errorImg } = await _supabase.storage.from('materiales').upload(fileName, fotoFile);
-            if (errorImg) throw errorImg;
-            
-            const { data: dataUrl } = _supabase.storage.from('materiales').getPublicUrl(fileName);
-            urlFoto = dataUrl.publicUrl;
+            const { error: errorImg } = await _supabase.storage.from('materiales').upload(fileName, fotoFile);
+            if (!errorImg) {
+                const { data: dataUrl } = _supabase.storage.from('materiales').getPublicUrl(fileName);
+                urlFoto = dataUrl.publicUrl;
+            } else {
+                console.warn("Aviso: No se pudo subir la foto, pero se guardará el texto.");
+            }
         }
 
         let idVinculado = null;
 
         // --- MAPEO PARA LA TABLA: ESTUDIO_DATA ---
         if (tipoGeneral === "Material") {
-            const { data: existente, error: errorBusqueda } = await _supabase.from('estudio_data')
+            const { data: existente } = await _supabase.from('estudio_data')
                 .select('*')
                 .ilike('tipo_material', nombreForm) 
                 .maybeSingle();
@@ -1378,13 +1380,12 @@ async function procesarGuardadoCapricho() {
                     composicion: composicion,
                     notas: notas
                 };
-                const { data: nuevo, error: errorInsert } = await _supabase.from('estudio_data').insert([datosNuevoStock]).select();
+                const { data: nuevo } = await _supabase.from('estudio_data').insert([datosNuevoStock]).select();
                 if (nuevo && nuevo.length > 0) idVinculado = nuevo[0].id;
             }
         }
 
         // --- MAPEO PARA LA TABLA: FINANZAS ---
-        console.log("Insertando en finanzas...");
         const { data: dataFinanza, error: errorFinanzas } = await _supabase.from('finanzas').insert([{
             tipo: tipoGeneral,
             concepto: nombreForm, 
@@ -1419,15 +1420,17 @@ async function procesarGuardadoCapricho() {
 
         alert("💖 ¡Procesado perfectamente!");
         
-        // --- LIMPIEZA Y ACTUALIZACIÓN VISUAL ---
+        // --- LIMPIEZA Y ACTUALIZACIÓN VISUAL CON RETRASO DE SEGURIDAD ---
         if (typeof limpiarFormularioCapricho === 'function') limpiarFormularioCapricho();
         if (typeof cerrarHistorial === 'function') cerrarHistorial();
         
-        if (typeof filtrar === 'function') {
-            filtrar('Todo');
-        } else if (typeof cargarStock === 'function') {
-            cargarStock();
-        }
+        setTimeout(() => {
+            if (typeof filtrar === 'function') {
+                filtrar('Todo');
+            } else if (typeof cargarStock === 'function') {
+                cargarStock();
+            }
+        }, 500);
         
     } catch (err) {
         console.error("Error detallado:", err);
