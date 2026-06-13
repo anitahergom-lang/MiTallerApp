@@ -564,7 +564,7 @@ function resetearVistas() {
     // 2. Limpiar botones activos
     document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
 }
-    function cambiarVista(v) {
+function cambiarVista(v) {
     resetearVistas();
     // 1. Gestionar botones activos
     document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
@@ -586,19 +586,27 @@ function resetearVistas() {
     if(vistaActiva) vistaActiva.style.display = 'block';
 
     // 5. Cargas específicas de cada sección
-    if(v === 'STOCK') filtrar('Todo');
+    if(v === 'STOCK') {
+        // FORZAMOS LA RECARGA:
+        // Primero intentamos refrescar desde Supabase y luego filtramos
+        console.log("Cargando stock actualizado...");
+        if (typeof cargarStock === 'function') {
+            cargarStock().then(() => filtrar('Todo'));
+        } else {
+            filtrar('Todo');
+        }
+    }
+    
     if(v === 'COMPRAS') cargarCompras();
     if(v === 'PROYECTOS') setTimeout(() => { iniciarCanvas('canvas-punto'); iniciarCanvas('canvas-cuerpos'); }, 100);
     if(v === 'REGALOS') cargarRegalos();
     if(v === 'PDFS') { cargarPDFs(); cargarBorradorLocal(); }
     if(v === 'NOTAS') cargarNotas();
     
-    // CORRECCIÓN 1: Cambiado 'id' por 'v' para que no falle al verificar las Llaves
     if(v === 'LLAVES') { 
         cargarLlaves();
     }
 
-    // CORRECCIÓN 2: Asegurar que al pulsar en "Mis Caprichos" desde fuera, aparezca su menú
     if(v === 'CAPRICHOS') {
         const menuCaprichos = document.getElementById('menu-caprichos');
         if(menuCaprichos) menuCaprichos.style.display = 'block';
