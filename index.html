@@ -1402,27 +1402,30 @@ async function procesarGuardadoCapricho() {
 
         alert("💖 ¡Procesado perfectamente!");
         
+        // --- LIMPIEZA ---
         if (typeof limpiarFormularioCapricho === 'function') limpiarFormularioCapricho();
         if (typeof cerrarHistorial === 'function') cerrarHistorial();
         
-        // --- RECARGA DE SEGURIDAD ---
-        console.log("Recargando stock...");
-        const { data: datosFinales } = await _supabase.from('estudio_data').select('*');
+        // --- AUTOMATIZACIÓN DE ACTUALIZACIÓN ---
+        console.log("Refrescando datos desde Supabase...");
         
-        if (datosFinales) {
-            // Buscamos el contenedor manualmente para asegurar que existe
-            const cont = document.getElementById('lista-stock');
-            if (cont) {
-                renderizarStock(datosFinales);
-                console.log("Stock repintado con éxito.");
-            } else {
-                // Si falla, recargamos la página como último recurso
-                window.location.reload();
-            }
+        const { data: datosNuevos, error: errorCarga } = await _supabase
+            .from('estudio_data')
+            .select('*')
+            .order('id', { ascending: false });
+
+        if (!errorCarga && datosNuevos) {
+            // 1. Forzamos renderizado directo
+            if (typeof renderizarStock === 'function') renderizarStock(datosNuevos);
+            
+            // 2. Si tu app usa un motor de filtrado, lo refrescamos también
+            if (typeof filtrar === 'function') await filtrar('Todo');
+            
+            console.log("Interfaz actualizada automáticamente.");
         }
         
     } catch (err) {
-        console.error("Error:", err);
+        console.error("Error al guardar:", err);
         alert("Error al guardar: " + err.message);
     }
 }
