@@ -1324,7 +1324,6 @@ async function procesarGuardadoCapricho() {
         return;
     }
 
-    // 2. Extraemos los valores introducidos
     const nombreForm = elNombre.value.trim();
     const tipoGeneral = elTipo ? elTipo.value : 'Material';
     const subtipo = elSubtipo ? elSubtipo.value : '';
@@ -1337,13 +1336,9 @@ async function procesarGuardadoCapricho() {
     const notas = elNotas ? elNotas.value : '';
     const fotoFile = elFoto && elFoto.files ? elFoto.files[0] : null;
 
-    if (!nombreForm) { 
-        alert("El nombre es obligatorio."); 
-        return; 
-    }
+    if (!nombreForm) { alert("El nombre es obligatorio."); return; }
 
     try {
-        // Manejo de la foto en Storage
         let urlFoto = null;
         if (fotoFile) {
             const fileName = `${Date.now()}-${fotoFile.name}`;
@@ -1351,14 +1346,11 @@ async function procesarGuardadoCapricho() {
             if (!errorImg) {
                 const { data: dataUrl } = _supabase.storage.from('materiales').getPublicUrl(fileName);
                 urlFoto = dataUrl.publicUrl;
-            } else {
-                console.warn("Aviso: No se pudo subir la foto, pero se guardará el texto.");
             }
         }
 
         let idVinculado = null;
 
-        // --- MAPEO PARA LA TABLA: ESTUDIO_DATA ---
         if (tipoGeneral === "Material") {
             const { data: existente } = await _supabase.from('estudio_data')
                 .select('*')
@@ -1370,7 +1362,7 @@ async function procesarGuardadoCapricho() {
                 await _supabase.from('estudio_data').update({ cantidad: nuevaCantidad }).eq('id', existente.id);
                 idVinculado = existente.id;
             } else {
-                const datosNuevoStock = {
+                const { data: nuevo } = await _supabase.from('estudio_data').insert([{
                     tipo_material: nombreForm, 
                     categoria: subtipo || 'Lana',
                     cantidad: cantidadCompra,
@@ -1379,14 +1371,12 @@ async function procesarGuardadoCapricho() {
                     tienda: tienda,
                     composicion: composicion,
                     notas: notas
-                };
-                const { data: nuevo } = await _supabase.from('estudio_data').insert([datosNuevoStock]).select();
+                }]).select();
                 if (nuevo && nuevo.length > 0) idVinculado = nuevo[0].id;
             }
         }
 
-        // --- MAPEO PARA LA TABLA: FINANZAS ---
-        const { data: dataFinanza, error: errorFinanzas } = await _supabase.from('finanzas').insert([{
+        await _supabase.from('finanzas').insert([{
             tipo: tipoGeneral,
             concepto: nombreForm, 
             monto_total: precioUnit * cantidadCompra,
@@ -1400,55 +1390,31 @@ async function procesarGuardadoCapricho() {
             notas: notas,
             foto: urlFoto,
             id_stock_vinculado: idVinculado
-        }]).select();
-
-        if (errorFinanzas) throw errorFinanzas;
-
-        // --- AUTOMATIZACIÓN: GUARDADO EN MI_HISTORIAL ---
-        if (dataFinanza && dataFinanza.length > 0) {
-            await _supabase.from('mi_historial').insert([{
-                id_finanza_original: dataFinanza[0].id,
-                categoria_padre: tipoGeneral,
-                subcategoria: subtipo,
-                nombre_producto: nombreForm,
-                fecha_compra: new Date().toISOString(),
-                tienda: tienda,
-                precio_total: precioUnit * cantidadCompra,
-                notas: notas
-            }]);
-        }
+        }]);
 
         alert("💖 ¡Procesado perfectamente!");
         
-// --- LIMPIEZA Y ACTUALIZACIÓN VISUAL ---
         if (typeof limpiarFormularioCapricho === 'function') limpiarFormularioCapricho();
         if (typeof cerrarHistorial === 'function') cerrarHistorial();
         
-        // Refresco de alta precisión para el Stock
-        setTimeout(async () => {
-            console.log("Forzando actualización de Stock desde Supabase...");
-
-            // 1. Descargamos los datos más recientes de la base de datos
-            const { data: stockActualizado, error } = await _supabase
-                .from('estudio_data')
-                .select('*');
-
-            // 2. Si la descarga fue exitosa, forzamos el repintado
-            if (!error && stockActualizado) {
-                // Si existe la función renderizarStock, la llamamos directamente con los nuevos datos
-                if (typeof renderizarStock === 'function') {
-                    renderizarStock(stockActualizado);
-                }
-                
-                // Mantenemos también tus funciones originales por si acaso
-                if (typeof filtrar === 'function') await filtrar('Todo');
+        // --- RECARGA DE SEGURIDAD ---
+        console.log("Recargando stock...");
+        const { data: datosFinales } = await _supabase.from('estudio_data').select('*');
+        
+        if (datosFinales) {
+            // Buscamos el contenedor manualmente para asegurar que existe
+            const cont = document.getElementById('lista-stock');
+            if (cont) {
+                renderizarStock(datosFinales);
+                console.log("Stock repintado con éxito.");
+            } else {
+                // Si falla, recargamos la página como último recurso
+                window.location.reload();
             }
-            
-            window.dispatchEvent(new Event('resize')); 
-        }, 500); // 500ms es suficiente si forzamos la descarga de datos
+        }
         
     } catch (err) {
-        console.error("Error detallado:", err);
+        console.error("Error:", err);
         alert("Error al guardar: " + err.message);
     }
 }
