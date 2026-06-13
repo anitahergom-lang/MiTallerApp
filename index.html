@@ -1420,19 +1420,32 @@ async function procesarGuardadoCapricho() {
 
         alert("💖 ¡Procesado perfectamente!");
         
-        // --- LIMPIEZA Y ACTUALIZACIÓN VISUAL CON RETRASO DE SEGURIDAD ---
+// --- LIMPIEZA Y ACTUALIZACIÓN VISUAL ---
         if (typeof limpiarFormularioCapricho === 'function') limpiarFormularioCapricho();
         if (typeof cerrarHistorial === 'function') cerrarHistorial();
         
-        // Refresco mejorado para asegurar que la UI se entere del cambio
+        // Refresco de alta precisión para el Stock
         setTimeout(async () => {
-            if (typeof filtrar === 'function') {
-                await filtrar('Todo');
-            } else if (typeof cargarStock === 'function') {
-                await cargarStock();
+            console.log("Forzando actualización de Stock desde Supabase...");
+
+            // 1. Descargamos los datos más recientes de la base de datos
+            const { data: stockActualizado, error } = await _supabase
+                .from('estudio_data')
+                .select('*');
+
+            // 2. Si la descarga fue exitosa, forzamos el repintado
+            if (!error && stockActualizado) {
+                // Si existe la función renderizarStock, la llamamos directamente con los nuevos datos
+                if (typeof renderizarStock === 'function') {
+                    renderizarStock(stockActualizado);
+                }
+                
+                // Mantenemos también tus funciones originales por si acaso
+                if (typeof filtrar === 'function') await filtrar('Todo');
             }
+            
             window.dispatchEvent(new Event('resize')); 
-        }, 800);
+        }, 500); // 500ms es suficiente si forzamos la descarga de datos
         
     } catch (err) {
         console.error("Error detallado:", err);
